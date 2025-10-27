@@ -34,6 +34,283 @@ export type Database = {
   }
   public: {
     Tables: {
+      event_edit_history: {
+        Row: {
+          action: string
+          changes: Json
+          edited_at: string | null
+          edited_by: string | null
+          event_id: string | null
+          id: string
+          previous_data: Json
+        }
+        Insert: {
+          action: string
+          changes: Json
+          edited_at?: string | null
+          edited_by?: string | null
+          event_id?: string | null
+          id?: string
+          previous_data: Json
+        }
+        Update: {
+          action?: string
+          changes?: Json
+          edited_at?: string | null
+          edited_by?: string | null
+          event_id?: string | null
+          id?: string
+          previous_data?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_edit_history_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "game_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_analytics: {
+        Row: {
+          breakout_success_rate: number | null
+          computed_at: string | null
+          faceoff_win_percentage: number | null
+          faceoffs_taken: number | null
+          faceoffs_won: number | null
+          game_id: string
+          goals: number | null
+          id: string
+          insights: string[] | null
+          power_play_goals: number | null
+          power_plays: number | null
+          recommended_drill_categories: string[] | null
+          shooting_percentage: number | null
+          shot_locations: Json | null
+          shot_quality_high: number | null
+          shot_quality_low: number | null
+          shot_quality_medium: number | null
+          shots_on_goal: number | null
+          successful_breakouts: number | null
+          total_breakouts: number | null
+          total_shots: number | null
+          turnover_locations: Json | null
+          turnovers: number | null
+          turnovers_defensive: number | null
+          turnovers_neutral: number | null
+          turnovers_offensive: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          breakout_success_rate?: number | null
+          computed_at?: string | null
+          faceoff_win_percentage?: number | null
+          faceoffs_taken?: number | null
+          faceoffs_won?: number | null
+          game_id: string
+          goals?: number | null
+          id?: string
+          insights?: string[] | null
+          power_play_goals?: number | null
+          power_plays?: number | null
+          recommended_drill_categories?: string[] | null
+          shooting_percentage?: number | null
+          shot_locations?: Json | null
+          shot_quality_high?: number | null
+          shot_quality_low?: number | null
+          shot_quality_medium?: number | null
+          shots_on_goal?: number | null
+          successful_breakouts?: number | null
+          total_breakouts?: number | null
+          total_shots?: number | null
+          turnover_locations?: Json | null
+          turnovers?: number | null
+          turnovers_defensive?: number | null
+          turnovers_neutral?: number | null
+          turnovers_offensive?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          breakout_success_rate?: number | null
+          computed_at?: string | null
+          faceoff_win_percentage?: number | null
+          faceoffs_taken?: number | null
+          faceoffs_won?: number | null
+          game_id?: string
+          goals?: number | null
+          id?: string
+          insights?: string[] | null
+          power_play_goals?: number | null
+          power_plays?: number | null
+          recommended_drill_categories?: string[] | null
+          shooting_percentage?: number | null
+          shot_locations?: Json | null
+          shot_quality_high?: number | null
+          shot_quality_low?: number | null
+          shot_quality_medium?: number | null
+          shots_on_goal?: number | null
+          successful_breakouts?: number | null
+          total_breakouts?: number | null
+          total_shots?: number | null
+          turnover_locations?: Json | null
+          turnovers?: number | null
+          turnovers_defensive?: number | null
+          turnovers_neutral?: number | null
+          turnovers_offensive?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_analytics_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: true
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_events: {
+        Row: {
+          created_at: string | null
+          details: Json
+          event_timestamp: string | null
+          event_type: Database["public"]["Enums"]["event_type"]
+          game_id: string
+          game_time_seconds: number | null
+          id: string
+          notes: string | null
+          period: number
+          player_id: string | null
+          situation: Database["public"]["Enums"]["game_situation"] | null
+          tracked_by: string | null
+          updated_at: string | null
+          x_coord: number | null
+          y_coord: number | null
+          zone: Database["public"]["Enums"]["ice_zone"] | null
+        }
+        Insert: {
+          created_at?: string | null
+          details?: Json
+          event_timestamp?: string | null
+          event_type: Database["public"]["Enums"]["event_type"]
+          game_id: string
+          game_time_seconds?: number | null
+          id?: string
+          notes?: string | null
+          period: number
+          player_id?: string | null
+          situation?: Database["public"]["Enums"]["game_situation"] | null
+          tracked_by?: string | null
+          updated_at?: string | null
+          x_coord?: number | null
+          y_coord?: number | null
+          zone?: Database["public"]["Enums"]["ice_zone"] | null
+        }
+        Update: {
+          created_at?: string | null
+          details?: Json
+          event_timestamp?: string | null
+          event_type?: Database["public"]["Enums"]["event_type"]
+          game_id?: string
+          game_time_seconds?: number | null
+          id?: string
+          notes?: string | null
+          period?: number
+          player_id?: string | null
+          situation?: Database["public"]["Enums"]["game_situation"] | null
+          tracked_by?: string | null
+          updated_at?: string | null
+          x_coord?: number | null
+          y_coord?: number | null
+          zone?: Database["public"]["Enums"]["ice_zone"] | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_events_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_events_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      games: {
+        Row: {
+          created_at: string | null
+          final_score_them: number | null
+          final_score_us: number | null
+          game_date: string
+          id: string
+          is_home: boolean | null
+          location: string | null
+          locked: boolean | null
+          locked_at: string | null
+          locked_by: string | null
+          notes: string | null
+          opponent_name: string
+          status: Database["public"]["Enums"]["game_status"] | null
+          team_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          final_score_them?: number | null
+          final_score_us?: number | null
+          game_date: string
+          id?: string
+          is_home?: boolean | null
+          location?: string | null
+          locked?: boolean | null
+          locked_at?: string | null
+          locked_by?: string | null
+          notes?: string | null
+          opponent_name: string
+          status?: Database["public"]["Enums"]["game_status"] | null
+          team_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          final_score_them?: number | null
+          final_score_us?: number | null
+          game_date?: string
+          id?: string
+          is_home?: boolean | null
+          location?: string | null
+          locked?: boolean | null
+          locked_at?: string | null
+          locked_by?: string | null
+          notes?: string | null
+          opponent_name?: string
+          status?: Database["public"]["Enums"]["game_status"] | null
+          team_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "games_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "games_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams_with_age_display"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_members: {
         Row: {
           created_at: string | null
@@ -320,8 +597,39 @@ export type Database = {
       }
     }
     Enums: {
+      event_type:
+        | "shot"
+        | "goal"
+        | "breakout"
+        | "turnover"
+        | "zone_entry"
+        | "faceoff"
+        | "penalty"
+        | "defensive_breakdown"
+        | "special_teams"
+      game_situation:
+        | "even_strength"
+        | "power_play"
+        | "penalty_kill"
+        | "empty_net"
+      game_status: "scheduled" | "in_progress" | "completed" | "cancelled"
+      ice_zone: "defensive" | "neutral" | "offensive"
       org_role: "owner" | "admin" | "coach" | "manager" | "stat_tracker"
       player_position: "forward" | "defense" | "goalie"
+      shot_result:
+        | "goal"
+        | "save"
+        | "miss_high"
+        | "miss_wide"
+        | "blocked"
+        | "post"
+      shot_type:
+        | "wrist"
+        | "slap"
+        | "snap"
+        | "backhand"
+        | "deflection"
+        | "one_timer"
       team_level: "house" | "travel" | "aaa" | "aa" | "a"
       team_role: "head_coach" | "assistant_coach" | "manager" | "stat_tracker"
     }
@@ -454,8 +762,43 @@ export const Constants = {
   },
   public: {
     Enums: {
+      event_type: [
+        "shot",
+        "goal",
+        "breakout",
+        "turnover",
+        "zone_entry",
+        "faceoff",
+        "penalty",
+        "defensive_breakdown",
+        "special_teams",
+      ],
+      game_situation: [
+        "even_strength",
+        "power_play",
+        "penalty_kill",
+        "empty_net",
+      ],
+      game_status: ["scheduled", "in_progress", "completed", "cancelled"],
+      ice_zone: ["defensive", "neutral", "offensive"],
       org_role: ["owner", "admin", "coach", "manager", "stat_tracker"],
       player_position: ["forward", "defense", "goalie"],
+      shot_result: [
+        "goal",
+        "save",
+        "miss_high",
+        "miss_wide",
+        "blocked",
+        "post",
+      ],
+      shot_type: [
+        "wrist",
+        "slap",
+        "snap",
+        "backhand",
+        "deflection",
+        "one_timer",
+      ],
       team_level: ["house", "travel", "aaa", "aa", "a"],
       team_role: ["head_coach", "assistant_coach", "manager", "stat_tracker"],
     },
