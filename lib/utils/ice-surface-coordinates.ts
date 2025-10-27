@@ -27,6 +27,11 @@ export interface Coordinates {
   y: number
 }
 
+export interface ScreenCoordinates {
+  x: number
+  y: number
+}
+
 export type Zone = 'defensive' | 'neutral' | 'offensive'
 export type Quadrant = 'defensive_left' | 'defensive_right' | 'neutral_left' | 'neutral_right' | 'offensive_left' | 'offensive_right'
 
@@ -141,6 +146,46 @@ export function getDistance(from: Coordinates, to: Coordinates): number {
   const dx = to.x - from.x
   const dy = to.y - from.y
   return Math.sqrt(dx * dx + dy * dy)
+}
+
+// ===========================================
+// SCREEN COORDINATE CONVERSION
+// ===========================================
+
+/**
+ * Convert screen coordinates (from click/tap) to ice surface coordinates
+ * @param screenCoords - Screen pixel coordinates (relative to SVG container)
+ * @param screenWidth - Width of the screen container in pixels
+ * @param screenHeight - Height of the screen container in pixels
+ * @returns Ice surface coordinates (x: 0-200, y: 0-100)
+ */
+export function screenToIce(
+  screenCoords: ScreenCoordinates,
+  screenWidth: number,
+  screenHeight: number
+): Coordinates {
+  const x = Math.round((screenCoords.x / screenWidth) * ICE_SURFACE.WIDTH)
+  const y = Math.round((screenCoords.y / screenHeight) * ICE_SURFACE.HEIGHT)
+
+  return normalizeCoordinates({ x, y })
+}
+
+/**
+ * Convert ice surface coordinates to screen coordinates (for rendering)
+ * @param iceCoords - Ice surface coordinates (x: 0-200, y: 0-100)
+ * @param screenWidth - Width of the screen container in pixels
+ * @param screenHeight - Height of the screen container in pixels
+ * @returns Screen pixel coordinates
+ */
+export function iceToScreen(
+  iceCoords: Coordinates,
+  screenWidth: number,
+  screenHeight: number
+): ScreenCoordinates {
+  const x = (iceCoords.x / ICE_SURFACE.WIDTH) * screenWidth
+  const y = (iceCoords.y / ICE_SURFACE.HEIGHT) * screenHeight
+
+  return { x, y }
 }
 
 // ===========================================

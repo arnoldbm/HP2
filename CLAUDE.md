@@ -28,17 +28,27 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 ### Database & Architecture
 | File | Purpose | Status |
 |------|---------|--------|
-| `supabase/migrations/001_initial_schema.sql` | Core database schema | TODO |
-| `lib/types/database.ts` | Auto-generated TypeScript types from Supabase | TODO |
+| `supabase/migrations/20251024144107_initial_schema.sql` | Organizations, teams, players, age groups | ✅ DONE |
+| `supabase/migrations/20251027165031_game_tracking_tables.sql` | Games, events, analytics, audit logging | ✅ DONE |
+| `supabase/migrations/20251027172535_fix_audit_logging_trigger.sql` | Nullable edited_by for service role | ✅ DONE |
+| `supabase/migrations/20251027175443_fix_event_edit_history_fk.sql` | FK SET NULL for deleted events | ✅ DONE |
+| `supabase/migrations/20251027180845_add_service_role_bypass_policies.sql` | Service role RLS bypass | ✅ DONE |
+| `supabase/migrations/20251027181536_fix_audit_trigger_delete.sql` | Audit log for deletes | ✅ DONE |
+| `lib/types/database.ts` | Auto-generated TypeScript types from Supabase | ✅ DONE |
 | Architecture diagram | System architecture overview | TODO |
 
 ### Testing
 | File | Purpose | Status |
 |------|---------|--------|
-| `vitest.config.ts` | Vitest test configuration | TODO |
-| `playwright.config.ts` | E2E test configuration | TODO |
-| `tests/unit/age-groups.test.ts` | Age group utilities tests | TODO |
-| `tests/integration/game-events.test.ts` | Game event CRUD tests | TODO |
+| `vitest.config.ts` | Vitest test configuration | ✅ DONE |
+| `playwright.config.ts` | E2E test configuration | ✅ DONE |
+| `tests/unit/setup.test.ts` | Smoke test for Vitest | ✅ DONE (2 tests) |
+| `tests/unit/age-groups.test.ts` | Age group utilities tests | ✅ DONE (9 tests) |
+| `tests/unit/shot-quality.test.ts` | Shot quality calculator | ✅ DONE (16 tests) |
+| `tests/unit/ice-surface-coordinates.test.ts` | Ice coordinate utilities | ✅ DONE (37 tests) |
+| `tests/unit/event-validation.test.ts` | Zod event schemas | ✅ DONE (33 tests) |
+| `tests/unit/breakout-analytics.test.ts` | Breakout statistics | ✅ DONE (17 tests) |
+| `tests/integration/game-events.test.ts` | Game event CRUD with RLS | ✅ DONE (23 tests, 2 skipped) |
 | `tests/e2e/game-tracking.spec.ts` | Live tracking E2E tests | TODO |
 
 ---
@@ -221,24 +231,33 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 501-528)
 
 ## 🚀 IMPLEMENTATION PHASES
 
-### Current Phase: **Phase 0 - Planning** ✅
+### Phase 0: Planning ✅ **COMPLETE**
 - [x] Product planning document
 - [x] Data model design
 - [x] TDD approach defined
 - [x] Tech stack decisions
-- [ ] Project initialization
+- [x] Project initialization
 
-### Phase 1: Foundation (Weeks 1-2)
-- [ ] Initialize Next.js project
-- [ ] Setup Supabase local dev
-- [ ] Configure Vitest + Playwright
-- [ ] First migration: organizations, teams, players
-- [ ] Setup RLS policies
-- [ ] Auth setup
+### Phase 1: Foundation ✅ **COMPLETE**
+- [x] Initialize Next.js project
+- [x] Setup Supabase local dev
+- [x] Configure Vitest + Playwright
+- [x] First migration: organizations, teams, players
+- [x] Setup RLS policies
+- [x] Built core utilities (age groups, shot quality, coordinates, breakout analytics)
+- [x] 114 unit tests passing (100% coverage on utilities)
+- [ ] Auth UI setup (deferred to when needed)
 
-### Phase 2: Ice Surface & Game Tracking (Weeks 3-4)
+### Current Phase: **Phase 2: Game Tracking Database** 90% COMPLETE
 **THE DIFFERENTIATOR FEATURE**
-- [ ] Interactive SVG ice surface component
+- [x] Game tracking migration (games, events, analytics, audit log)
+- [x] Polymorphic events table with JSONB details
+- [x] Shot quality auto-calculation trigger
+- [x] Audit logging trigger
+- [x] RLS policies with service role bypass
+- [x] Event validation schemas (Zod)
+- [x] Integration tests (23/25 passing)
+- [ ] Interactive SVG ice surface component **← NEXT**
 - [ ] Shot tracking interface (tap-to-log flow)
 - [ ] Defensive event tracking UI
 - [ ] Live stats display (running totals)

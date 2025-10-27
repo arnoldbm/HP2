@@ -7,6 +7,8 @@ import {
   getDistance,
   normalizeCoordinates,
   getQuadrant,
+  screenToIce,
+  iceToScreen,
 } from '@/lib/utils/ice-surface-coordinates'
 
 describe('Ice Surface Coordinate Helpers', () => {
@@ -198,6 +200,82 @@ describe('Ice Surface Coordinate Helpers', () => {
 
     it('should handle center ice correctly', () => {
       expect(getQuadrant({ x: 100, y: 50 })).toBe('neutral_left')
+    })
+  })
+
+  describe('screenToIce', () => {
+    it('should convert top-left corner (0, 0) to ice coordinate (0, 0)', () => {
+      const result = screenToIce({ x: 0, y: 0 }, 400, 200)
+      expect(result).toEqual({ x: 0, y: 0 })
+    })
+
+    it('should convert bottom-right corner to ice coordinate (200, 100)', () => {
+      const result = screenToIce({ x: 400, y: 200 }, 400, 200)
+      expect(result).toEqual({ x: 200, y: 100 })
+    })
+
+    it('should convert center of screen to center of ice (100, 50)', () => {
+      const result = screenToIce({ x: 200, y: 100 }, 400, 200)
+      expect(result).toEqual({ x: 100, y: 50 })
+    })
+
+    it('should handle different screen dimensions (800x400)', () => {
+      const result = screenToIce({ x: 400, y: 200 }, 800, 400)
+      expect(result).toEqual({ x: 100, y: 50 })
+    })
+
+    it('should round coordinates to nearest integer', () => {
+      // Screen coordinate that would produce decimal ice coordinates
+      const result = screenToIce({ x: 201, y: 101 }, 400, 200)
+      expect(Number.isInteger(result.x)).toBe(true)
+      expect(Number.isInteger(result.y)).toBe(true)
+    })
+
+    it('should handle edge cases near boundaries', () => {
+      const result = screenToIce({ x: 1, y: 1 }, 400, 200)
+      expect(result.x).toBeGreaterThanOrEqual(0)
+      expect(result.x).toBeLessThanOrEqual(200)
+      expect(result.y).toBeGreaterThanOrEqual(0)
+      expect(result.y).toBeLessThanOrEqual(100)
+    })
+  })
+
+  describe('iceToScreen', () => {
+    it('should convert ice coordinate (0, 0) to screen (0, 0)', () => {
+      const result = iceToScreen({ x: 0, y: 0 }, 400, 200)
+      expect(result).toEqual({ x: 0, y: 0 })
+    })
+
+    it('should convert ice coordinate (200, 100) to screen bottom-right', () => {
+      const result = iceToScreen({ x: 200, y: 100 }, 400, 200)
+      expect(result).toEqual({ x: 400, y: 200 })
+    })
+
+    it('should convert ice center (100, 50) to screen center', () => {
+      const result = iceToScreen({ x: 100, y: 50 }, 400, 200)
+      expect(result).toEqual({ x: 200, y: 100 })
+    })
+
+    it('should handle different screen dimensions (800x400)', () => {
+      const result = iceToScreen({ x: 100, y: 50 }, 800, 400)
+      expect(result).toEqual({ x: 400, y: 200 })
+    })
+
+    it('should be inverse of screenToIce', () => {
+      const screenCoord = { x: 123, y: 67 }
+      const iceCoord = screenToIce(screenCoord, 400, 200)
+      const backToScreen = iceToScreen(iceCoord, 400, 200)
+
+      // Allow for small rounding errors
+      expect(Math.abs(backToScreen.x - screenCoord.x)).toBeLessThanOrEqual(2)
+      expect(Math.abs(backToScreen.y - screenCoord.y)).toBeLessThanOrEqual(2)
+    })
+
+    it('should handle slot coordinates correctly', () => {
+      // Center of slot at ice (95, 50)
+      const result = iceToScreen({ x: 95, y: 50 }, 400, 200)
+      expect(result.x).toBe(190)
+      expect(result.y).toBe(100)
     })
   })
 })
