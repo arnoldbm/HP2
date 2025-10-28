@@ -41,11 +41,11 @@ describe('QuickEventButtons', () => {
 
       await user.click(screen.getByText('Shot'))
 
-      expect(handleSelect).toHaveBeenCalledWith('shot')
+      expect(handleSelect).toHaveBeenCalledWith('shot', undefined)
       expect(handleSelect).toHaveBeenCalledTimes(1)
     })
 
-    it('should call onEventSelect with goal when Goal button clicked', async () => {
+    it('should call onEventSelect with shot and pre-filled result when Goal button clicked', async () => {
       const user = userEvent.setup()
       const handleSelect = vi.fn()
 
@@ -53,7 +53,7 @@ describe('QuickEventButtons', () => {
 
       await user.click(screen.getByText('Goal'))
 
-      expect(handleSelect).toHaveBeenCalledWith('goal')
+      expect(handleSelect).toHaveBeenCalledWith('shot', { result: 'goal' })
     })
 
     it('should call onEventSelect with turnover when Turnover button clicked', async () => {
@@ -64,7 +64,7 @@ describe('QuickEventButtons', () => {
 
       await user.click(screen.getByText('Turnover'))
 
-      expect(handleSelect).toHaveBeenCalledWith('turnover')
+      expect(handleSelect).toHaveBeenCalledWith('turnover', undefined)
     })
 
     it('should call onEventSelect with breakout when Breakout button clicked', async () => {
@@ -75,7 +75,7 @@ describe('QuickEventButtons', () => {
 
       await user.click(screen.getByText('Breakout'))
 
-      expect(handleSelect).toHaveBeenCalledWith('breakout')
+      expect(handleSelect).toHaveBeenCalledWith('breakout', undefined)
     })
 
     it('should call onEventSelect with zone_entry when Zone Entry button clicked', async () => {
@@ -86,7 +86,7 @@ describe('QuickEventButtons', () => {
 
       await user.click(screen.getByText('Zone Entry'))
 
-      expect(handleSelect).toHaveBeenCalledWith('zone_entry')
+      expect(handleSelect).toHaveBeenCalledWith('zone_entry', undefined)
     })
 
     it('should call onEventSelect with faceoff when Faceoff button clicked', async () => {
@@ -97,7 +97,7 @@ describe('QuickEventButtons', () => {
 
       await user.click(screen.getByText('Faceoff'))
 
-      expect(handleSelect).toHaveBeenCalledWith('faceoff')
+      expect(handleSelect).toHaveBeenCalledWith('faceoff', undefined)
     })
   })
 
@@ -140,11 +140,12 @@ describe('QuickEventButtons', () => {
   })
 
   describe('Custom Event Types', () => {
-    it('should only show specified event types when provided', () => {
-      const eventTypes: EventType[] = ['shot', 'goal']
+    it('should show both Shot and Goal buttons when shot type is specified', () => {
+      const eventTypes: EventType[] = ['shot']
 
       render(<QuickEventButtons onEventSelect={() => {}} eventTypes={eventTypes} />)
 
+      // Both Shot and Goal buttons should appear since Goal is a shot with pre-filled result
       expect(screen.getByText('Shot')).toBeTruthy()
       expect(screen.getByText('Goal')).toBeTruthy()
       expect(screen.queryByText('Turnover')).toBeFalsy()

@@ -4,7 +4,7 @@ import React from 'react'
 import type { EventType } from '@/lib/stores/game-tracking-store'
 
 export interface QuickEventButtonsProps {
-  onEventSelect: (eventType: EventType) => void
+  onEventSelect: (eventType: EventType, prefilledDetails?: Record<string, unknown>) => void
   disabled?: boolean
   compact?: boolean
   eventTypes?: EventType[]
@@ -17,6 +17,7 @@ interface EventButton {
   color: string
   bgHover: string
   icon?: string
+  prefilledDetails?: Record<string, unknown>
 }
 
 const defaultEventButtons: EventButton[] = [
@@ -28,11 +29,12 @@ const defaultEventButtons: EventButton[] = [
     icon: '🏒',
   },
   {
-    type: 'goal',
+    type: 'shot',
     label: 'Goal',
     color: 'bg-green-500 hover:bg-green-600 text-white',
     bgHover: 'hover:bg-green-50',
     icon: '🎯',
+    prefilledDetails: { result: 'goal' },
   },
   {
     type: 'turnover',
@@ -82,10 +84,10 @@ export function QuickEventButtons({
         compact ? 'grid-cols-2 gap-2' : 'grid-cols-2 sm:grid-cols-3 gap-3'
       } w-full`}
     >
-      {buttons.map((button) => (
+      {buttons.map((button, index) => (
         <button
-          key={button.type}
-          onClick={() => onEventSelect(button.type)}
+          key={`${button.type}-${index}`}
+          onClick={() => onEventSelect(button.type, button.prefilledDetails)}
           disabled={disabled}
           className={`
             ${button.color}

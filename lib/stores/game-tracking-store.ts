@@ -1,10 +1,16 @@
 import { create } from 'zustand'
 import type { Coordinates } from '@/lib/utils/ice-surface-coordinates'
+import {
+  saveGameEvent,
+  updateGameEvent,
+  deleteGameEvent as deleteGameEventFromDb,
+  getGameEvents,
+  mapRowToGameEvent,
+} from '@/lib/db/game-events'
 
 // Event types matching database schema
 export type EventType =
   | 'shot'
-  | 'goal'
   | 'breakout'
   | 'turnover'
   | 'zone_entry'
@@ -67,18 +73,19 @@ interface GameTrackingStore {
   setPlayers: (players: Player[]) => void
 
   // Event logging flow
-  startEventLogging: (eventType: EventType, coordinates?: Coordinates) => void
+  startEventLogging: (eventType: EventType, coordinates?: Coordinates, prefilledDetails?: Record<string, unknown>) => void
   setCoordinates: (coordinates: Coordinates) => void
   setPlayer: (playerId: string) => void
   setEventDetails: (details: Record<string, unknown>) => void
-  completeEvent: () => void
+  completeEvent: () => Promise<void>
   cancelEventLogging: () => void
 
   // Event management
   addEvent: (event: GameEvent) => void
-  updateEvent: (eventId: string, updates: Partial<GameEvent>) => void
-  deleteEvent: (eventId: string) => void
-  undoLastEvent: () => void
+  updateEvent: (eventId: string, updates: Partial<GameEvent>) => Promise<void>
+  deleteEvent: (eventId: string) => Promise<void>
+  undoLastEvent: () => Promise<void>
+  loadEvents: (gameId: string) => Promise<void>
 
   // Computed stats
   getEventsByType: (type: EventType) => GameEvent[]
@@ -128,14 +135,14 @@ export const useGameTrackingStore = create<GameTrackingStore>((set, get) => ({
   setPlayers: (players) => set({ players }),
 
   // Event logging flow
-  startEventLogging: (eventType, coordinates) =>
+  startEventLogging: (eventType, coordinates, prefilledDetails) =>
     set({
       loggingFlow: {
         step: coordinates ? 'select_player' : 'select_location',
         eventType,
         coordinates: coordinates || null,
         playerId: null,
-        details: {},
+        details: prefilledDetails || {},
       },
     }),
 
@@ -166,14 +173,14 @@ export const useGameTrackingStore = create<GameTrackingStore>((set, get) => ({
       },
     })),
 
-  completeEvent: () => {
+  completeEvent: async () => {
     const { loggingFlow, gameState, events } = get()
 
     if (!loggingFlow.eventType || !gameState.gameId) {
       return
     }
 
-    const newEvent: GameEvent = {
+    const tempEvent: GameEvent = {
       id: `temp_${Date.now()}`, // Temporary ID until synced with DB
       gameId: gameState.gameId,
       eventType: loggingFlow.eventType,
@@ -186,10 +193,26 @@ export const useGameTrackingStore = create<GameTrackingStore>((set, get) => ({
       timestamp: new Date().toISOString(),
     }
 
+    // Optimistic update - add to local state immediately
     set({
-      events: [...events, newEvent],
+      events: [...events, tempEvent],
       loggingFlow: initialLoggingFlow,
     })
+
+    // Save to database in background
+    try {
+      const savedEvent = await saveGameEvent(tempEvent)
+
+      // Update local event with real ID from database
+      set((state) => ({
+        events: state.events.map((e) =>
+          e.id === tempEvent.id ? mapRowToGameEvent(savedEvent) : e
+        ),
+      }))
+    } catch (error) {
+      console.error('Failed to save event to database:', error)
+      // TODO: Add to sync queue for offline support
+    }
   },
 
   cancelEventLogging: () =>
@@ -203,22 +226,72 @@ export const useGameTrackingStore = create<GameTrackingStore>((set, get) => ({
       events: [...prev.events, event],
     })),
 
-  updateEvent: (eventId, updates) =>
+  updateEvent: async (eventId, updates) => {
+    // Optimistic update
     set((prev) => ({
       events: prev.events.map((e) =>
         e.id === eventId ? { ...e, ...updates } : e
       ),
-    })),
+    }))
 
-  deleteEvent: (eventId) =>
+    // Persist to database
+    try {
+      await updateGameEvent(eventId, updates)
+    } catch (error) {
+      console.error('Failed to update event in database:', error)
+      // TODO: Add to sync queue for offline support
+    }
+  },
+
+  deleteEvent: async (eventId) => {
+    // Optimistic update
     set((prev) => ({
       events: prev.events.filter((e) => e.id !== eventId),
-    })),
+    }))
 
-  undoLastEvent: () =>
+    // Persist to database (skip temp events)
+    if (!eventId.startsWith('temp_')) {
+      try {
+        await deleteGameEventFromDb(eventId)
+      } catch (error) {
+        console.error('Failed to delete event from database:', error)
+        // TODO: Add to sync queue for offline support
+      }
+    }
+  },
+
+  undoLastEvent: async () => {
+    const { events } = get()
+    if (events.length === 0) return
+
+    const lastEvent = events[events.length - 1]
+
+    // Optimistic update
     set((prev) => ({
       events: prev.events.slice(0, -1),
-    })),
+    }))
+
+    // Delete from database (skip temp events)
+    if (!lastEvent.id.startsWith('temp_')) {
+      try {
+        await deleteGameEventFromDb(lastEvent.id)
+      } catch (error) {
+        console.error('Failed to undo event in database:', error)
+        // TODO: Add to sync queue for offline support
+      }
+    }
+  },
+
+  loadEvents: async (gameId) => {
+    try {
+      const rows = await getGameEvents(gameId)
+      const events = rows.map(mapRowToGameEvent)
+
+      set({ events })
+    } catch (error) {
+      console.error('Failed to load events from database:', error)
+    }
+  },
 
   // Computed stats
   getEventsByType: (type) => {
@@ -227,9 +300,7 @@ export const useGameTrackingStore = create<GameTrackingStore>((set, get) => ({
 
   getShotStats: () => {
     const { events } = get()
-    const shotEvents = events.filter(
-      (e) => e.eventType === 'shot' || e.eventType === 'goal'
-    )
+    const shotEvents = events.filter((e) => e.eventType === 'shot')
 
     const stats = {
       total: shotEvents.length,
@@ -241,18 +312,18 @@ export const useGameTrackingStore = create<GameTrackingStore>((set, get) => ({
     }
 
     shotEvents.forEach((event) => {
-      if (event.eventType === 'goal') {
+      const result = event.details.result as ShotResult | undefined
+
+      if (result === 'goal') {
         stats.goals++
         stats.onGoal++
-      } else if (event.details.result === 'goal') {
-        stats.goals++
-        stats.onGoal++
-      } else if (event.details.result === 'save') {
+      } else if (result === 'save') {
         stats.saves++
         stats.onGoal++
-      } else if (event.details.result === 'blocked') {
+      } else if (result === 'blocked') {
         stats.blocked++
       } else {
+        // miss_high, miss_wide, post, or undefined
         stats.misses++
       }
     })

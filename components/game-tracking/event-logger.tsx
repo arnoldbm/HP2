@@ -41,8 +41,8 @@ export function EventLogger({
   }
 
   // Handle event type selection
-  const handleEventTypeSelect = (eventType: string) => {
-    startEventLogging(eventType as any)
+  const handleEventTypeSelect = (eventType: string, prefilledDetails?: Record<string, unknown>) => {
+    startEventLogging(eventType as any, undefined, prefilledDetails)
   }
 
   // Handle player selection
@@ -50,8 +50,9 @@ export function EventLogger({
     setPlayer(playerId)
 
     // If this is not a shot, complete immediately
-    if (loggingFlow.eventType !== 'shot' && loggingFlow.eventType !== 'goal') {
-      // Auto-complete for non-shot events
+    // For shots with pre-filled result (like goal), also complete immediately
+    if (loggingFlow.eventType !== 'shot' || loggingFlow.details.result) {
+      // Auto-complete for non-shot events or shots with result already set
       setTimeout(() => {
         completeEvent()
       }, 100)

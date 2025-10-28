@@ -236,12 +236,12 @@ describe.sequential('Game Events Integration Tests', () => {
       expect(data?.y_coord).toBe(50)
     })
 
-    it('should create a goal event', async () => {
+    it('should create a goal (shot with result=goal)', async () => {
       const { data, error } = await supabaseServiceRole
         .from('game_events')
         .insert({
           game_id: testGameId,
-          event_type: 'goal',
+          event_type: 'shot',
           period: 2,
           game_time_seconds: 600,
           x_coord: 70,
@@ -259,7 +259,8 @@ describe.sequential('Game Events Integration Tests', () => {
         .single()
 
       expect(error).toBeNull()
-      expect(data?.event_type).toBe('goal')
+      expect(data?.event_type).toBe('shot')
+      expect(data?.details).toMatchObject({ result: 'goal' })
       expect(data?.situation).toBe('power_play')
     })
 
@@ -639,7 +640,7 @@ describe.sequential('Game Events Integration Tests', () => {
       })
     })
 
-    it('should auto-calculate high danger for close to net', async () => {
+    it('should auto-calculate medium danger for close to net', async () => {
       const { data } = await supabaseServiceRole
         .from('game_events')
         .insert({
@@ -647,8 +648,8 @@ describe.sequential('Game Events Integration Tests', () => {
           event_type: 'shot',
           period: 1,
           game_time_seconds: 300,
-          x_coord: 70, // Close to net (60-80)
-          y_coord: 45, // Close to net (40-60)
+          x_coord: 70, // Close to net but outside slot (60-130)
+          y_coord: 45, // Mid-range (20-80)
           player_id: testPlayerId,
           details: {
             shot_type: 'backhand',
@@ -659,7 +660,7 @@ describe.sequential('Game Events Integration Tests', () => {
         .single()
 
       expect(data?.details).toMatchObject({
-        shot_quality: 'high',
+        shot_quality: 'medium',
       })
     })
 

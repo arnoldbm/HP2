@@ -599,14 +599,11 @@ export type Database = {
     Enums: {
       event_type:
         | "shot"
-        | "goal"
         | "breakout"
         | "turnover"
         | "zone_entry"
         | "faceoff"
         | "penalty"
-        | "defensive_breakdown"
-        | "special_teams"
       game_situation:
         | "even_strength"
         | "power_play"
@@ -764,14 +761,11 @@ export const Constants = {
     Enums: {
       event_type: [
         "shot",
-        "goal",
         "breakout",
         "turnover",
         "zone_entry",
         "faceoff",
         "penalty",
-        "defensive_breakdown",
-        "special_teams",
       ],
       game_situation: [
         "even_strength",
