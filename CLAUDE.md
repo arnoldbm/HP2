@@ -21,7 +21,7 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | File | Purpose | Last Updated |
 |------|---------|--------------|
 | `README.md` | GitHub repository overview, project status, quick start | 2025-10-28 |
-| `CLAUDE.md` | This file - central documentation hub for AI context | 2025-10-28 |
+| `CLAUDE.md` | This file - central documentation hub for AI context | 2025-10-29 |
 | `docs/HOCKEY_PRACTICE_APP_PLAN.md` | Complete product plan, features, user flows, monetization | 2024-01-XX |
 | `docs/DEV_SETUP_AND_DATA_MODELS.md` | Dev environment setup, database schema, TDD approach | 2024-01-XX |
 | `docs/CHANGELOG.md` | Complete project changelog with all changes by phase | 2025-10-28 |
@@ -86,7 +86,14 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `components/analytics/shot-quality-chart.tsx` | Shot quality breakdown with bar charts | - | ✅ DONE |
 | `components/analytics/breakout-analysis.tsx` | Breakout performance with pie/bar charts | - | ✅ DONE |
 | `components/analytics/period-trends.tsx` | Period-by-period trends with line/bar charts | - | ✅ DONE |
-| `app/demo/analytics/page.tsx` | Analytics dashboard with filters | - | ✅ DONE |
+| `app/demo/analytics/page.tsx` | Analytics dashboard with filters & game selector | - | ✅ DONE |
+
+### Practice Planning Components
+| Component | Purpose | Tests | Status |
+|-----------|---------|-------|--------|
+| `app/demo/drills/page.tsx` | Drill library with search, filters, and pagination | - | ✅ DONE |
+| `components/drills/drill-card.tsx` | Individual drill display card | - | ✅ DONE |
+| `app/api/generate-practice-plan/route.ts` | AI practice plan generation API (OpenAI GPT-4o) | - | ✅ DONE |
 
 ### Authentication Components
 | Component | Purpose | Status |
@@ -266,13 +273,15 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 206-702)
 - [x] **Live stats during game** - Running totals, success rates, expandable panel
 - [x] **Event editing** - Undo last event, delete specific events during/after games
 - [x] **Post-game analytics** - Shot charts, heat maps, breakout stats, period trends
+- [x] **Game management** - Create games with opponent/location, switch between games in analytics
+- [x] **Drill library** - 255 pre-loaded drills with search, filters, and categorization
+- [x] **AI practice plan generation** - OpenAI GPT-4o integration analyzing game data to recommend drills
 
 🚧 In Progress / Deferred:
 - [ ] **Offline support** (PWA + IndexedDB + background sync) - Deferred to post-MVP
-- [ ] Basic drill library (100+ pre-loaded drills) - Phase 4-6
-- [ ] Manual practice plan builder - Phase 4-6
-- [ ] AI practice plan generation (integrates tracking data) - Phase 4-6
-- [ ] Practice history - Phase 4-6
+- [ ] **Practice plan saving** - Save AI-generated plans to database (practices, practice_drills tables)
+- [ ] **Manual practice plan builder** - Drag-and-drop drill selection interface
+- [ ] **Practice history** - View past practices with drill details
 
 ### Post-MVP (Deferred)
 - [ ] Stripe integration (launch free tier only)
@@ -364,7 +373,7 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 501-528)
 - [x] Local email testing via Mailpit (localhost:54324)
 - [x] Updated Supabase config for password reset redirects
 
-### Phase 4-6: Practice Planning & AI 🚧 **IN PROGRESS** (~35% COMPLETE)
+### Phase 4-6: Practice Planning & AI 🚧 **IN PROGRESS** (~70% COMPLETE)
 
 **Database Foundation:** ✅ **COMPLETE**
 - [x] Database schema (drills, practices, practice_drills tables)
@@ -377,13 +386,27 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 501-528)
   - Searchable tags array for filtering
 - [x] Seed data loaded into database (255 drills)
 
-**UI & Features:** 🚧 **TODO**
-- [ ] Drill library UI with search and filters
-- [ ] Practice plan builder (drag-and-drop drill selection)
-- [ ] OpenAI integration for AI-powered practice plan generation
-- [ ] AI practice plan generation (uses tracked game data to recommend drills)
-- [ ] Practice history view
-- [ ] Mobile-friendly practice plan display
+**UI & Features:** ✅ **MAJOR PROGRESS**
+- [x] **Drill library UI** with search and filters (`/demo/drills`)
+  - Search by title, description, tags
+  - Filter by category, skill level, age range, duration
+  - 10 drills per page with pagination
+  - Expandable drill details view
+  - RLS-tested with user authentication
+- [x] **OpenAI integration** with GPT-4o model
+  - API route: `/api/generate-practice-plan`
+  - Analyzes game performance data (shots, breakouts, turnovers)
+  - Fetches age-appropriate drills from database
+  - Returns structured practice plans with reasoning
+- [x] **AI practice plan generation** integrated into analytics
+  - "Generate AI Practice Plan" button on analytics page
+  - Displays AI reasoning (top 3 focus areas, goals)
+  - Shows drill recommendations by section (warm-up, skills, scrimmage, cool-down)
+  - Links recommendations to specific game stats
+- [ ] **Practice plan saving** to database (practices, practice_drills tables)
+- [ ] **Manual practice plan builder** (drag-and-drop drill selection)
+- [ ] **Practice history view** (view past practices)
+- [ ] **Mobile-friendly practice plan display**
 
 See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 509-574)
 
@@ -405,12 +428,17 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 509-574)
 | Goal is a shot with result='goal' | Eliminates redundancy, simplifies queries, cleaner data model | Removed 'goal' event type, pre-fill result in UI |
 | Database persistence with optimistic updates | Instant UI feedback, background sync to Supabase | Better UX, handles slow connections |
 | Recharts for analytics | Pre-installed, good docs, sufficient for MVP needs | Bar/line/pie charts for all analytics |
+| AI explains drill choices | Coaches need to trust AI recommendations | Shows focus areas, links drills to specific game stats |
+| Explicit game creation with metadata | Better organization, clearer game history | Create game with opponent name & location before tracking |
+| Game selector in analytics | Support multiple games per team | Dropdown to switch between games, auto-loads most recent |
+| Replace browser dialogs with inline forms | Better UX, editable inputs, mobile-friendly | React forms instead of prompt()/alert() |
+| OpenAI GPT-4o for practice plans | Latest model, best at structured output | JSON mode for reliable parsing |
 
 ### To Decide 🤔
 - [ ] Game situation detection (PP/PK): Manual buttons or auto-detect from penalties?
 - [ ] Free tier: 3 games or unlimited tracking with limited analytics?
 - [ ] Premium pricing: $14.99 or $19.99/month?
-- [ ] Should AI explain WHY it chose drills (show tracked data)?
+- [x] ~~Should AI explain WHY it chose drills (show tracked data)?~~ ✅ YES - implemented with reasoning display
 - [ ] Ice surface: Konva.js or plain SVG + React?
 - [ ] Video hosting: YouTube embeds or self-hosted?
 
@@ -469,27 +497,50 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
 
 ---
 
+### Problem: Analytics page showing 0 events, how does it know which game?
+**Solution**: Auto-load most recent game and provide game selector dropdown.
+- Analytics page fetches all games for user's team on mount
+- Auto-selects most recent game by game_date
+- Loads events from database for selected game
+- Dropdown allows switching between games
+- Game display format: "vs {opponent_name} - {date} @ {location}"
+- Resolves issue where analytics relied only on Zustand store
+
+See: `app/demo/analytics/page.tsx` (lines 30-80)
+
+---
+
+### Problem: Browser dialogs (prompt/alert) are poor UX for game creation
+**Solution**: Replace with inline React forms.
+- Show/hide form with useState toggle
+- Controlled inputs for opponent name (required) and location (optional)
+- Submit button with loading state
+- Cancel button to dismiss form
+- Auto-focus first input for keyboard accessibility
+- Form validation before submission
+- Better mobile experience
+
+See: `components/game-tracking/live-stats.tsx` (lines 36-119, 216-274)
+
+---
+
 ## 📝 TODO: HIGH-PRIORITY ITEMS
 
-### Immediate Next Steps
-- [ ] Initialize Next.js project with setup from `docs/DEV_SETUP_AND_DATA_MODELS.md`
-- [ ] Setup Supabase local dev environment
-- [ ] Create first migration (organizations, teams, players)
-- [ ] Write + implement age group utilities (TDD practice)
-- [ ] Setup testing infrastructure (Vitest + Playwright configs)
-
-### Before Phase 2 (Ice Surface)
-- [ ] Prototype ice surface tap interactions (SVG coordinate mapping)
-- [ ] Design event logging flow (minimize taps, maximize speed)
-- [ ] Test offline sync mechanism (simulate poor WiFi)
-- [ ] Create ice surface coordinate system diagram
+### Phase 4-6 Next Steps (Practice Planning)
+- [ ] **Implement practice plan saving** - Save AI-generated plans to database (practices, practice_drills tables)
+- [ ] **Build manual practice plan builder** - Drag-and-drop drill selection interface
+- [ ] **Create practice history view** - List all past practices with drill details
+- [ ] **Mobile-friendly practice display** - Responsive practice plan view for mobile devices
+- [ ] **Write tests for practice planning** - Unit tests for AI integration, practice CRUD operations
 
 ### Before Launch
 - [x] **Seed drill library with 255 drills** ✅ (exceeded goal!)
-- [ ] Create AI prompt templates for practice plan generation
-- [ ] Design onboarding flow for new coaches
-- [ ] Beta test with 3-5 real teams (full season)
-- [ ] Performance testing (can handle 50+ events per game?)
+- [x] **Create AI prompt templates for practice plan generation** ✅
+- [x] **Implement AI practice plan generation** ✅
+- [ ] **Design onboarding flow for new coaches**
+- [ ] **Beta test with 3-5 real teams** (full season)
+- [ ] **Performance testing** (can handle 50+ events per game?)
+- [ ] **E2E tests** for critical paths (game tracking, analytics, practice planning)
 
 ---
 
@@ -543,9 +594,9 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
 
 ## 📊 PROJECT STATUS
 
-**Current Status**: Phase 4-6 In Progress - Practice Planning Database & Drills Complete! 🏒📚
-**Next Milestone**: Drill Library UI → AI Integration (Phase 4-6)
-**Target MVP Completion**: On track! ~65% complete (database + 255 drills done!)
+**Current Status**: Phase 4-6 In Progress - AI Practice Plan Generation Live! 🤖✨
+**Next Milestone**: Practice Plan Saving & History Views
+**Target MVP Completion**: On track! ~80% complete 🎉
 **Target Beta Launch**: 10-12 weeks from start
 
 **Progress Tracker**:
@@ -568,19 +619,25 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
   - [x] Shot charts, breakout analysis, period trends
   - [x] Full authentication system (email/password, reset flow)
   - [x] Session management and RLS security
+  - [x] Game management (create games, switch between games)
   - [x] 21 analytics tests
-- [ ] **Phase 4-6: Practice Planning & AI (35%)** 🚧
+- [ ] **Phase 4-6: Practice Planning & AI (70%)** 🚧
   - [x] Database schema (drills, practices, practice_drills)
   - [x] 255-drill library with AI metadata loaded
   - [x] RLS policies for multi-tenant practice planning
-  - [ ] Drill library UI with search
-  - [ ] Practice plan builder
-  - [ ] OpenAI integration for AI-generated plans
+  - [x] **Drill library UI** with search, filters, pagination
+  - [x] **OpenAI GPT-4o integration** for AI-generated plans
+  - [x] **AI practice plan generation** button in analytics
+  - [x] **Practice plan display** with AI reasoning & drill recommendations
+  - [ ] Practice plan saving to database
+  - [ ] Manual practice plan builder
+  - [ ] Practice history views
 
 **Demo Pages Available**:
 - 🎨 `/demo/ice-surface` - Interactive ice surface visualization
 - 🏒 `/demo/game-tracking` - Complete event logger with live stats & database persistence (requires auth)
-- 📊 `/demo/analytics` - Post-game analytics dashboard with charts & insights
+- 📊 `/demo/analytics` - Post-game analytics dashboard with charts, insights, & AI practice plans
+- 📚 `/demo/drills` - Drill library with 255 drills, search, and filters
 
 **Local Development Tools**:
 - 🗄️ http://localhost:54323 - Supabase Studio (database GUI)
@@ -603,27 +660,40 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
 1. This is a hockey practice planning app with live game tracking
 2. We're using TDD (tests first, always!)
 3. Key docs: `docs/HOCKEY_PRACTICE_APP_PLAN.md` + `docs/DEV_SETUP_AND_DATA_MODELS.md`
-4. **Current phase: Phase 3 COMPLETE** ✅ - Game tracking + Analytics + Authentication all working!
-5. **Next phase: Phase 4-6** - Practice Planning & AI Integration
-6. Critical decisions:
+4. **Current phase: Phase 4-6 (70% complete)** 🚧 - AI Practice Plan Generation LIVE!
+5. Critical decisions:
    - Age groups stored as integers, formatted by region
    - Goal is a shot with result='goal' (not separate event type)
    - Database persistence with optimistic updates
-7. MVP scope is locked - see "MVP SCOPE" section above
+   - AI explains WHY it chose drills (focus areas + game stats)
+   - Explicit game creation with metadata (opponent, location)
+   - Game selector in analytics for multi-game support
+6. MVP scope is locked - see "MVP SCOPE" section above
 
 **What's working now?**
 - ✅ Live game tracking with 6 event types
 - ✅ Database persistence (save/load from Supabase)
 - ✅ Post-game analytics dashboard (shot charts, breakout analysis, trends)
+- ✅ Game management (create games, switch between games)
+- ✅ Drill library with 255 drills (search, filters, pagination)
+- ✅ **AI practice plan generation** (OpenAI GPT-4o)
+  - Analyzes game data (shots, breakouts, turnovers)
+  - Recommends drills by section (warm-up, skills, scrimmage, cool-down)
+  - Explains reasoning (focus areas, expected improvements)
 - ✅ 234/236 tests passing
-- ✅ 3 demo pages: ice surface, game tracking, analytics
+- ✅ 4 demo pages: ice surface, game tracking, analytics, drills
 
 **Try it:**
 - `npm run dev` → http://localhost:3000/demo/game-tracking
-- Track some events, then view analytics at `/demo/analytics`
+- Create a new game, track some events
+- View analytics at `/demo/analytics`
+- Click "Generate AI Practice Plan" to see AI recommendations
+- Browse drills at `/demo/drills`
+
+**Next steps:**
+- Practice plan saving (persist AI plans to database)
+- Manual practice plan builder (drag-and-drop)
+- Practice history view
+- Mobile-friendly practice display
 
 **Ask the user**: "What would you like to work on next?"
-- Continue to Phase 4 (Practice Planning)?
-- Add more analytics features?
-- Implement offline support (PWA)?
-- Something else?
