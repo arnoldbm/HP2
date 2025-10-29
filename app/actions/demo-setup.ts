@@ -5,23 +5,32 @@ import type { Player } from '@/lib/stores/game-tracking-store'
 
 /**
  * Server action to set up demo data for the game tracking demo
+ * Creates organization, team, players, and game for the authenticated user
  * Returns gameId and players
+ *
+ * Note: userId must be passed from client since server actions can't reliably read auth cookies
  */
-export async function setupDemoGameData() {
+export async function setupDemoGameData(userId: string) {
   try {
-    // 1. Create or get organization
+    if (!userId) {
+      throw new Error('User ID is required')
+    }
+    // 1. Create or get user's organization
+    // Use user ID to create a unique slug for each user
+    const orgSlug = `demo-org-${userId.substring(0, 8)}`
+
     let org = await supabaseAdmin
       .from('organizations')
       .select()
-      .eq('slug', 'demo-hockey-club')
-      .single()
+      .eq('slug', orgSlug)
+      .maybeSingle()
 
     if (!org.data) {
       const { data, error: orgError } = await supabaseAdmin
         .from('organizations')
         .insert({
-          name: 'Demo Hockey Club',
-          slug: 'demo-hockey-club',
+          name: 'My Hockey Club',
+          slug: orgSlug,
         })
         .select()
         .single()
@@ -35,8 +44,8 @@ export async function setupDemoGameData() {
       .from('teams')
       .select()
       .eq('organization_id', org.data.id)
-      .eq('name', 'Demo Team')
-      .single()
+      .limit(1)
+      .maybeSingle()
 
     if (!team.data) {
       const { data, error: teamError } = await supabaseAdmin
@@ -56,7 +65,32 @@ export async function setupDemoGameData() {
       team.data = data
     }
 
-    // 3. Create demo players (if they don't exist)
+    // 3. Add user as team member (head_coach role)
+    const existingMembership = await supabaseAdmin
+      .from('team_members')
+      .select()
+      .eq('team_id', team.data.id)
+      .eq('user_id', userId)
+      .maybeSingle()
+
+    if (!existingMembership.data) {
+      console.log('Creating team membership for user:', userId, 'team:', team.data.id)
+      const { error: memberError } = await supabaseAdmin.from('team_members').insert({
+        team_id: team.data.id,
+        user_id: userId,
+        role: 'head_coach',
+      })
+
+      if (memberError) {
+        console.error('Failed to create team membership:', memberError)
+        throw memberError
+      }
+      console.log('✅ Team membership created successfully')
+    } else {
+      console.log('✅ Team membership already exists')
+    }
+
+    // 4. Create demo players (if they don't exist)
     const demoPlayers = [
       { jersey_number: 7, first_name: 'Connor', last_name: 'McDavid', position: 'forward' as const },
       { jersey_number: 97, first_name: 'Connor', last_name: 'Bedard', position: 'forward' as const },
@@ -93,7 +127,7 @@ export async function setupDemoGameData() {
       players.data = data
     }
 
-    // 4. Create a demo game (if it doesn't exist)
+    // 5. Create a demo game (if it doesn't exist)
     // Get the most recent demo game or create one
     let game = await supabaseAdmin
       .from('games')

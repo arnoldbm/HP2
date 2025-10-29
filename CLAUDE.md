@@ -20,10 +20,11 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 ### Planning & Product Specs
 | File | Purpose | Last Updated |
 |------|---------|--------------|
-| `README.md` | GitHub repository overview, project status, quick start | 2024-01-XX |
-| `CLAUDE.md` | This file - central documentation hub for AI context | 2024-01-XX |
+| `README.md` | GitHub repository overview, project status, quick start | 2025-10-27 |
+| `CLAUDE.md` | This file - central documentation hub for AI context | 2025-10-27 |
 | `docs/HOCKEY_PRACTICE_APP_PLAN.md` | Complete product plan, features, user flows, monetization | 2024-01-XX |
 | `docs/DEV_SETUP_AND_DATA_MODELS.md` | Dev environment setup, database schema, TDD approach | 2024-01-XX |
+| `docs/CHANGELOG.md` | Complete project changelog with all changes by phase | 2025-10-27 |
 
 ### Database & Architecture
 | File | Purpose | Status |
@@ -34,6 +35,7 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `supabase/migrations/20251027175443_fix_event_edit_history_fk.sql` | FK SET NULL for deleted events | ✅ DONE |
 | `supabase/migrations/20251027180845_add_service_role_bypass_policies.sql` | Service role RLS bypass | ✅ DONE |
 | `supabase/migrations/20251027181536_fix_audit_trigger_delete.sql` | Audit log for deletes | ✅ DONE |
+| `supabase/migrations/20251027235333_remove_goal_event_type.sql` | Remove 'goal' event type (use shot with result='goal') | ✅ DONE |
 | `lib/types/database.ts` | Auto-generated TypeScript types from Supabase | ✅ DONE |
 | Architecture diagram | System architecture overview | TODO |
 
@@ -51,23 +53,36 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `tests/unit/ice-surface.test.tsx` | Ice surface component | ✅ DONE (20 tests) |
 | `tests/unit/player-selector.test.tsx` | Player selector component | ✅ DONE (17 tests) |
 | `tests/unit/quick-event-buttons.test.tsx` | Quick event buttons | ✅ DONE (16 tests) |
+| `tests/unit/analytics.test.ts` | Analytics calculation functions | ✅ DONE (21 tests) |
 | `tests/integration/game-events.test.ts` | Game event CRUD with RLS | ✅ DONE (23 tests, 2 skipped) |
+| `tests/integration/game-event-persistence.test.ts` | Event save/load with optimistic updates | ✅ DONE (11 tests) |
 | `tests/e2e/game-tracking.spec.ts` | Live tracking E2E tests | TODO |
 
-**Current Test Count: 202 tests passing (2 skipped) = 204 total**
-- Unit: 179 tests
-- Integration: 23 tests (2 skipped due to JWT limitation)
+**Current Test Count: 234 tests passing (2 skipped) = 236 total**
+- Unit: 200 tests
+- Integration: 34 tests (2 skipped due to JWT limitation)
 
 ### Game Tracking Components
 | Component | Purpose | Tests | Status |
 |-----------|---------|-------|--------|
 | `components/game-tracking/ice-surface.tsx` | Interactive SVG ice surface with tap-to-log | 20 | ✅ DONE |
 | `components/game-tracking/player-selector.tsx` | Quick player selection grid by jersey # | 17 | ✅ DONE |
-| `components/game-tracking/quick-event-buttons.tsx` | 6 event type buttons (shot, goal, etc.) | 16 | ✅ DONE |
+| `components/game-tracking/quick-event-buttons.tsx` | 6 event type buttons (shot, turnover, etc.) | 16 | ✅ DONE |
 | `components/game-tracking/event-logger.tsx` | Multi-step event logging orchestrator | - | ✅ DONE |
 | `components/game-tracking/live-stats.tsx` | Real-time stats dashboard | - | ✅ DONE |
 | `components/game-tracking/recent-events-list.tsx` | Event list with undo/delete | - | ✅ DONE |
-| `lib/stores/game-tracking-store.ts` | Zustand state management | - | ✅ DONE |
+| `lib/stores/game-tracking-store.ts` | Zustand state management with DB persistence | - | ✅ DONE |
+| `lib/db/game-event-persistence.ts` | Save/load events from Supabase with optimistic updates | 11 | ✅ DONE |
+
+### Analytics Components
+| Component | Purpose | Tests | Status |
+|-----------|---------|-------|--------|
+| `lib/analytics/game-analytics.ts` | Analytics calculation functions (shots, breakouts, periods) | 21 | ✅ DONE |
+| `components/analytics/shot-chart.tsx` | Shot location visualization on ice surface | - | ✅ DONE |
+| `components/analytics/shot-quality-chart.tsx` | Shot quality breakdown with bar charts | - | ✅ DONE |
+| `components/analytics/breakout-analysis.tsx` | Breakout performance with pie/bar charts | - | ✅ DONE |
+| `components/analytics/period-trends.tsx` | Period-by-period trends with line/bar charts | - | ✅ DONE |
+| `app/demo/analytics/page.tsx` | Analytics dashboard with filters | - | ✅ DONE |
 
 ---
 
@@ -266,7 +281,7 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 501-528)
 - [x] 114 unit tests passing (100% coverage on utilities)
 - [ ] Auth UI setup (deferred to when needed)
 
-### Current Phase: **Phase 2: Game Tracking & Event Logger** 95% COMPLETE ✅
+### Phase 2: Game Tracking & Event Logger ✅ **COMPLETE**
 **THE DIFFERENTIATOR FEATURE**
 
 **Database Layer:**
@@ -276,7 +291,8 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 501-528)
 - [x] Audit logging trigger
 - [x] RLS policies with service role bypass
 - [x] Event validation schemas (Zod)
-- [x] Integration tests (23/25 passing)
+- [x] Integration tests (34 passing, 2 skipped)
+- [x] Removed 'goal' event type (now shot with result='goal')
 
 **UI Components & Event Logger:**
 - [x] Interactive SVG ice surface component (20 tests)
@@ -291,15 +307,23 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 501-528)
 - [x] Event editing UI (undo last, delete specific events)
 - [x] Event list view (chronological, recent 10)
 - [x] Demo page: `/demo/game-tracking` - Full working event logger
-- [ ] Database persistence (save to Supabase) **← NEXT**
-- [ ] Offline storage (IndexedDB)
-- [ ] Background sync
+- [x] Database persistence (save to Supabase with optimistic updates)
 
-### Phase 3: Post-Game Analytics (Week 5)
-- [ ] Shot chart heat map generation
-- [ ] Defensive analytics (breakout success, turnover locations)
-- [ ] Analytics dashboard UI
-- [ ] Auto-generated insights engine
+**Deferred to Post-MVP:**
+- [ ] Offline storage (IndexedDB)
+- [ ] Background sync (PWA)
+
+### Phase 3: Post-Game Analytics ✅ **COMPLETE**
+**Data Analysis & Visualization**
+- [x] Analytics calculation functions (21 tests)
+- [x] Shot chart with location visualization on ice surface
+- [x] Shot quality breakdown (high/medium/low danger)
+- [x] Breakout analysis (success rates by type)
+- [x] Period-by-period trends (shots, goals, turnovers)
+- [x] Shooting percentage by situation (ES/PP/PK)
+- [x] Analytics dashboard with filters (period, situation)
+- [x] Demo page: `/demo/analytics` - Full analytics dashboard
+- [x] Auto-generated insights (breakout performance, period analysis)
 
 ### Phase 4-6: Practice Planning & AI (Weeks 6-8)
 - [ ] Drill library with search
@@ -324,6 +348,9 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 509-574)
 | SVG over Canvas for ice surface | Easier tap interactions, accessibility | Use Konva.js or plain SVG |
 | Offline-first with PWA | Rinks often have poor WiFi | IndexedDB + service workers required |
 | Single tracker in MVP | Multi-tracker collaboration is complex | Defer merging to post-MVP |
+| Goal is a shot with result='goal' | Eliminates redundancy, simplifies queries, cleaner data model | Removed 'goal' event type, pre-fill result in UI |
+| Database persistence with optimistic updates | Instant UI feedback, background sync to Supabase | Better UX, handles slow connections |
+| Recharts for analytics | Pre-installed, good docs, sufficient for MVP needs | Bar/line/pie charts for all analytics |
 
 ### To Decide 🤔
 - [ ] Game situation detection (PP/PK): Manual buttons or auto-detect from penalties?
@@ -353,6 +380,17 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 708-790)
 - Easy to add new event types without migrations
 
 See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 362-449)
+
+---
+
+### Problem: Should 'Goal' be a separate event type or a shot with result='goal'?
+**Solution**: Treat goal as a shot with result='goal', not a separate event type.
+- Eliminates redundancy in data model
+- Simplifies queries: `WHERE event_type = 'shot' AND details->>'result' = 'goal'`
+- UI preserves UX: Goal button pre-fills result field
+- Migration: Converted existing 'goal' events to 'shot' with result='goal'
+
+See: `supabase/migrations/20251027235333_remove_goal_event_type.sql`
 
 ---
 
@@ -451,9 +489,9 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
 
 ## 📊 PROJECT STATUS
 
-**Current Status**: Phase 2 - Event Logger 95% Complete 🚀
-**Next Milestone**: Database persistence + Post-game analytics
-**Target MVP Completion**: 6-8 weeks from start
+**Current Status**: Phase 3 Complete - Analytics Dashboard Live! 🎉
+**Next Milestone**: Practice Planning & AI Integration (Phase 4-6)
+**Target MVP Completion**: On track! 50% complete
 **Target Beta Launch**: 10-12 weeks from start
 
 **Progress Tracker**:
@@ -463,20 +501,25 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
 - [x] Tech stack decisions
 - [x] Project initialization (100%)
 - [x] Phase 1: Foundation (100%)
-- [x] Phase 2: Game Tracking & Event Logger (95%)
-  - [x] Database layer with 6 migrations
-  - [x] Event logger UI with 5 components
+- [x] Phase 2: Game Tracking & Event Logger (100%) ✅
+  - [x] Database layer with 7 migrations
+  - [x] Event logger UI with 6 components
   - [x] Live stats and event list
-  - [x] 202 tests passing
-  - [ ] Database persistence (5% remaining)
-- [ ] Phase 3: Post-Game Analytics (0%)
+  - [x] Database persistence with optimistic updates
+  - [x] 234 tests passing (2 skipped)
+- [x] Phase 3: Post-Game Analytics (100%) ✅
+  - [x] Analytics calculation functions
+  - [x] 4 visualization components (shot chart, quality, breakouts, trends)
+  - [x] Analytics dashboard with filters
+  - [x] 21 analytics tests passing
 - [ ] Phase 4-6: Practice Planning (0%)
 
 **Demo Pages Available**:
 - 🎨 `/demo/ice-surface` - Interactive ice surface visualization
-- 🏒 `/demo/game-tracking` - Complete event logger with live stats
+- 🏒 `/demo/game-tracking` - Complete event logger with live stats & database persistence
+- 📊 `/demo/analytics` - Post-game analytics dashboard with charts & insights
 
-**Test Coverage**: 202/204 tests passing (99% success rate)
+**Test Coverage**: 234/236 tests passing (99.2% success rate)
 
 ---
 
@@ -493,12 +536,27 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
 1. This is a hockey practice planning app with live game tracking
 2. We're using TDD (tests first, always!)
 3. Key docs: `docs/HOCKEY_PRACTICE_APP_PLAN.md` + `docs/DEV_SETUP_AND_DATA_MODELS.md`
-4. Current phase: Project initialization (ready to start coding)
-5. Critical decision: Age groups stored as integers, formatted by region
-6. MVP scope is locked - see "MVP SCOPE" section above
+4. **Current phase: Phase 3 COMPLETE** - Event tracking + Analytics working!
+5. **Next up**: Phase 4-6 - Practice Planning & AI Integration
+6. Critical decisions:
+   - Age groups stored as integers, formatted by region
+   - Goal is a shot with result='goal' (not separate event type)
+   - Database persistence with optimistic updates
+7. MVP scope is locked - see "MVP SCOPE" section above
 
-**Ask the user**: "What would you like to work on today?"
-- Project initialization?
-- First TDD feature (age group utils)?
-- Database migrations?
-- Ice surface prototype?
+**What's working now?**
+- ✅ Live game tracking with 6 event types
+- ✅ Database persistence (save/load from Supabase)
+- ✅ Post-game analytics dashboard (shot charts, breakout analysis, trends)
+- ✅ 234/236 tests passing
+- ✅ 3 demo pages: ice surface, game tracking, analytics
+
+**Try it:**
+- `npm run dev` → http://localhost:3000/demo/game-tracking
+- Track some events, then view analytics at `/demo/analytics`
+
+**Ask the user**: "What would you like to work on next?"
+- Continue to Phase 4 (Practice Planning)?
+- Add more analytics features?
+- Implement offline support (PWA)?
+- Something else?

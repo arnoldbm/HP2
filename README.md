@@ -2,7 +2,8 @@
 
 > AI-powered practice planning with live game tracking for youth hockey coaches
 
-[![Status](https://img.shields.io/badge/status-planning-blue.svg)](https://github.com/yourusername/HP2)
+[![Status](https://img.shields.io/badge/status-in%20development-green.svg)](https://github.com/yourusername/HP2)
+[![Tests](https://img.shields.io/badge/tests-234%20passing-brightgreen.svg)](https://github.com/yourusername/HP2)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ## 🏒 What is HP2?
@@ -18,32 +19,53 @@ Coaches rely on memory and subjective impressions after games. "We need to work 
 - **AI Practice Plans**: Get customized practice plans that target specific issues identified in game tracking
 - **Offline-First**: Works without WiFi (common in hockey rinks) with automatic sync when back online
 
-## 🎯 Key Features (Planned)
+## 🎯 Key Features
 
-- ✅ **Live Game Event Tracking**
+### ✅ Implemented
+
+- **Live Game Event Tracking** ✅
   - Interactive ice surface for tap-to-log shot tracking
-  - Defensive event tracking (breakouts, turnovers, zone entries)
-  - Live stats during games
-  - Post-game editing and correction
-  - Works offline with automatic sync
+  - Defensive event tracking (breakouts, turnovers, zone entries, faceoffs)
+  - Live stats during games (running totals, success rates)
+  - Event editing (undo/delete during and after games)
+  - Database persistence with optimistic updates
+  - Demo: `/demo/game-tracking`
 
-- ✅ **Post-Game Analytics**
-  - Shot chart heat maps
-  - Breakout success rates by zone
-  - Turnover location analysis
-  - AI-generated insights
+- **Post-Game Analytics** ✅
+  - Shot chart visualization on ice surface
+  - Shot quality breakdown (high/medium/low danger)
+  - Breakout success rates by type
+  - Period-by-period trends (shots, goals, turnovers)
+  - Shooting percentage by situation (ES/PP/PK)
+  - Auto-generated insights
+  - Dashboard with filters (period, situation)
+  - Demo: `/demo/analytics`
 
-- ✅ **AI-Powered Practice Planning**
+- **Team & Player Management** ✅
+  - Database schema for organizations, teams, players
+  - Supports both USA and Canadian age groups
+  - Player selection by jersey number
+
+### 🚧 In Progress
+
+- **AI-Powered Practice Planning** (Phase 4-6)
   - Generates practice plans based on tracked game data
   - Suggests drills that address specific weaknesses
   - Considers age group, skill level, and ice time
   - Drill library with 200+ hockey drills
 
-- ✅ **Team Management**
-  - Multi-team organization support
-  - Player roster management
-  - Practice history tracking
-  - Supports both USA and Canadian age groups
+### 📋 Planned
+
+- **Offline Support** (Post-MVP)
+  - Works without WiFi (common in hockey rinks)
+  - IndexedDB for local storage
+  - Automatic sync when back online
+
+- **Additional Features** (Post-MVP)
+  - Season-long analytics trends
+  - Comparative analytics (vs league benchmarks)
+  - Multi-tracker collaboration
+  - Video drill library
 
 ## 🏗️ Tech Stack
 
@@ -59,22 +81,37 @@ Coaches rely on memory and subjective impressions after games. "We need to work 
 
 ## 📊 Project Status
 
-**Current Phase**: Planning & Design ✅
+**Current Phase**: Phase 3 Complete - Analytics Dashboard Live! 🎉
 
-We're following a **Test-Driven Development (TDD)** approach with comprehensive planning before implementation.
+We're following a **Test-Driven Development (TDD)** approach with comprehensive testing throughout.
 
 **Progress**:
-- [x] Product planning (features, user flows, monetization)
-- [x] Database schema design
-- [x] TDD approach defined
-- [x] Tech stack decisions
-- [ ] Project initialization
-- [ ] Phase 1: Foundation (0%)
-- [ ] Phase 2: Game Tracking (0%)
-- [ ] Phase 3: Analytics (0%)
-- [ ] Phase 4-6: Practice Planning (0%)
+- [x] Product planning (features, user flows, monetization) - 100%
+- [x] Database schema design - 100%
+- [x] TDD approach defined - 100%
+- [x] Tech stack decisions - 100%
+- [x] Project initialization - 100%
+- [x] **Phase 1: Foundation** - 100% ✅
+  - Next.js + Supabase setup
+  - Core utilities (age groups, shot quality, coordinates)
+  - Testing infrastructure (Vitest + Playwright)
+- [x] **Phase 2: Game Tracking** - 100% ✅
+  - Interactive ice surface component
+  - Event logger with 6 event types
+  - Database persistence with optimistic updates
+  - Live stats and event management
+- [x] **Phase 3: Post-Game Analytics** - 100% ✅
+  - Shot chart visualization
+  - Shot quality and breakout analysis
+  - Period-by-period trends
+  - Analytics dashboard with filters
+- [ ] **Phase 4-6: Practice Planning & AI** - 0%
+  - Drill library
+  - Practice plan builder
+  - AI integration with OpenAI
 
-**Target MVP**: 6-8 weeks from start
+**Test Coverage**: 234/236 tests passing (99.2% success rate)
+**MVP Completion**: ~50% (on track!)
 **Target Beta Launch**: 10-12 weeks from start
 
 ## 📚 Documentation
@@ -112,9 +149,95 @@ The app intelligently handles both conventions with a unified data model.
 - **Premium** ($14.99/mo): Unlimited tracking, full analytics, AI practice plans
 - **Pro** ($29.99/mo): Season trends, comparative analytics, data export
 
-## 🚀 Getting Started (Coming Soon)
+## 🚀 Getting Started
 
-Currently in planning phase. Setup instructions will be added once project initialization begins.
+### Prerequisites
+
+- Node.js 18+ and npm
+- Supabase CLI (`npm install -g supabase`)
+
+### Local Development Setup
+
+1. **Clone the repository**
+   ```bash
+   git clone <your-repo-url>
+   cd hp2
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Set up environment variables**
+   ```bash
+   cp .env.local.example .env.local
+   # Edit .env.local with your Supabase credentials
+   ```
+
+4. **Start Supabase locally**
+   ```bash
+   npx supabase start
+   ```
+   This will output your local Supabase credentials. Copy them to `.env.local`.
+
+5. **Run migrations**
+   ```bash
+   npx supabase db reset
+   ```
+
+6. **Generate TypeScript types**
+   ```bash
+   npm run generate-types
+   ```
+
+7. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+8. **Try the demos!**
+   - Game Tracking: http://localhost:3000/demo/game-tracking
+   - Analytics Dashboard: http://localhost:3000/demo/analytics
+
+### Running Tests
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Run integration tests only
+npm test tests/integration
+```
+
+### Local Development Tools
+
+After running `npx supabase start`, you'll have access to:
+
+**Supabase Studio** (Database GUI)
+- URL: http://localhost:54323
+- View tables, run SQL queries, manage RLS policies
+
+**Email Inbox** (Inbucket/Mailpit)
+- URL: http://localhost:54324
+- View all emails sent by the app (confirmation emails, password resets, etc.)
+- Useful for testing auth flows without real email delivery
+
+### Database Management
+
+```bash
+# Create a new migration
+npx supabase migration new migration_name
+
+# Reset database (applies all migrations)
+npx supabase db reset
+
+# Generate TypeScript types from database schema
+npm run generate-types
+```
 
 ## 🧪 Testing Strategy
 

@@ -13,6 +13,17 @@ export async function saveGameEvent(
   event: GameEvent,
   client: SupabaseClient<Database> = supabase
 ) {
+  // Debug: Check if we have a valid session
+  const {
+    data: { session },
+  } = await client.auth.getSession()
+  console.log('📊 Saving event with session:', session ? 'AUTHENTICATED' : 'NOT AUTHENTICATED')
+  if (session) {
+    console.log('User ID:', session.user.id)
+  } else {
+    console.error('❌ No session found! User is not authenticated.')
+  }
+
   const eventData: GameEventInsert = {
     game_id: event.gameId,
     event_type: event.eventType as any,
@@ -33,6 +44,14 @@ export async function saveGameEvent(
 
   if (error) {
     console.error('Error saving game event:', error)
+
+    // If it's a 403 (Forbidden) error, sign out the user
+    // This typically means the session expired or RLS policy denied access
+    if (error.code === '42501' || error.message?.includes('row-level security')) {
+      console.error('🔒 RLS policy denied access - signing out user')
+      await client.auth.signOut()
+    }
+
     throw error
   }
 
@@ -83,6 +102,13 @@ export async function updateGameEvent(
 
   if (error) {
     console.error('Error updating game event:', error)
+
+    // If it's a 403 (Forbidden) error, sign out the user
+    if (error.code === '42501' || error.message?.includes('row-level security')) {
+      console.error('🔒 RLS policy denied access - signing out user')
+      await client.auth.signOut()
+    }
+
     throw error
   }
 
@@ -103,6 +129,13 @@ export async function deleteGameEvent(
 
   if (error) {
     console.error('Error deleting game event:', error)
+
+    // If it's a 403 (Forbidden) error, sign out the user
+    if (error.code === '42501' || error.message?.includes('row-level security')) {
+      console.error('🔒 RLS policy denied access - signing out user')
+      await client.auth.signOut()
+    }
+
     throw error
   }
 }
@@ -122,6 +155,13 @@ export async function getGameEvents(
 
   if (error) {
     console.error('Error fetching game events:', error)
+
+    // If it's a 403 (Forbidden) error, sign out the user
+    if (error.code === '42501' || error.message?.includes('row-level security')) {
+      console.error('🔒 RLS policy denied access - signing out user')
+      await client.auth.signOut()
+    }
+
     throw error
   }
 

@@ -5,18 +5,58 @@ import { useGameTrackingStore } from '@/lib/stores/game-tracking-store'
 import { EventLogger } from '@/components/game-tracking/event-logger'
 import { LiveStats } from '@/components/game-tracking/live-stats'
 import { RecentEventsList } from '@/components/game-tracking/recent-events-list'
+import { AuthModal } from '@/components/auth/auth-modal'
 import { setupDemoGameData } from '@/app/actions/demo-setup'
+import { supabase } from '@/lib/db/supabase'
 
 export default function GameTrackingDemoPage() {
   const { setGameState, setPlayers, loadEvents } = useGameTrackingStore()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [checkingAuth, setCheckingAuth] = useState(true)
 
+  // Check authentication status
   useEffect(() => {
+    async function checkAuth() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      setIsAuthenticated(!!user)
+      setCheckingAuth(false)
+
+      // Listen for auth changes
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
+        setIsAuthenticated(!!session?.user)
+      })
+
+      return () => {
+        subscription.unsubscribe()
+      }
+    }
+
+    checkAuth()
+  }, [])
+
+  // Initialize demo once authenticated
+  useEffect(() => {
+    if (!isAuthenticated) return
+
     async function initializeDemo() {
       try {
-        // Set up demo data in database (creates org, team, players, game)
-        const { gameId, players } = await setupDemoGameData()
+        // Get the current user
+        const {
+          data: { user },
+        } = await supabase.auth.getUser()
+
+        if (!user) {
+          throw new Error('User not found')
+        }
+
+        // Set up demo data in database (creates org, team, players, game for authenticated user)
+        const { gameId, players } = await setupDemoGameData(user.id)
 
         // Initialize game state
         setGameState({
@@ -42,7 +82,39 @@ export default function GameTrackingDemoPage() {
     }
 
     initializeDemo()
-  }, [setGameState, setPlayers, loadEvents])
+  }, [isAuthenticated, setGameState, setPlayers, loadEvents])
+
+  // Show auth modal if not authenticated
+  if (checkingAuth) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <div className="text-center max-w-2xl">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">🏒 Hockey Practice Planner</h1>
+          <p className="text-lg text-gray-600 mb-8">
+            Track games in real-time and get AI-powered practice plans
+          </p>
+          <AuthModal
+            initialMode="signup"
+            onSuccess={() => {
+              // Auth state will be updated by the listener
+              setIsAuthenticated(true)
+            }}
+          />
+        </div>
+      </div>
+    )
+  }
 
   if (loading) {
     return (
@@ -72,20 +144,35 @@ export default function GameTrackingDemoPage() {
     )
   }
 
+  const handleSignOut = async () => {
+    await supabase.auth.signOut()
+    setIsAuthenticated(false)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Live Game Tracking Demo
-          </h1>
-          <p className="text-gray-600">
-            The complete event logging system - events are saved to Supabase in real-time
-          </p>
-          <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-            <span className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></span>
-            Connected to database
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                Live Game Tracking Demo
+              </h1>
+              <p className="text-gray-600">
+                The complete event logging system - events are saved to Supabase in real-time
+              </p>
+              <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                <span className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></span>
+                Connected to database
+              </div>
+            </div>
+            <button
+              onClick={handleSignOut}
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+            >
+              Sign Out
+            </button>
           </div>
         </div>
 
@@ -261,6 +348,19 @@ export default function GameTrackingDemoPage() {
             </li>
           </ul>
 
+          <h3 className="text-lg font-semibold mt-6 mb-3">View Analytics</h3>
+          <div className="mb-4">
+            <a
+              href="/demo/analytics"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+            >
+              📊 View Post-Game Analytics Dashboard
+            </a>
+            <p className="text-sm text-gray-600 mt-2">
+              See shot charts, breakout analysis, and period-by-period trends from your tracked events
+            </p>
+          </div>
+
           <h3 className="text-lg font-semibold mt-6 mb-3">What's Next?</h3>
           <ul className="space-y-2 text-gray-700">
             <li className="flex items-start gap-2">
@@ -269,11 +369,11 @@ export default function GameTrackingDemoPage() {
             </li>
             <li className="flex items-start gap-2">
               <span className="text-gray-400">○</span>
-              <span>Post-game analytics dashboard (heat maps, insights)</span>
+              <span>Period clock and game situation tracking</span>
             </li>
             <li className="flex items-start gap-2">
               <span className="text-gray-400">○</span>
-              <span>Period clock and game situation tracking</span>
+              <span>Event editing UI (post-game corrections)</span>
             </li>
           </ul>
 
