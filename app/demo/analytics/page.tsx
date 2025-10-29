@@ -60,6 +60,14 @@ export default function AnalyticsDemoPage() {
   const [availableGames, setAvailableGames] = useState<Game[]>([])
   const [selectedGameId, setSelectedGameId] = useState<string | null>(null)
 
+  // Save practice plan state
+  const [showSaveModal, setShowSaveModal] = useState(false)
+  const [savingPractice, setSavingPractice] = useState(false)
+  const [practiceDate, setPracticeDate] = useState('')
+  const [practiceNotes, setPracticeNotes] = useState('')
+  const [saveError, setSaveError] = useState<string | null>(null)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+
   // Load available games on mount
   useEffect(() => {
     async function loadAvailableGames() {
@@ -238,6 +246,143 @@ export default function AnalyticsDemoPage() {
     } finally {
       setGeneratingPlan(false)
     }
+  }
+
+  // Save practice plan to database
+  async function savePracticePlan() {
+    if (!generatedPlan || !practiceDate) {
+      setSaveError('Please provide a practice date')
+      return
+    }
+
+    setSavingPractice(true)
+    setSaveError(null)
+    setSaveSuccess(false)
+
+    try {
+      console.log('💾 Saving practice plan to database...')
+
+      // Get current user and team
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        throw new Error('No authenticated user')
+      }
+
+      const { data: teamMember } = await supabase
+        .from('team_members')
+        .select('team_id')
+        .eq('user_id', user.id)
+        .single()
+
+      if (!teamMember) {
+        throw new Error('No team found for user')
+      }
+
+      // Fetch all available drills to match titles
+      const { data: allDrills, error: drillsError } = await supabase
+        .from('drills')
+        .select('id, title')
+        .eq('is_global', true)
+
+      if (drillsError) {
+        throw new Error('Failed to fetch drills')
+      }
+
+      // Create a map of drill titles to IDs (case-insensitive)
+      const drillTitleMap = new Map(
+        allDrills.map((d) => [d.title.toLowerCase(), d.id])
+      )
+
+      // Create the practice record
+      const { data: practice, error: practiceError } = await supabase
+        .from('practices')
+        .insert({
+          team_id: teamMember.team_id,
+          practice_date: new Date(practiceDate).toISOString(),
+          duration_minutes: generatedPlan.practice_plan.total_duration_minutes,
+          objectives: generatedPlan.reasoning.practice_goals.join('\n'),
+          notes: practiceNotes,
+          generated_by_ai: true,
+          based_on_game_id: selectedGameId,
+          ai_reasoning: {
+            top_focus_areas: generatedPlan.reasoning.top_focus_areas,
+            overall_assessment: generatedPlan.reasoning.overall_assessment,
+            practice_goals: generatedPlan.reasoning.practice_goals,
+          },
+          status: 'planned',
+          created_by: user.id,
+        })
+        .select()
+        .single()
+
+      if (practiceError) {
+        console.error('Error creating practice:', practiceError)
+        throw new Error('Failed to create practice record')
+      }
+
+      console.log('✅ Practice created:', practice.id)
+
+      // Now create practice_drill records for each drill
+      const practiceDrills = []
+      let sequenceOrder = 1
+
+      for (const section of generatedPlan.practice_plan.sections) {
+        for (const drill of section.drills) {
+          // Find drill ID by title (case-insensitive match)
+          const drillId = drillTitleMap.get(drill.drill_title.toLowerCase())
+
+          if (!drillId) {
+            console.warn(`⚠️ Could not find drill ID for: "${drill.drill_title}"`)
+            continue // Skip drills we can't match
+          }
+
+          practiceDrills.push({
+            practice_id: practice.id,
+            drill_id: drillId,
+            section: section.section,
+            sequence_order: sequenceOrder++,
+            duration_minutes: drill.duration_minutes,
+            notes: `${drill.reason}\n\nExpected: ${drill.expected_improvement}`,
+          })
+        }
+      }
+
+      // Insert all practice drills
+      const { error: drillsInsertError } = await supabase
+        .from('practice_drills')
+        .insert(practiceDrills)
+
+      if (drillsInsertError) {
+        console.error('Error inserting practice drills:', drillsInsertError)
+        throw new Error('Failed to save practice drills')
+      }
+
+      console.log('✅ Saved', practiceDrills.length, 'practice drills')
+
+      setSaveSuccess(true)
+      setTimeout(() => {
+        setShowSaveModal(false)
+        setSaveSuccess(false)
+        setPracticeDate('')
+        setPracticeNotes('')
+      }, 2000)
+    } catch (error) {
+      console.error('❌ Error saving practice plan:', error)
+      setSaveError(error instanceof Error ? error.message : 'Failed to save practice plan')
+    } finally {
+      setSavingPractice(false)
+    }
+  }
+
+  // Open save modal and set default date (tomorrow)
+  function openSaveModal() {
+    const tomorrow = new Date()
+    tomorrow.setDate(tomorrow.getDate() + 1)
+    setPracticeDate(tomorrow.toISOString().split('T')[0])
+    setPracticeNotes('')
+    setSaveError(null)
+    setSaveSuccess(false)
+    setShowSaveModal(true)
   }
 
   // Show loading state
@@ -543,11 +688,8 @@ export default function AnalyticsDemoPage() {
             {/* Actions for generated plan */}
             <div className="mt-6 flex gap-4">
               <button
-                onClick={() => {
-                  // TODO: Save to database
-                  alert('Save to database coming soon!')
-                }}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                onClick={openSaveModal}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-semibold"
               >
                 💾 Save Practice Plan
               </button>
@@ -557,6 +699,96 @@ export default function AnalyticsDemoPage() {
               >
                 ✕ Close
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Save Practice Plan Modal */}
+        {showSaveModal && generatedPlan && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+              <h3 className="text-xl font-bold text-gray-900 mb-4">
+                Save Practice Plan
+              </h3>
+
+              <div className="space-y-4">
+                {/* Practice Date */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Practice Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={practiceDate}
+                    onChange={(e) => setPracticeDate(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    required
+                    disabled={savingPractice}
+                  />
+                </div>
+
+                {/* Duration (read-only) */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Duration
+                  </label>
+                  <input
+                    type="text"
+                    value={`${generatedPlan.practice_plan.total_duration_minutes} minutes`}
+                    className="w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-md text-gray-600"
+                    disabled
+                  />
+                </div>
+
+                {/* Notes */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Notes (optional)
+                  </label>
+                  <textarea
+                    value={practiceNotes}
+                    onChange={(e) => setPracticeNotes(e.target.value)}
+                    placeholder="Add any additional notes about this practice..."
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    disabled={savingPractice}
+                  />
+                </div>
+
+                {/* Error message */}
+                {saveError && (
+                  <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                    <p className="text-red-800 text-sm">{saveError}</p>
+                  </div>
+                )}
+
+                {/* Success message */}
+                {saveSuccess && (
+                  <div className="bg-green-50 border border-green-200 rounded-md p-3">
+                    <p className="text-green-800 text-sm font-semibold">
+                      ✅ Practice plan saved successfully!
+                    </p>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={savePracticePlan}
+                    disabled={savingPractice || !practiceDate}
+                    className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {savingPractice ? 'Saving...' : 'Save Practice Plan'}
+                  </button>
+                  <button
+                    onClick={() => setShowSaveModal(false)}
+                    disabled={savingPractice}
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}

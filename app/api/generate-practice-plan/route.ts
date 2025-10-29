@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next'
+import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/types/database'
@@ -70,25 +70,35 @@ interface GeneratePracticePlanRequest {
 function buildPracticePlanPrompt(analytics: GameAnalytics, drills: any[], teamAge?: number): string {
   const { shotQualityStats, breakoutAnalytics, turnoverCount, periodStats, situationStats } = analytics
 
+  // Provide defaults for missing stats
+  const totalShots = shotQualityStats?.totalShots || 0
+  const totalGoals = shotQualityStats?.totalGoals || 0
+  const shootingPercentage = shotQualityStats?.shootingPercentage || 0
+  const highDangerShots = shotQualityStats?.highDangerShots || 0
+  const highDangerGoals = shotQualityStats?.highDangerGoals || 0
+  const highDangerPercentage = shotQualityStats?.highDangerPercentage || 0
+  const mediumDangerShots = shotQualityStats?.mediumDangerShots || 0
+  const lowDangerShots = shotQualityStats?.lowDangerShots || 0
+
   return `You are a professional hockey coach analyzing game performance data to create a targeted practice plan.
 
 ## GAME PERFORMANCE ANALYSIS
 
 ### Shot Quality & Scoring
-- Total Shots: ${shotQualityStats.totalShots} (${shotQualityStats.totalGoals} goals, ${shotQualityStats.shootingPercentage.toFixed(1)}% shooting)
-- High Danger Shots: ${shotQualityStats.highDangerShots} (${shotQualityStats.highDangerGoals} goals, ${shotQualityStats.highDangerPercentage.toFixed(1)}% of total shots)
-- Medium Danger: ${shotQualityStats.mediumDangerShots} shots
-- Low Danger: ${shotQualityStats.lowDangerShots} shots
+- Total Shots: ${totalShots} (${totalGoals} goals, ${shootingPercentage.toFixed(1)}% shooting)
+- High Danger Shots: ${highDangerShots} (${highDangerGoals} goals, ${highDangerPercentage.toFixed(1)}% of total shots)
+- Medium Danger: ${mediumDangerShots} shots
+- Low Danger: ${lowDangerShots} shots
 
-${shotQualityStats.highDangerPercentage < 30 ? '⚠️ LOW HIGH-DANGER SHOTS - Need to work on getting to the net' : ''}
-${shotQualityStats.shootingPercentage < 10 ? '⚠️ LOW SHOOTING PERCENTAGE - Need to work on shot accuracy and quality' : ''}
+${highDangerPercentage < 30 ? '⚠️ LOW HIGH-DANGER SHOTS - Need to work on getting to the net' : ''}
+${shootingPercentage < 10 ? '⚠️ LOW SHOOTING PERCENTAGE - Need to work on shot accuracy and quality' : ''}
 
 ### Breakout Performance
-- Success Rate: ${breakoutAnalytics.successRate.toFixed(1)}% (${breakoutAnalytics.successfulBreakouts}/${breakoutAnalytics.totalBreakouts})
-${breakoutAnalytics.successRate < 60 ? '⚠️ POOR BREAKOUT EXECUTION - High priority for practice' : ''}
+- Success Rate: ${(breakoutAnalytics?.successRate || 0).toFixed(1)}% (${breakoutAnalytics?.successfulBreakouts || 0}/${breakoutAnalytics?.totalBreakouts || 0})
+${(breakoutAnalytics?.successRate || 0) < 60 ? '⚠️ POOR BREAKOUT EXECUTION - High priority for practice' : ''}
 
 Breakout Types:
-${breakoutAnalytics.byType.map(bt => `- ${bt.type}: ${bt.successRate.toFixed(1)}% success (${bt.successful}/${bt.total})`).join('\n')}
+${Array.isArray(breakoutAnalytics?.byType) ? breakoutAnalytics.byType.map(bt => `- ${bt.type}: ${bt.successRate.toFixed(1)}% success (${bt.successful}/${bt.total})`).join('\n') : 'No breakout data available'}
 
 ### Turnovers
 - Total Turnovers: ${turnoverCount}
@@ -98,8 +108,8 @@ ${turnoverCount > 15 ? '⚠️ HIGH TURNOVER COUNT - Need puck protection drills
 ${periodStats.map(ps => `Period ${ps.period}: ${ps.shots} shots, ${ps.goals} goals, ${ps.events} total events`).join('\n')}
 
 ### Special Teams
-- Power Play: ${situationStats.powerPlay.shots} shots, ${situationStats.powerPlay.goals} goals (${situationStats.powerPlay.percentage.toFixed(1)}%)
-- Penalty Kill: ${situationStats.penaltyKill.shots} shots allowed, ${situationStats.penaltyKill.goals} goals allowed
+- Power Play: ${situationStats?.powerPlay?.shots || 0} shots, ${situationStats?.powerPlay?.goals || 0} goals (${(situationStats?.powerPlay?.percentage || 0).toFixed(1)}%)
+- Penalty Kill: ${situationStats?.penaltyKill?.shots || 0} shots allowed, ${situationStats?.penaltyKill?.goals || 0} goals allowed
 
 ## AVAILABLE DRILLS
 
