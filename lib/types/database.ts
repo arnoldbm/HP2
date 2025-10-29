@@ -34,6 +34,80 @@ export type Database = {
   }
   public: {
     Tables: {
+      drills: {
+        Row: {
+          addresses_situations: Json | null
+          age_max: number | null
+          age_min: number | null
+          category: Database["public"]["Enums"]["drill_category"]
+          created_at: string | null
+          created_by: string | null
+          description: string
+          diagram_url: string | null
+          duration_minutes: number
+          id: string
+          is_global: boolean | null
+          organization_id: string | null
+          players_max: number | null
+          players_min: number | null
+          skill_level: Database["public"]["Enums"]["skill_level"] | null
+          tags: string[] | null
+          title: string
+          updated_at: string | null
+          video_url: string | null
+        }
+        Insert: {
+          addresses_situations?: Json | null
+          age_max?: number | null
+          age_min?: number | null
+          category: Database["public"]["Enums"]["drill_category"]
+          created_at?: string | null
+          created_by?: string | null
+          description: string
+          diagram_url?: string | null
+          duration_minutes: number
+          id?: string
+          is_global?: boolean | null
+          organization_id?: string | null
+          players_max?: number | null
+          players_min?: number | null
+          skill_level?: Database["public"]["Enums"]["skill_level"] | null
+          tags?: string[] | null
+          title: string
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Update: {
+          addresses_situations?: Json | null
+          age_max?: number | null
+          age_min?: number | null
+          category?: Database["public"]["Enums"]["drill_category"]
+          created_at?: string | null
+          created_by?: string | null
+          description?: string
+          diagram_url?: string | null
+          duration_minutes?: number
+          id?: string
+          is_global?: boolean | null
+          organization_id?: string | null
+          players_max?: number | null
+          players_min?: number | null
+          skill_level?: Database["public"]["Enums"]["skill_level"] | null
+          tags?: string[] | null
+          title?: string
+          updated_at?: string | null
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "drills_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       event_edit_history: {
         Row: {
           action: string
@@ -424,6 +498,148 @@ export type Database = {
           },
         ]
       }
+      practice_drills: {
+        Row: {
+          coach_feedback: string | null
+          completed: boolean | null
+          created_at: string | null
+          drill_id: string
+          duration_minutes: number
+          effectiveness_rating: number | null
+          id: string
+          modifications: string | null
+          notes: string | null
+          practice_id: string
+          section: Database["public"]["Enums"]["practice_section"]
+          sequence_order: number
+        }
+        Insert: {
+          coach_feedback?: string | null
+          completed?: boolean | null
+          created_at?: string | null
+          drill_id: string
+          duration_minutes: number
+          effectiveness_rating?: number | null
+          id?: string
+          modifications?: string | null
+          notes?: string | null
+          practice_id: string
+          section: Database["public"]["Enums"]["practice_section"]
+          sequence_order: number
+        }
+        Update: {
+          coach_feedback?: string | null
+          completed?: boolean | null
+          created_at?: string | null
+          drill_id?: string
+          duration_minutes?: number
+          effectiveness_rating?: number | null
+          id?: string
+          modifications?: string | null
+          notes?: string | null
+          practice_id?: string
+          section?: Database["public"]["Enums"]["practice_section"]
+          sequence_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practice_drills_drill_id_fkey"
+            columns: ["drill_id"]
+            isOneToOne: false
+            referencedRelation: "drills"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "practice_drills_practice_id_fkey"
+            columns: ["practice_id"]
+            isOneToOne: false
+            referencedRelation: "practices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      practices: {
+        Row: {
+          ai_prompt: string | null
+          ai_reasoning: Json | null
+          based_on_game_id: string | null
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string | null
+          created_by: string | null
+          duration_minutes: number
+          generated_by_ai: boolean | null
+          id: string
+          location: string | null
+          notes: string | null
+          objectives: string | null
+          practice_date: string
+          status: Database["public"]["Enums"]["practice_status"] | null
+          team_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          ai_prompt?: string | null
+          ai_reasoning?: Json | null
+          based_on_game_id?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          duration_minutes: number
+          generated_by_ai?: boolean | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          objectives?: string | null
+          practice_date: string
+          status?: Database["public"]["Enums"]["practice_status"] | null
+          team_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          ai_prompt?: string | null
+          ai_reasoning?: Json | null
+          based_on_game_id?: string | null
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          duration_minutes?: number
+          generated_by_ai?: boolean | null
+          id?: string
+          location?: string | null
+          notes?: string | null
+          objectives?: string | null
+          practice_date?: string
+          status?: Database["public"]["Enums"]["practice_status"] | null
+          team_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practices_based_on_game_id_fkey"
+            columns: ["based_on_game_id"]
+            isOneToOne: false
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "practices_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "practices_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams_with_age_display"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_members: {
         Row: {
           created_at: string | null
@@ -591,12 +807,37 @@ export type Database = {
       }
     }
     Functions: {
+      calculate_practice_duration: {
+        Args: { practice_uuid: string }
+        Returns: number
+      }
       format_age_group: {
         Args: { age_years: number; region: string }
         Returns: string
       }
+      get_practice_drill_counts: {
+        Args: { practice_uuid: string }
+        Returns: Json
+      }
     }
     Enums: {
+      drill_category:
+        | "shooting"
+        | "passing"
+        | "skating"
+        | "breakouts"
+        | "forechecking"
+        | "backchecking"
+        | "defensive_zone"
+        | "power_play"
+        | "penalty_kill"
+        | "transition"
+        | "faceoffs"
+        | "warm_up"
+        | "cool_down"
+        | "conditioning"
+        | "small_area_games"
+        | "scrimmage"
       event_type:
         | "shot"
         | "breakout"
@@ -613,6 +854,14 @@ export type Database = {
       ice_zone: "defensive" | "neutral" | "offensive"
       org_role: "owner" | "admin" | "coach" | "manager" | "stat_tracker"
       player_position: "forward" | "defense" | "goalie"
+      practice_section:
+        | "warm_up"
+        | "skills"
+        | "drills"
+        | "small_area_games"
+        | "scrimmage"
+        | "cool_down"
+      practice_status: "planned" | "in_progress" | "completed" | "cancelled"
       shot_result:
         | "goal"
         | "save"
@@ -627,6 +876,7 @@ export type Database = {
         | "backhand"
         | "deflection"
         | "one_timer"
+      skill_level: "beginner" | "intermediate" | "advanced" | "all"
       team_level: "house" | "travel" | "aaa" | "aa" | "a"
       team_role: "head_coach" | "assistant_coach" | "manager" | "stat_tracker"
     }
@@ -759,6 +1009,24 @@ export const Constants = {
   },
   public: {
     Enums: {
+      drill_category: [
+        "shooting",
+        "passing",
+        "skating",
+        "breakouts",
+        "forechecking",
+        "backchecking",
+        "defensive_zone",
+        "power_play",
+        "penalty_kill",
+        "transition",
+        "faceoffs",
+        "warm_up",
+        "cool_down",
+        "conditioning",
+        "small_area_games",
+        "scrimmage",
+      ],
       event_type: [
         "shot",
         "breakout",
@@ -777,6 +1045,15 @@ export const Constants = {
       ice_zone: ["defensive", "neutral", "offensive"],
       org_role: ["owner", "admin", "coach", "manager", "stat_tracker"],
       player_position: ["forward", "defense", "goalie"],
+      practice_section: [
+        "warm_up",
+        "skills",
+        "drills",
+        "small_area_games",
+        "scrimmage",
+        "cool_down",
+      ],
+      practice_status: ["planned", "in_progress", "completed", "cancelled"],
       shot_result: [
         "goal",
         "save",
@@ -793,6 +1070,7 @@ export const Constants = {
         "deflection",
         "one_timer",
       ],
+      skill_level: ["beginner", "intermediate", "advanced", "all"],
       team_level: ["house", "travel", "aaa", "aa", "a"],
       team_role: ["head_coach", "assistant_coach", "manager", "stat_tracker"],
     },
