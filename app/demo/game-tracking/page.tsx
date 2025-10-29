@@ -9,12 +9,23 @@ import { AuthModal } from '@/components/auth/auth-modal'
 import { setupDemoGameData } from '@/app/actions/demo-setup'
 import { supabase } from '@/lib/db/supabase'
 
+interface GameInfo {
+  opponent_name: string
+  game_date: string
+  location: string | null
+}
+
 export default function GameTrackingDemoPage() {
-  const { setGameState, setPlayers, loadEvents } = useGameTrackingStore()
+  const { gameState, setGameState, setPlayers, loadEvents } = useGameTrackingStore()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [checkingAuth, setCheckingAuth] = useState(true)
+  const [gameInfo, setGameInfo] = useState<GameInfo | null>(null)
+  const [isEditingGameInfo, setIsEditingGameInfo] = useState(false)
+  const [editOpponentName, setEditOpponentName] = useState('')
+  const [editLocation, setEditLocation] = useState('')
+  const [savingGameInfo, setSavingGameInfo] = useState(false)
 
   // Check authentication status
   useEffect(() => {
@@ -55,8 +66,83 @@ export default function GameTrackingDemoPage() {
           throw new Error('User not found')
         }
 
-        // Set up demo data in database (creates org, team, players, game for authenticated user)
-        const { gameId, players } = await setupDemoGameData(user.id)
+        // Set up demo data (creates org, team, players if they don't exist)
+        const { players } = await setupDemoGameData(user.id)
+
+        // Get user's team
+        const { data: teamMember } = await supabase
+          .from('team_members')
+          .select('team_id')
+          .eq('user_id', user.id)
+          .single()
+
+        if (!teamMember) {
+          throw new Error('No team found for user')
+        }
+
+        let gameId: string | null = null
+
+        // 1. Try to load the current game from localStorage (user-specific)
+        const storageKey = `current_game_${user.id}`
+        const storedGameId = localStorage.getItem(storageKey)
+
+        if (storedGameId) {
+          // Verify the stored game still exists and belongs to this user's team
+          const { data: storedGame } = await supabase
+            .from('games')
+            .select('id')
+            .eq('id', storedGameId)
+            .eq('team_id', teamMember.team_id)
+            .maybeSingle()
+
+          if (storedGame) {
+            gameId = storedGame.id
+            console.log('✅ Loaded game from localStorage:', gameId)
+          } else {
+            // Stored game doesn't exist anymore, clear localStorage
+            localStorage.removeItem(storageKey)
+            console.log('⚠️ Stored game not found, cleared localStorage')
+          }
+        }
+
+        // 2. If no stored game, load the most recent game for this team
+        if (!gameId) {
+          const { data: recentGame } = await supabase
+            .from('games')
+            .select('id')
+            .eq('team_id', teamMember.team_id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+
+          if (recentGame) {
+            gameId = recentGame.id
+            // Store it in localStorage for next time
+            localStorage.setItem(storageKey, gameId)
+            console.log('✅ Loaded most recent game:', gameId)
+          }
+        }
+
+        // 3. If still no game, create a default one
+        if (!gameId) {
+          const { data: newGame, error: gameError } = await supabase
+            .from('games')
+            .insert({
+              team_id: teamMember.team_id,
+              opponent_name: 'Rival Team',
+              game_date: new Date().toISOString(),
+              is_home: true,
+              status: 'in_progress',
+            })
+            .select()
+            .single()
+
+          if (gameError) throw gameError
+          gameId = newGame.id
+          // Store it in localStorage
+          localStorage.setItem(storageKey, gameId)
+          console.log('✅ Created new default game:', gameId)
+        }
 
         // Initialize game state
         setGameState({
@@ -83,6 +169,31 @@ export default function GameTrackingDemoPage() {
 
     initializeDemo()
   }, [isAuthenticated, setGameState, setPlayers, loadEvents])
+
+  // Fetch game info when gameId is available
+  useEffect(() => {
+    if (!gameState.gameId) return
+
+    async function fetchGameInfo() {
+      try {
+        const { data: game, error } = await supabase
+          .from('games')
+          .select('opponent_name, game_date, location')
+          .eq('id', gameState.gameId)
+          .single()
+
+        if (error) throw error
+
+        if (game) {
+          setGameInfo(game)
+        }
+      } catch (err) {
+        console.error('Failed to fetch game info:', err)
+      }
+    }
+
+    fetchGameInfo()
+  }, [gameState.gameId])
 
   // Show auth modal if not authenticated
   if (checkingAuth) {
@@ -149,6 +260,56 @@ export default function GameTrackingDemoPage() {
     setIsAuthenticated(false)
   }
 
+  const handleEditGameInfo = () => {
+    if (gameInfo) {
+      setEditOpponentName(gameInfo.opponent_name)
+      setEditLocation(gameInfo.location || '')
+      setIsEditingGameInfo(true)
+    }
+  }
+
+  const handleCancelEdit = () => {
+    setIsEditingGameInfo(false)
+    setEditOpponentName('')
+    setEditLocation('')
+  }
+
+  const handleSaveGameInfo = async () => {
+    if (!gameState.gameId || !editOpponentName.trim()) {
+      alert('Opponent name is required')
+      return
+    }
+
+    try {
+      setSavingGameInfo(true)
+
+      const { error } = await supabase
+        .from('games')
+        .update({
+          opponent_name: editOpponentName.trim(),
+          location: editLocation.trim() !== '' ? editLocation.trim() : null,
+        })
+        .eq('id', gameState.gameId)
+
+      if (error) throw error
+
+      // Update local state
+      setGameInfo({
+        ...gameInfo!,
+        opponent_name: editOpponentName.trim(),
+        location: editLocation.trim() !== '' ? editLocation.trim() : null,
+      })
+
+      setIsEditingGameInfo(false)
+      console.log('✅ Game info updated successfully')
+    } catch (error) {
+      console.error('❌ Error updating game info:', error)
+      alert('Failed to update game info. Please try again.')
+    } finally {
+      setSavingGameInfo(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
@@ -175,6 +336,120 @@ export default function GameTrackingDemoPage() {
             </button>
           </div>
         </div>
+
+        {/* Game Info Header */}
+        {gameInfo && (
+          <div className="mb-6 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 text-white">
+            {!isEditingGameInfo ? (
+              // Display Mode
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-3xl font-bold">🏒</span>
+                    <h2 className="text-2xl font-bold">
+                      vs {gameInfo.opponent_name}
+                    </h2>
+                  </div>
+                  <div className="flex items-center gap-4 text-blue-100">
+                    <div className="flex items-center gap-2">
+                      <span>📅</span>
+                      <span>
+                        {new Date(gameInfo.game_date).toLocaleDateString('en-US', {
+                          weekday: 'short',
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric',
+                        })}
+                      </span>
+                    </div>
+                    {gameInfo.location && (
+                      <div className="flex items-center gap-2">
+                        <span>📍</span>
+                        <span>{gameInfo.location}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="text-right">
+                    <div className="text-sm text-blue-100 mb-1">Period {gameState.period}</div>
+                    <div className="text-4xl font-bold">
+                      {gameState.score.us} - {gameState.score.them}
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleEditGameInfo}
+                    className="px-3 py-2 bg-white/20 hover:bg-white/30 rounded-md transition-colors text-sm font-medium"
+                    title="Edit game info"
+                  >
+                    ✏️ Edit
+                  </button>
+                </div>
+              </div>
+            ) : (
+              // Edit Mode
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="text-3xl font-bold">🏒</span>
+                  <h3 className="text-xl font-bold">Edit Game Information</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div>
+                    <label className="block text-sm font-medium text-blue-100 mb-2">
+                      Opponent Name *
+                    </label>
+                    <input
+                      type="text"
+                      value={editOpponentName}
+                      onChange={(e) => setEditOpponentName(e.target.value)}
+                      placeholder="e.g., Hawks, Red Wings"
+                      className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-md text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/50"
+                      disabled={savingGameInfo}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-blue-100 mb-2">
+                      Location (optional)
+                    </label>
+                    <input
+                      type="text"
+                      value={editLocation}
+                      onChange={(e) => setEditLocation(e.target.value)}
+                      placeholder="e.g., Home Arena, Away Rink"
+                      className="w-full px-3 py-2 bg-white/10 border border-white/30 rounded-md text-white placeholder-blue-200 focus:outline-none focus:ring-2 focus:ring-white/50"
+                      disabled={savingGameInfo}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleSaveGameInfo}
+                    disabled={savingGameInfo || !editOpponentName.trim()}
+                    className="px-4 py-2 bg-white text-blue-600 rounded-md hover:bg-blue-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {savingGameInfo ? 'Saving...' : '💾 Save Changes'}
+                  </button>
+                  <button
+                    onClick={handleCancelEdit}
+                    disabled={savingGameInfo}
+                    className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-md transition-colors font-medium disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <div className="flex-1"></div>
+                  <div className="text-right">
+                    <div className="text-sm text-blue-100 mb-1">Period {gameState.period}</div>
+                    <div className="text-3xl font-bold">
+                      {gameState.score.us} - {gameState.score.them}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
 
         {/* Main Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

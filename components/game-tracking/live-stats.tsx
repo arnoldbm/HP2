@@ -92,6 +92,10 @@ export function LiveStats() {
 
       console.log('✅ New game created:', newGame.id, 'vs', opponentName)
 
+      // Store the new game ID in localStorage (user-specific)
+      const storageKey = `current_game_${user.id}`
+      localStorage.setItem(storageKey, newGame.id)
+
       // Reset game state with new game ID
       setGameState({
         gameId: newGame.id,

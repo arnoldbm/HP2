@@ -274,6 +274,9 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 206-702)
 - [x] **Event editing** - Undo last event, delete specific events during/after games
 - [x] **Post-game analytics** - Shot charts, heat maps, breakout stats, period trends
 - [x] **Game management** - Create games with opponent/location, switch between games in analytics
+- [x] **Game info header** - Display current game details (opponent, date, location, score, period)
+- [x] **Edit game info** - Update opponent name and location with inline form
+- [x] **Game persistence** - User-specific localStorage to remember current game across refreshes
 - [x] **Drill library** - 255 pre-loaded drills with search, filters, and categorization
 - [x] **AI practice plan generation** - OpenAI GPT-4o integration analyzing game data to recommend drills
 
@@ -433,6 +436,7 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 509-574)
 | Game selector in analytics | Support multiple games per team | Dropdown to switch between games, auto-loads most recent |
 | Replace browser dialogs with inline forms | Better UX, editable inputs, mobile-friendly | React forms instead of prompt()/alert() |
 | OpenAI GPT-4o for practice plans | Latest model, best at structured output | JSON mode for reliable parsing |
+| User-specific game persistence with localStorage | Remember current game across page refreshes | Key: `current_game_${userId}` with database verification |
 
 ### To Decide 🤔
 - [ ] Game situation detection (PP/PK): Manual buttons or auto-detect from penalties?
@@ -521,6 +525,24 @@ See: `app/demo/analytics/page.tsx` (lines 30-80)
 - Better mobile experience
 
 See: `components/game-tracking/live-stats.tsx` (lines 36-119, 216-274)
+
+---
+
+### Problem: Page refresh forgets which game is being tracked
+**Solution**: User-specific localStorage with database verification.
+- Store current game ID in localStorage with key `current_game_${userId}`
+- On page load: Check localStorage → Verify game exists in DB → Fall back to most recent
+- When creating new game: Save game ID to localStorage
+- Security: Verify stored game belongs to user's team
+- Clear localStorage if game no longer exists
+
+**Benefits**:
+- Game persists across page refreshes
+- User-specific (different users get different games)
+- Database verification prevents stale data
+- Graceful fallback to most recent game
+
+See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking/live-stats.tsx` (line 96)
 
 ---
 
@@ -647,7 +669,7 @@ See: `components/game-tracking/live-stats.tsx` (lines 36-119, 216-274)
 
 ---
 
-**Last Updated**: 2025-10-29
+**Last Updated**: 2025-10-29 (evening)
 **Maintained By**: Brock Arnold + Claude
 **Project Name**: HP2 (Hockey Practice Planner v2)
 
