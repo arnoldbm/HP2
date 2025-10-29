@@ -20,11 +20,11 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 ### Planning & Product Specs
 | File | Purpose | Last Updated |
 |------|---------|--------------|
-| `README.md` | GitHub repository overview, project status, quick start | 2025-10-27 |
-| `CLAUDE.md` | This file - central documentation hub for AI context | 2025-10-27 |
+| `README.md` | GitHub repository overview, project status, quick start | 2025-10-28 |
+| `CLAUDE.md` | This file - central documentation hub for AI context | 2025-10-28 |
 | `docs/HOCKEY_PRACTICE_APP_PLAN.md` | Complete product plan, features, user flows, monetization | 2024-01-XX |
 | `docs/DEV_SETUP_AND_DATA_MODELS.md` | Dev environment setup, database schema, TDD approach | 2024-01-XX |
-| `docs/CHANGELOG.md` | Complete project changelog with all changes by phase | 2025-10-27 |
+| `docs/CHANGELOG.md` | Complete project changelog with all changes by phase | 2025-10-28 |
 
 ### Database & Architecture
 | File | Purpose | Status |
@@ -36,6 +36,8 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `supabase/migrations/20251027180845_add_service_role_bypass_policies.sql` | Service role RLS bypass | ✅ DONE |
 | `supabase/migrations/20251027181536_fix_audit_trigger_delete.sql` | Audit log for deletes | ✅ DONE |
 | `supabase/migrations/20251027235333_remove_goal_event_type.sql` | Remove 'goal' event type (use shot with result='goal') | ✅ DONE |
+| `supabase/migrations/20251028104517_add_demo_game_support.sql` | Demo game support for testing | ✅ DONE |
+| `supabase/migrations/20251028_fix_team_members_rls.sql` | Fixed RLS policies on team_members (added SELECT policies) | ✅ DONE |
 | `lib/types/database.ts` | Auto-generated TypeScript types from Supabase | ✅ DONE |
 | Architecture diagram | System architecture overview | TODO |
 
@@ -83,6 +85,24 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `components/analytics/breakout-analysis.tsx` | Breakout performance with pie/bar charts | - | ✅ DONE |
 | `components/analytics/period-trends.tsx` | Period-by-period trends with line/bar charts | - | ✅ DONE |
 | `app/demo/analytics/page.tsx` | Analytics dashboard with filters | - | ✅ DONE |
+
+### Authentication Components
+| Component | Purpose | Status |
+|-----------|---------|--------|
+| `components/auth/auth-form.tsx` | Reusable auth form with sign up/sign in modes | ✅ DONE |
+| `components/auth/auth-modal.tsx` | Modal wrapper for auth form with mode toggling | ✅ DONE |
+| `app/auth/reset-password/page.tsx` | Password reset page with email verification | ✅ DONE |
+| `app/demo/game-tracking/page.tsx` | Demo page with auth gates and session management | ✅ DONE |
+| `app/actions/demo-setup.ts` | Server action for creating user-specific demo data | ✅ DONE |
+
+**Authentication Features:**
+- Email/password authentication via Supabase Auth
+- Email confirmation required before sign-in
+- Password reset flow with email verification
+- Session management with auto-redirect on 403/RLS errors
+- Local email testing via Mailpit (localhost:54324)
+- User-specific data isolation via team memberships
+- Auto-signout on RLS policy violations
 
 ---
 
@@ -236,19 +256,21 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 206-702)
 ## 🎨 MVP SCOPE (Phase 1 - 6-8 weeks)
 
 ### Must-Have Features
-✅ Decided in planning:
-- [x] User auth (email/password)
-- [x] Organization + Team + Player management
-- [x] **Live game tracking** (shots + defensive events + special teams)
-- [x] **Interactive ice surface** (SVG, tap-to-log)
-- [x] **Live stats during game** (running totals, expandable panel)
-- [x] **Event editing** (undo during game, full edit post-game)
-- [x] **Offline support** (PWA + IndexedDB + background sync)
-- [x] **Post-game analytics** (shot charts, heat maps, breakout stats)
-- [x] Basic drill library (100+ pre-loaded drills)
-- [x] Manual practice plan builder
-- [x] AI practice plan generation (integrates tracking data)
-- [x] Practice history
+✅ Completed:
+- [x] **User auth (email/password)** - Full authentication system with email confirmation and password reset
+- [x] **Organization + Team + Player management** - Database schema with RLS policies
+- [x] **Live game tracking** - Shots + defensive events (breakouts, turnovers, zone entries, faceoffs)
+- [x] **Interactive ice surface** - SVG with tap-to-log coordinates (0-200 x 0-100)
+- [x] **Live stats during game** - Running totals, success rates, expandable panel
+- [x] **Event editing** - Undo last event, delete specific events during/after games
+- [x] **Post-game analytics** - Shot charts, heat maps, breakout stats, period trends
+
+🚧 In Progress / Deferred:
+- [ ] **Offline support** (PWA + IndexedDB + background sync) - Deferred to post-MVP
+- [ ] Basic drill library (100+ pre-loaded drills) - Phase 4-6
+- [ ] Manual practice plan builder - Phase 4-6
+- [ ] AI practice plan generation (integrates tracking data) - Phase 4-6
+- [ ] Practice history - Phase 4-6
 
 ### Post-MVP (Deferred)
 - [ ] Stripe integration (launch free tier only)
@@ -313,8 +335,9 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 501-528)
 - [ ] Offline storage (IndexedDB)
 - [ ] Background sync (PWA)
 
-### Phase 3: Post-Game Analytics ✅ **COMPLETE**
-**Data Analysis & Visualization**
+### Phase 3: Post-Game Analytics + Authentication ✅ **COMPLETE**
+
+**Data Analysis & Visualization:**
 - [x] Analytics calculation functions (21 tests)
 - [x] Shot chart with location visualization on ice surface
 - [x] Shot quality breakdown (high/medium/low danger)
@@ -324,6 +347,20 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 501-528)
 - [x] Analytics dashboard with filters (period, situation)
 - [x] Demo page: `/demo/analytics` - Full analytics dashboard
 - [x] Auto-generated insights (breakout performance, period analysis)
+
+**Authentication System:**
+- [x] Email/password authentication via Supabase Auth
+- [x] User registration with full name field
+- [x] Email confirmation required before sign-in
+- [x] Password reset flow with email verification
+- [x] Password reset page: `/auth/reset-password`
+- [x] Session management with `onAuthStateChange` listeners
+- [x] Auto-redirect on 403/RLS policy violations
+- [x] Auth components: `AuthForm`, `AuthModal`
+- [x] User-specific demo data (each user gets own org/team/game)
+- [x] Fixed RLS policies on `team_members` table (added SELECT policies)
+- [x] Local email testing via Mailpit (localhost:54324)
+- [x] Updated Supabase config for password reset redirects
 
 ### Phase 4-6: Practice Planning & AI (Weeks 6-8)
 - [ ] Drill library with search
@@ -489,9 +526,9 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
 
 ## 📊 PROJECT STATUS
 
-**Current Status**: Phase 3 Complete - Analytics Dashboard Live! 🎉
+**Current Status**: Phase 3 Complete - Analytics + Authentication Live! 🎉🔐
 **Next Milestone**: Practice Planning & AI Integration (Phase 4-6)
-**Target MVP Completion**: On track! 50% complete
+**Target MVP Completion**: On track! ~60% complete
 **Target Beta Launch**: 10-12 weeks from start
 
 **Progress Tracker**:
@@ -500,30 +537,40 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
 - [x] TDD approach defined
 - [x] Tech stack decisions
 - [x] Project initialization (100%)
-- [x] Phase 1: Foundation (100%)
-- [x] Phase 2: Game Tracking & Event Logger (100%) ✅
-  - [x] Database layer with 7 migrations
+- [x] **Phase 1: Foundation (100%)** ✅
+  - [x] Next.js + Supabase + Vitest + Playwright
+  - [x] 114 unit tests for core utilities
+- [x] **Phase 2: Game Tracking & Event Logger (100%)** ✅
+  - [x] Database layer with 9 migrations
   - [x] Event logger UI with 6 components
   - [x] Live stats and event list
   - [x] Database persistence with optimistic updates
   - [x] 234 tests passing (2 skipped)
-- [x] Phase 3: Post-Game Analytics (100%) ✅
-  - [x] Analytics calculation functions
-  - [x] 4 visualization components (shot chart, quality, breakouts, trends)
-  - [x] Analytics dashboard with filters
-  - [x] 21 analytics tests passing
-- [ ] Phase 4-6: Practice Planning (0%)
+- [x] **Phase 3: Post-Game Analytics + Authentication (100%)** ✅
+  - [x] Analytics dashboard with 4 visualization components
+  - [x] Shot charts, breakout analysis, period trends
+  - [x] Full authentication system (email/password, reset flow)
+  - [x] Session management and RLS security
+  - [x] 21 analytics tests
+- [ ] **Phase 4-6: Practice Planning & AI (0%)**
+  - [ ] Drill library with search
+  - [ ] Practice plan builder
+  - [ ] OpenAI integration for AI-generated plans
 
 **Demo Pages Available**:
 - 🎨 `/demo/ice-surface` - Interactive ice surface visualization
-- 🏒 `/demo/game-tracking` - Complete event logger with live stats & database persistence
+- 🏒 `/demo/game-tracking` - Complete event logger with live stats & database persistence (requires auth)
 - 📊 `/demo/analytics` - Post-game analytics dashboard with charts & insights
+
+**Local Development Tools**:
+- 🗄️ http://localhost:54323 - Supabase Studio (database GUI)
+- 📧 http://localhost:54324 - Mailpit (email inbox for testing auth flows)
 
 **Test Coverage**: 234/236 tests passing (99.2% success rate)
 
 ---
 
-**Last Updated**: 2025-10-27
+**Last Updated**: 2025-10-28
 **Maintained By**: Brock Arnold + Claude
 **Project Name**: HP2 (Hockey Practice Planner v2)
 
@@ -536,8 +583,8 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
 1. This is a hockey practice planning app with live game tracking
 2. We're using TDD (tests first, always!)
 3. Key docs: `docs/HOCKEY_PRACTICE_APP_PLAN.md` + `docs/DEV_SETUP_AND_DATA_MODELS.md`
-4. **Current phase: Phase 3 COMPLETE** - Event tracking + Analytics working!
-5. **Next up**: Phase 4-6 - Practice Planning & AI Integration
+4. **Current phase: Phase 3 COMPLETE** ✅ - Game tracking + Analytics + Authentication all working!
+5. **Next phase: Phase 4-6** - Practice Planning & AI Integration
 6. Critical decisions:
    - Age groups stored as integers, formatted by region
    - Goal is a shot with result='goal' (not separate event type)

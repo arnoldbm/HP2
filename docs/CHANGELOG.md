@@ -6,7 +6,103 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Phase 3 Complete] - 2025-10-27
+## [Phase 3 Complete + Authentication] - 2025-10-28
+
+### 🎉 Major Milestone: Full Authentication System + Phase 3 Complete!
+
+This release adds a production-ready authentication system with email confirmation and password reset, completing Phase 3 with both analytics and auth working together.
+
+### Added
+
+#### Authentication System
+- **Auth Components**
+  - `components/auth/auth-form.tsx` - Reusable authentication form with sign up/sign in modes
+    - Email/password authentication
+    - Full name field for user registration
+    - Password reset functionality
+    - Resend confirmation email
+    - Improved error messages with specific handling for common auth errors
+    - Local development email link (localhost:54324)
+  - `components/auth/auth-modal.tsx` - Modal wrapper with mode toggling
+  - `app/auth/reset-password/page.tsx` - Password reset page with email verification
+    - Session validation from reset link
+    - Password confirmation with validation
+    - Auto-redirect to demo page after success
+
+- **Authentication Features**
+  - Email confirmation required before sign-in
+  - Password reset flow with email verification
+  - Session management with `onAuthStateChange` listeners
+  - Auto-redirect on 403/RLS policy violations
+  - Auto-signout when RLS policies deny access
+  - User-specific data isolation via team memberships
+
+- **Demo Setup for Authenticated Users**
+  - Updated `app/actions/demo-setup.ts` to accept userId parameter
+  - Each user gets their own organization (unique slug: `demo-org-{userId}`)
+  - Auto-creates team membership linking user to team
+  - Server-side user verification
+
+- **Updated Demo Pages**
+  - `app/demo/game-tracking/page.tsx` now requires authentication
+  - Auth state checking on mount
+  - Sign out button with proper session cleanup
+  - Auth modal shown when not authenticated
+  - Loading states for auth checks
+
+#### Database & Security
+- **Fixed RLS Policies** (`supabase/migrations/20251028_fix_team_members_rls.sql`)
+  - Added SELECT policies to `team_members` table (was blocking RLS subqueries)
+  - Policy: "Users can view all team memberships" (needed for game_events RLS to work)
+  - Policy: "Users can view their own memberships"
+  - Policy: "Team members can add other members"
+
+- **Demo Game Support** (`supabase/migrations/20251028104517_add_demo_game_support.sql`)
+  - Database migrations for demo game setup
+
+- **Enhanced Error Handling** (`lib/db/game-events.ts`)
+  - All database operations now detect RLS errors (code 42501)
+  - Auto-signout on RLS policy violations
+  - Clear error logging for debugging
+
+#### Configuration
+- **Updated Supabase Config** (`supabase/config.toml`)
+  - Added `additional_redirect_urls` for password reset redirects
+  - URLs: `http://127.0.0.1:3000/auth/reset-password`, `http://localhost:3000/auth/reset-password`
+  - Enables proper password reset flow
+
+### Changed
+
+#### Authentication Flow
+- All database operations now include authentication checks
+- Session validation before API calls
+- Improved error messages guiding users to create accounts after database resets
+- Better handling of expired or invalid sessions
+
+### Fixed
+
+- **RLS Policy Issue**: `team_members` table had RLS enabled but no SELECT policies, causing `game_events` INSERT policy subqueries to fail
+- **Password Reset Redirects**: Emails now properly redirect to `/auth/reset-password` page
+- **Session Persistence**: Auth state properly synced across page loads and refreshes
+
+### Documentation Updates
+- Updated `README.md`:
+  - Added "Local Development Tools" section
+  - Documented Supabase Studio (localhost:54323)
+  - Documented Mailpit email inbox (localhost:54324)
+
+- Updated `CLAUDE.md`:
+  - Added authentication components section
+  - Added 2 new migrations to database section
+  - Updated dates to 2025-10-28
+  - Updated Phase 3 to include authentication
+  - Updated project status to ~60% complete
+  - Added local development tools URLs
+  - Updated quick start section for new sessions
+
+---
+
+## [Phase 3 Complete - Analytics] - 2025-10-27
 
 ### 🎉 Major Milestone: Post-Game Analytics Dashboard Complete!
 
