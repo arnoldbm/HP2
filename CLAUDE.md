@@ -38,6 +38,8 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `supabase/migrations/20251027235333_remove_goal_event_type.sql` | Remove 'goal' event type (use shot with result='goal') | ✅ DONE |
 | `supabase/migrations/20251028104517_add_demo_game_support.sql` | Demo game support for testing | ✅ DONE |
 | `supabase/migrations/20251028_fix_team_members_rls.sql` | Fixed RLS policies on team_members (added SELECT policies) | ✅ DONE |
+| `supabase/migrations/20251028230000_practice_planning_schema.sql` | Practice planning schema (drills, practices, practice_drills with RLS) | ✅ DONE |
+| `supabase/seeds/drills.sql` | 255 hockey drills with AI metadata (addresses_situations JSONB) | ✅ DONE |
 | `lib/types/database.ts` | Auto-generated TypeScript types from Supabase | ✅ DONE |
 | Architecture diagram | System architecture overview | TODO |
 
@@ -362,11 +364,26 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 501-528)
 - [x] Local email testing via Mailpit (localhost:54324)
 - [x] Updated Supabase config for password reset redirects
 
-### Phase 4-6: Practice Planning & AI (Weeks 6-8)
-- [ ] Drill library with search
-- [ ] Practice plan builder (drag-and-drop)
-- [ ] OpenAI integration
-- [ ] AI practice plan generation (uses tracking data)
+### Phase 4-6: Practice Planning & AI 🚧 **IN PROGRESS** (~35% COMPLETE)
+
+**Database Foundation:** ✅ **COMPLETE**
+- [x] Database schema (drills, practices, practice_drills tables)
+- [x] Full RLS policies for multi-tenant practice planning
+- [x] Helper functions (calculate_practice_duration, get_practice_drill_counts)
+- [x] 255-drill library with AI integration metadata
+  - 16 categories (shooting, passing, skating, breakouts, forechecking, backchecking, defensive_zone, power_play, penalty_kill, transition, faceoffs, warm_up, cool_down, conditioning, small_area_games, scrimmage)
+  - Each drill includes: title, description, duration, age range, skill level
+  - AI metadata: `addresses_situations` JSONB field mapping drills to game analytics issues
+  - Searchable tags array for filtering
+- [x] Seed data loaded into database (255 drills)
+
+**UI & Features:** 🚧 **TODO**
+- [ ] Drill library UI with search and filters
+- [ ] Practice plan builder (drag-and-drop drill selection)
+- [ ] OpenAI integration for AI-powered practice plan generation
+- [ ] AI practice plan generation (uses tracked game data to recommend drills)
+- [ ] Practice history view
+- [ ] Mobile-friendly practice plan display
 
 See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 509-574)
 
@@ -468,7 +485,7 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
 - [ ] Create ice surface coordinate system diagram
 
 ### Before Launch
-- [ ] Seed drill library with 100+ drills
+- [x] **Seed drill library with 255 drills** ✅ (exceeded goal!)
 - [ ] Create AI prompt templates for practice plan generation
 - [ ] Design onboarding flow for new coaches
 - [ ] Beta test with 3-5 real teams (full season)
@@ -526,9 +543,9 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
 
 ## 📊 PROJECT STATUS
 
-**Current Status**: Phase 3 Complete - Analytics + Authentication Live! 🎉🔐
-**Next Milestone**: Practice Planning & AI Integration (Phase 4-6)
-**Target MVP Completion**: On track! ~60% complete
+**Current Status**: Phase 4-6 In Progress - Practice Planning Database & Drills Complete! 🏒📚
+**Next Milestone**: Drill Library UI → AI Integration (Phase 4-6)
+**Target MVP Completion**: On track! ~65% complete (database + 255 drills done!)
 **Target Beta Launch**: 10-12 weeks from start
 
 **Progress Tracker**:
@@ -552,8 +569,11 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
   - [x] Full authentication system (email/password, reset flow)
   - [x] Session management and RLS security
   - [x] 21 analytics tests
-- [ ] **Phase 4-6: Practice Planning & AI (0%)**
-  - [ ] Drill library with search
+- [ ] **Phase 4-6: Practice Planning & AI (35%)** 🚧
+  - [x] Database schema (drills, practices, practice_drills)
+  - [x] 255-drill library with AI metadata loaded
+  - [x] RLS policies for multi-tenant practice planning
+  - [ ] Drill library UI with search
   - [ ] Practice plan builder
   - [ ] OpenAI integration for AI-generated plans
 
@@ -570,7 +590,7 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
 
 ---
 
-**Last Updated**: 2025-10-28
+**Last Updated**: 2025-10-29
 **Maintained By**: Brock Arnold + Claude
 **Project Name**: HP2 (Hockey Practice Planner v2)
 
