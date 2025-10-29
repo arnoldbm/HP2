@@ -25,6 +25,7 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `docs/HOCKEY_PRACTICE_APP_PLAN.md` | Complete product plan, features, user flows, monetization | 2024-01-XX |
 | `docs/DEV_SETUP_AND_DATA_MODELS.md` | Dev environment setup, database schema, TDD approach | 2024-01-XX |
 | `docs/CHANGELOG.md` | Complete project changelog with all changes by phase | 2025-10-28 |
+| `docs/AI_PRACTICE_PLAN_GENERATION.md` | **NEW** Complete guide to AI practice plan generation (workflow, prompts, algorithms, testing) | 2025-10-29 |
 
 ### Database & Architecture
 | File | Purpose | Status |
@@ -60,11 +61,15 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `tests/unit/analytics.test.ts` | Analytics calculation functions | ✅ DONE (21 tests) |
 | `tests/integration/game-events.test.ts` | Game event CRUD with RLS | ✅ DONE (23 tests, 2 skipped) |
 | `tests/integration/game-event-persistence.test.ts` | Event save/load with optimistic updates | ✅ DONE (11 tests) |
+| `tests/integration/practice-planning.test.ts` | **NEW** Practice plan CRUD, drill associations, drill matching, RLS | ✅ DONE (21 tests) |
 | `tests/e2e/game-tracking.spec.ts` | Live tracking E2E tests | TODO |
 
-**Current Test Count: 234 tests passing (2 skipped) = 236 total**
+**Current Test Count: 255 tests passing (2 skipped) = 257 total**
 - Unit: 200 tests
-- Integration: 34 tests (2 skipped due to JWT limitation)
+- Integration: 55 tests (2 skipped due to JWT limitation)
+  - Game events: 23 tests (2 skipped)
+  - Game event persistence: 11 tests
+  - Practice planning: 21 tests ✨ NEW
 
 ### Game Tracking Components
 | Component | Purpose | Tests | Status |
@@ -437,6 +442,9 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 509-574)
 | Replace browser dialogs with inline forms | Better UX, editable inputs, mobile-friendly | React forms instead of prompt()/alert() |
 | OpenAI GPT-4o for practice plans | Latest model, best at structured output | JSON mode for reliable parsing |
 | User-specific game persistence with localStorage | Remember current game across page refreshes | Key: `current_game_${userId}` with database verification |
+| Store AI reasoning in JSONB field | Preserves full context for future reference | `practices.ai_reasoning` stores focus areas, assessment, goals |
+| Case-insensitive drill matching | Handles variations in AI-generated titles | Map-based lookup with normalized keys |
+| Save AI practice plans to database | Coaches need to reference plans across sessions | Full persistence with drill associations and sections |
 
 ### To Decide 🤔
 - [ ] Game situation detection (PP/PK): Manual buttons or auto-detect from penalties?
@@ -494,10 +502,29 @@ See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 634-675)
 **Solution**: PWA with IndexedDB + background sync
 - All events stored locally first (IndexedDB via Dexie.js)
 - `sync_queue` table tracks pending changes
-- Background Sync API syncs when online
-- Visual indicator: "Offline - will sync when connected"
 
-See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 677-702)
+---
+
+### Problem: AI generates drill titles that don't exactly match database drills
+**Solution**: Case-insensitive drill title matching with Map lookup
+- Fetch all drills: `SELECT id, title FROM drills WHERE is_global = true`
+- Create map: `new Map(drills.map(d => [d.title.toLowerCase(), d.id]))`
+- Match AI titles: `drillTitleMap.get(aiDrillTitle.toLowerCase())`
+- Gracefully skip unmatched drills with console warning
+- Coaches can manually add missing drills later
+
+See: `docs/AI_PRACTICE_PLAN_GENERATION.md` (Drill Matching Algorithm section)
+
+---
+
+### Problem: Need to preserve AI reasoning for why drills were chosen
+**Solution**: Store full AI reasoning in JSONB field
+- `practices.ai_reasoning` stores: top_focus_areas, overall_assessment, practice_goals
+- `practice_drills.notes` stores: drill reason + expected improvement
+- Coaches can review AI logic later
+- Future: Use for drill effectiveness analysis
+
+See: `docs/AI_PRACTICE_PLAN_GENERATION.md` (Database Schema section)
 
 ---
 
