@@ -91,21 +91,23 @@ export function QuickEventButtons({
           disabled={disabled}
           className={`
             ${button.color}
-            ${compact ? 'py-3 px-4 text-sm' : 'py-4 px-6 text-base'}
+            ${compact ? 'py-3 px-3 text-sm' : 'py-5 md:py-4 px-4 md:px-6 text-base'}
             font-semibold rounded-lg
             shadow-md
             transition-all duration-150
             active:scale-95
             disabled:opacity-50 disabled:cursor-not-allowed
             ${!disabled ? 'hover:shadow-lg' : ''}
+            touch-manipulation
+            min-h-[56px]
           `}
           aria-label={button.label}
         >
           <div className="flex items-center justify-center gap-2">
             {showIcons && button.icon && (
-              <span className="text-xl">{button.icon}</span>
+              <span className="text-xl md:text-2xl">{button.icon}</span>
             )}
-            <span>{button.label}</span>
+            <span className="text-sm md:text-base">{button.label}</span>
           </div>
         </button>
       ))}

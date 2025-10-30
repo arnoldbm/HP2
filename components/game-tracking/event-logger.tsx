@@ -9,15 +9,12 @@ import type { Coordinates } from '@/lib/utils/ice-surface-coordinates'
 import type { ShotResult } from '@/lib/stores/game-tracking-store'
 
 export interface EventLoggerProps {
-  width?: number
-  height?: number
   showZones?: boolean
   showSlot?: boolean
+  // Remove fixed width/height props - now fully responsive
 }
 
 export function EventLogger({
-  width = 600,
-  height = 300,
   showZones = true,
   showSlot = true,
 }: EventLoggerProps) {
@@ -70,16 +67,15 @@ export function EventLogger({
     switch (loggingFlow.step) {
       case 'idle':
         return (
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {/* Ice Surface for visualization */}
-            <div className="bg-white rounded-lg shadow p-4">
+            <div className="bg-white rounded-lg shadow p-3 md:p-4">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Ice Surface</h3>
-              <div className="flex justify-center">
+              <div className="w-full">
                 <IceSurface
-                  width={width}
-                  height={height}
                   showZones={showZones}
                   showSlot={showSlot}
+                  responsive={true}
                   events={events.map((e) => ({
                     id: e.id,
                     x: e.coordinates?.x || 0,
@@ -91,9 +87,9 @@ export function EventLogger({
             </div>
 
             {/* Quick Event Buttons */}
-            <div className="bg-white rounded-lg shadow p-4">
+            <div className="bg-white rounded-lg shadow p-3 md:p-4">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Log Event</h3>
-              <QuickEventButtons onEventSelect={handleEventTypeSelect} />
+              <QuickEventButtons onEventSelect={handleEventTypeSelect} showIcons={true} />
             </div>
           </div>
         )
@@ -101,20 +97,19 @@ export function EventLogger({
       case 'select_location':
         return (
           <div className="space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-blue-900 font-medium">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
+              <p className="text-blue-900 font-medium text-sm md:text-base">
                 Tap the ice surface where the {loggingFlow.eventType} occurred
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-4">
-              <div className="flex justify-center">
+            <div className="bg-white rounded-lg shadow p-3 md:p-4">
+              <div className="w-full">
                 <IceSurface
-                  width={width}
-                  height={height}
                   onClick={handleIceClick}
                   showZones={showZones}
                   showSlot={showSlot}
+                  responsive={true}
                   events={events.map((e) => ({
                     id: e.id,
                     x: e.coordinates?.x || 0,
@@ -127,7 +122,7 @@ export function EventLogger({
 
             <button
               onClick={cancelEventLogging}
-              className="w-full py-2 text-sm text-gray-600 hover:text-gray-800"
+              className="w-full py-3 md:py-2 text-sm md:text-base text-gray-600 hover:text-gray-800 font-medium"
             >
               Cancel
             </button>
@@ -164,45 +159,45 @@ export function EventLogger({
         if (loggingFlow.eventType === 'shot' || loggingFlow.eventType === 'goal') {
           return (
             <div className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-blue-900 font-medium">Select shot result</p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
+                <p className="text-blue-900 font-medium text-sm md:text-base">Select shot result</p>
               </div>
 
-              <div className="bg-white rounded-lg shadow p-4">
+              <div className="bg-white rounded-lg shadow p-3 md:p-4">
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={() => handleShotResultSelect('goal')}
-                    className="py-4 px-6 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg shadow"
+                    className="py-5 md:py-4 px-4 md:px-6 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation"
                   >
                     Goal
                   </button>
                   <button
                     onClick={() => handleShotResultSelect('save')}
-                    className="py-4 px-6 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg shadow"
+                    className="py-5 md:py-4 px-4 md:px-6 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => handleShotResultSelect('miss_wide')}
-                    className="py-4 px-6 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow"
+                    className="py-5 md:py-4 px-4 md:px-6 bg-gray-500 hover:bg-gray-600 active:bg-gray-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation"
                   >
                     Miss Wide
                   </button>
                   <button
                     onClick={() => handleShotResultSelect('miss_high')}
-                    className="py-4 px-6 bg-gray-500 hover:bg-gray-600 text-white font-semibold rounded-lg shadow"
+                    className="py-5 md:py-4 px-4 md:px-6 bg-gray-500 hover:bg-gray-600 active:bg-gray-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation"
                   >
                     Miss High
                   </button>
                   <button
                     onClick={() => handleShotResultSelect('blocked')}
-                    className="py-4 px-6 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-lg shadow"
+                    className="py-5 md:py-4 px-4 md:px-6 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation"
                   >
                     Blocked
                   </button>
                   <button
                     onClick={() => handleShotResultSelect('post')}
-                    className="py-4 px-6 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg shadow"
+                    className="py-5 md:py-4 px-4 md:px-6 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation"
                   >
                     Post
                   </button>
@@ -210,7 +205,7 @@ export function EventLogger({
 
                 <button
                   onClick={cancelEventLogging}
-                  className="w-full mt-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+                  className="w-full mt-4 py-3 md:py-2 text-sm md:text-base text-gray-600 hover:text-gray-800 font-medium"
                 >
                   Cancel
                 </button>

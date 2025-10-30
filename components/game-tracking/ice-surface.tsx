@@ -16,25 +16,31 @@ export interface IceEvent {
 }
 
 export interface IceSurfaceProps {
-  width?: number
-  height?: number
+  width?: number | string
+  height?: number | string
   onClick?: (coords: Coordinates) => void
   showZones?: boolean
   showSlot?: boolean
   events?: IceEvent[]
   className?: string
+  responsive?: boolean // New prop for responsive behavior
 }
 
 export function IceSurface({
-  width = 400,
-  height = 200,
+  width,
+  height,
   onClick,
   showZones = false,
   showSlot = false,
   events = [],
   className = '',
+  responsive = true, // Default to responsive
 }: IceSurfaceProps) {
   const svgRef = useRef<SVGSVGElement>(null)
+
+  // For responsive mode, use 100% width and auto height
+  const svgWidth = responsive ? '100%' : (width || 400)
+  const svgHeight = responsive ? 'auto' : (height || 200)
 
   const handleClick = (e: MouseEvent<SVGSVGElement>) => {
     if (!onClick) return
@@ -78,15 +84,15 @@ export function IceSurface({
   return (
     <svg
       ref={svgRef}
-      width={width}
-      height={height}
+      width={svgWidth}
+      height={svgHeight}
       viewBox={`0 0 ${ICE_SURFACE.WIDTH} ${ICE_SURFACE.HEIGHT}`}
       preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="Hockey ice surface"
       onClick={handleClick}
-      className={`cursor-pointer ${className}`}
-      style={{ border: '1px solid #ccc' }}
+      className={`cursor-pointer ${responsive ? 'max-w-full' : ''} ${className}`}
+      style={{ border: '1px solid #ccc', display: 'block' }}
     >
       {/* Ice surface background */}
       <rect

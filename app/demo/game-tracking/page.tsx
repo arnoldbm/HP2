@@ -330,46 +330,46 @@ export default function GameTrackingDemoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+    <div className="min-h-screen bg-gray-50 p-3 md:p-4 lg:p-8">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Live Game Tracking Demo
+        {/* Header - Mobile Optimized */}
+        <div className="mb-6 md:mb-8">
+          <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3 md:gap-0">
+            <div className="flex-1">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                Live Game Tracking
               </h1>
-              <p className="text-gray-600">
-                The complete event logging system - events are saved to Supabase in real-time
+              <p className="text-sm md:text-base text-gray-600">
+                Events saved to Supabase in real-time
               </p>
-              <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+              <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs md:text-sm">
                 <span className="w-2 h-2 bg-green-600 rounded-full animate-pulse"></span>
-                Connected to database
+                Connected
               </div>
             </div>
             <button
               onClick={handleSignOut}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors self-start md:self-auto"
             >
               Sign Out
             </button>
           </div>
         </div>
 
-        {/* Game Info Header */}
+        {/* Game Info Header - Mobile Optimized */}
         {gameInfo && (
-          <div className="mb-6 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-6 text-white">
+          <div className="mb-4 md:mb-6 bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-lg p-4 md:p-6 text-white">
             {!isEditingGameInfo ? (
               // Display Mode
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-3xl font-bold">🏒</span>
-                    <h2 className="text-2xl font-bold">
+                  <div className="flex items-center gap-2 md:gap-3 mb-2">
+                    <span className="text-2xl md:text-3xl font-bold">🏒</span>
+                    <h2 className="text-xl md:text-2xl font-bold">
                       vs {gameInfo.opponent_name}
                     </h2>
                   </div>
-                  <div className="flex items-center gap-4 text-blue-100">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-blue-100 text-sm md:text-base">
                     <div className="flex items-center gap-2">
                       <span>📅</span>
                       <span>
@@ -389,16 +389,16 @@ export default function GameTrackingDemoPage() {
                     )}
                   </div>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className="text-sm text-blue-100 mb-1">Period {gameState.period}</div>
-                    <div className="text-4xl font-bold">
+                <div className="flex items-center justify-between md:justify-end gap-3 md:gap-4">
+                  <div className="text-left md:text-right">
+                    <div className="text-xs md:text-sm text-blue-100 mb-1">Period {gameState.period}</div>
+                    <div className="text-3xl md:text-4xl font-bold">
                       {gameState.score.us} - {gameState.score.them}
                     </div>
                   </div>
                   <button
                     onClick={handleEditGameInfo}
-                    className="px-3 py-2 bg-white/20 hover:bg-white/30 rounded-md transition-colors text-sm font-medium"
+                    className="px-3 py-2 bg-white/20 hover:bg-white/30 rounded-md transition-colors text-xs md:text-sm font-medium whitespace-nowrap"
                     title="Edit game info"
                   >
                     ✏️ Edit
@@ -470,15 +470,15 @@ export default function GameTrackingDemoPage() {
         )}
 
 
-        {/* Main Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Event Logger */}
+        {/* Main Layout - Mobile-First */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+          {/* Event Logger - Full width on mobile */}
           <div className="lg:col-span-2">
-            <EventLogger width={700} height={350} />
+            <EventLogger />
           </div>
 
-          {/* Right Column - Stats & Events */}
-          <div className="space-y-6">
+          {/* Stats & Events - Stack on mobile */}
+          <div className="space-y-4 md:space-y-6">
             {/* Live Stats */}
             <LiveStats />
 
