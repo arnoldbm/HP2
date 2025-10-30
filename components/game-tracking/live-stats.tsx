@@ -10,6 +10,7 @@ export function LiveStats() {
   const [showNewGameForm, setShowNewGameForm] = useState(false)
   const [opponentName, setOpponentName] = useState('')
   const [location, setLocation] = useState('')
+  const [isExpanded, setIsExpanded] = useState(false) // Collapsed by default on mobile
 
   const shotStats = getShotStats()
   const breakoutStats = getBreakoutStats()
@@ -123,31 +124,59 @@ export function LiveStats() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
-      <h2 className="text-xl font-bold mb-4">Live Game Stats</h2>
+    <div className="bg-white rounded-lg shadow-lg p-4 md:p-6">
+      {/* Header with expand/collapse button */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg md:text-xl font-bold">Live Stats</h2>
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="md:hidden p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-md transition-colors"
+          aria-label={isExpanded ? 'Collapse stats' : 'Expand stats'}
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className={`h-5 w-5 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+      </div>
 
-      {/* Period and Score */}
-      <div className="mb-6 p-4 bg-gray-100 rounded-lg">
+      {/* Period and Score - Always visible */}
+      <div className="mb-4 p-3 md:p-4 bg-gray-100 rounded-lg">
         <div className="flex justify-between items-center">
           <div>
-            <span className="text-sm text-gray-600">Period</span>
-            <p className="text-2xl font-bold">{gameState.period}</p>
+            <span className="text-xs md:text-sm text-gray-600">Period</span>
+            <p className="text-xl md:text-2xl font-bold">{gameState.period}</p>
           </div>
           <div className="text-center">
-            <span className="text-sm text-gray-600">Score</span>
-            <p className="text-3xl font-bold">
+            <span className="text-xs md:text-sm text-gray-600">Score</span>
+            <p className="text-2xl md:text-3xl font-bold">
               {gameState.score.us} - {gameState.score.them}
             </p>
           </div>
           <div>
-            <span className="text-sm text-gray-600">Situation</span>
-            <p className="text-sm font-medium">{gameState.situation.replace('_', ' ')}</p>
+            <span className="text-xs md:text-sm text-gray-600">Situation</span>
+            <p className="text-xs md:text-sm font-medium capitalize">{gameState.situation.replace('_', ' ')}</p>
           </div>
         </div>
       </div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+      {/* Collapsed Summary - Mobile only */}
+      {!isExpanded && (
+        <div className="md:hidden text-sm text-gray-600 mb-4 flex items-center gap-4">
+          <span>Shots: <strong className="text-gray-900">{shotStats.total}</strong></span>
+          <span>Events: <strong className="text-gray-900">{events.length}</strong></span>
+          <span className="text-xs text-gray-500">Tap ▼ for details</span>
+        </div>
+      )}
+
+      {/* Stats Grid - Collapsible on mobile, always visible on desktop */}
+      <div className={`${isExpanded ? 'block' : 'hidden'} md:block`}>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
         {/* Shot Stats */}
         <div className="p-4 bg-blue-50 rounded-lg">
           <h3 className="text-sm font-medium text-blue-900 mb-2">Shots</h3>
@@ -195,8 +224,8 @@ export function LiveStats() {
         </div>
       </div>
 
-      {/* Game Controls */}
-      <div className="mt-6 pt-6 border-t border-gray-200">
+      {/* Game Controls - Also collapsible on mobile */}
+      <div className="mt-4 md:mt-6 pt-4 md:pt-6 border-t border-gray-200">
         <h3 className="text-sm font-semibold text-gray-900 mb-3">Game Controls</h3>
         <div className="space-y-3">
           {/* Period/Game controls */}
@@ -278,6 +307,7 @@ export function LiveStats() {
           )}
         </div>
       </div>
+      </div>{/* End collapsible section */}
     </div>
   )
 }
