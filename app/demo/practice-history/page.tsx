@@ -108,7 +108,7 @@ export default function PracticeHistoryPage() {
       }
 
       console.log('✅ Loaded', practicesData.length, 'practices')
-      setPractices(practicesData)
+      setPractices(practicesData as any)
     } catch (err) {
       console.error('❌ Error loading practices:', err)
       setError('An unexpected error occurred')
