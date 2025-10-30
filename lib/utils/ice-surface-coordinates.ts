@@ -6,20 +6,26 @@
  * Coordinate System:
  * - x: 0-200 (left to right, defensive zone → offensive zone)
  * - y: 0-100 (bottom to top)
+ * - Based on NHL standard rink dimensions (200 feet x 85 feet)
  *
  * Key Locations:
  * - (0, 0) = Defensive zone, bottom-left corner
  * - (100, 50) = Center ice
  * - (200, 100) = Offensive zone, top-right corner
  *
+ * Standard Rink Markings:
+ * - Goal lines: x = 11, x = 189 (11 feet from boards)
+ * - Blue lines: x = 64, x = 136 (64 and 136 feet from end boards)
+ * - Center red line: x = 100
+ *
  * Zones:
- * - Defensive: x < 67 (0-66)
- * - Neutral: x 67-133
- * - Offensive: x > 133 (134-200)
+ * - Defensive: x < 64 (0-63)
+ * - Neutral: x 64-136
+ * - Offensive: x > 136 (137-200)
  *
  * High Danger Area (Slot):
- * - x: 80-110, y: 35-65
- * - Very close to net: x: 60-80, y: 40-60
+ * - x: 145-175, y: 35-65
+ * - Very close to net: x: 175-189, y: 40-60
  */
 
 export interface Coordinates {
@@ -75,8 +81,8 @@ export function normalizeCoordinates(coords: Coordinates): Coordinates {
  * @returns Zone: 'defensive', 'neutral', or 'offensive'
  */
 export function getZone(coords: Coordinates): Zone {
-  if (coords.x < 67) return 'defensive'
-  if (coords.x <= 133) return 'neutral'
+  if (coords.x < 64) return 'defensive'
+  if (coords.x <= 136) return 'neutral'
   return 'offensive'
 }
 
@@ -98,12 +104,12 @@ export function getQuadrant(coords: Coordinates): Quadrant {
 /**
  * Check if coordinates are in the high-danger slot area
  * @param coords - Ice surface coordinates
- * @returns True if in slot area (x: 80-110, y: 35-65)
+ * @returns True if in slot area (x: 145-175, y: 35-65)
  */
 export function isInSlot(coords: Coordinates): boolean {
   return (
-    coords.x >= 80 &&
-    coords.x <= 110 &&
+    coords.x >= 145 &&
+    coords.x <= 175 &&
     coords.y >= 35 &&
     coords.y <= 65
   )
@@ -119,10 +125,10 @@ export function isInHighDangerArea(coords: Coordinates): boolean {
   // Slot area
   if (isInSlot(coords)) return true
 
-  // Very close to net
+  // Very close to net (right in front of crease)
   if (
-    coords.x >= 60 &&
-    coords.x <= 80 &&
+    coords.x >= 175 &&
+    coords.x <= 189 &&
     coords.y >= 40 &&
     coords.y <= 60
   ) {
@@ -197,12 +203,12 @@ export const ICE_SURFACE = {
   HEIGHT: 100,
   CENTER: { x: 100, y: 50 },
   ZONES: {
-    DEFENSIVE_END: 67,
-    NEUTRAL_END: 133,
+    DEFENSIVE_END: 64, // Blue line position (64 feet from end boards)
+    NEUTRAL_END: 136,  // Blue line position (136 feet from end boards)
   },
   SLOT: {
-    MIN_X: 80,
-    MAX_X: 110,
+    MIN_X: 145, // High danger area in offensive zone
+    MAX_X: 175,
     MIN_Y: 35,
     MAX_Y: 65,
   },

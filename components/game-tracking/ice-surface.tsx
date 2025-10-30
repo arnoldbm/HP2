@@ -92,55 +92,180 @@ export function IceSurface({
       aria-label="Hockey ice surface"
       onClick={handleClick}
       className={`cursor-pointer ${responsive ? 'max-w-full' : ''} ${className}`}
-      style={{ border: '1px solid #ccc', display: 'block' }}
+      style={{ border: '2px solid #666', display: 'block', borderRadius: '8px' }}
     >
-      {/* Ice surface background */}
+      {/* Ice surface background - white ice */}
       <rect
         x={0}
         y={0}
         width={ICE_SURFACE.WIDTH}
         height={ICE_SURFACE.HEIGHT}
-        fill="#f0f9ff"
-        stroke="#9ca3af"
-        strokeWidth={0.5}
+        fill="#ffffff"
+        rx={4}
       />
 
-      {/* Zone markings */}
+      {/* Boards (darker border inside) */}
+      <rect
+        x={1}
+        y={1}
+        width={ICE_SURFACE.WIDTH - 2}
+        height={ICE_SURFACE.HEIGHT - 2}
+        fill="none"
+        stroke="#333"
+        strokeWidth={2}
+        rx={4}
+      />
+
+      {/* Goal lines (thin red lines at ends) - 11 feet from boards */}
+      <line
+        x1={11}
+        y1={0}
+        x2={11}
+        y2={ICE_SURFACE.HEIGHT}
+        stroke="#cc0000"
+        strokeWidth={1.5}
+      />
+      <line
+        x1={189}
+        y1={0}
+        x2={189}
+        y2={ICE_SURFACE.HEIGHT}
+        stroke="#cc0000"
+        strokeWidth={1.5}
+      />
+
+      {/* Blue line - Defensive zone (64 feet from end) */}
+      <line
+        x1={64}
+        y1={0}
+        x2={64}
+        y2={ICE_SURFACE.HEIGHT}
+        stroke="#0066cc"
+        strokeWidth={2}
+      />
+
+      {/* Blue line - Offensive zone (136 feet from end) */}
+      <line
+        x1={136}
+        y1={0}
+        x2={136}
+        y2={ICE_SURFACE.HEIGHT}
+        stroke="#0066cc"
+        strokeWidth={2}
+      />
+
+      {/* Red center line */}
+      <line
+        x1={ICE_SURFACE.CENTER.x}
+        y1={0}
+        x2={ICE_SURFACE.CENTER.x}
+        y2={ICE_SURFACE.HEIGHT}
+        stroke="#cc0000"
+        strokeWidth={2}
+      />
+
+      {/* Center ice circle (15 foot radius) */}
+      <circle
+        cx={100}
+        cy={50}
+        r={15}
+        fill="none"
+        stroke="#0066cc"
+        strokeWidth={1.5}
+      />
+
+      {/* Center ice dot */}
+      <circle
+        cx={100}
+        cy={50}
+        r={1}
+        fill="#0066cc"
+      />
+
+      {/* Defensive zone faceoff circles - 20 feet from goal line, 22 feet from boards */}
+      <circle
+        cx={31}
+        cy={26}
+        r={15}
+        fill="none"
+        stroke="#cc0000"
+        strokeWidth={1.5}
+      />
+      <circle
+        cx={31}
+        cy={74}
+        r={15}
+        fill="none"
+        stroke="#cc0000"
+        strokeWidth={1.5}
+      />
+
+      {/* Offensive zone faceoff circles */}
+      <circle
+        cx={169}
+        cy={26}
+        r={15}
+        fill="none"
+        stroke="#cc0000"
+        strokeWidth={1.5}
+      />
+      <circle
+        cx={169}
+        cy={74}
+        r={15}
+        fill="none"
+        stroke="#cc0000"
+        strokeWidth={1.5}
+      />
+
+      {/* Faceoff dots in end zone circles */}
+      <circle cx={31} cy={26} r={1.5} fill="#cc0000" />
+      <circle cx={31} cy={74} r={1.5} fill="#cc0000" />
+      <circle cx={169} cy={26} r={1.5} fill="#cc0000" />
+      <circle cx={169} cy={74} r={1.5} fill="#cc0000" />
+
+      {/* Neutral zone faceoff dots - 5 feet outside blue lines */}
+      <circle cx={69} cy={26} r={1.5} fill="#cc0000" />
+      <circle cx={69} cy={74} r={1.5} fill="#cc0000" />
+      <circle cx={131} cy={26} r={1.5} fill="#cc0000" />
+      <circle cx={131} cy={74} r={1.5} fill="#cc0000" />
+
+      {/* Goal creases - Defensive (4 foot radius semi-circle) */}
+      <path
+        d="M 7 45 A 6 6 0 0 1 7 55 L 11 55 L 11 45 Z"
+        fill="rgba(173, 216, 230, 0.4)"
+        stroke="#0066cc"
+        strokeWidth={1.5}
+      />
+
+      {/* Goal creases - Offensive */}
+      <path
+        d="M 193 45 A 6 6 0 0 0 193 55 L 189 55 L 189 45 Z"
+        fill="rgba(173, 216, 230, 0.4)"
+        stroke="#0066cc"
+        strokeWidth={1.5}
+      />
+
+      {/* Optional zone shading */}
       {showZones && (
         <>
-          {/* Defensive zone */}
+          {/* Defensive zone shading */}
           <rect
             x={0}
             y={0}
-            width={ICE_SURFACE.ZONES.DEFENSIVE_END}
+            width={64}
             height={ICE_SURFACE.HEIGHT}
-            fill="rgba(239, 68, 68, 0.1)"
-            stroke="#ef4444"
-            strokeWidth={0.5}
+            fill="rgba(200, 220, 255, 0.15)"
             data-zone="defensive"
           />
 
-          {/* Neutral zone */}
+          {/* Offensive zone shading */}
           <rect
-            x={ICE_SURFACE.ZONES.DEFENSIVE_END}
+            x={136}
             y={0}
-            width={ICE_SURFACE.ZONES.NEUTRAL_END - ICE_SURFACE.ZONES.DEFENSIVE_END}
+            width={64}
             height={ICE_SURFACE.HEIGHT}
-            fill="rgba(156, 163, 175, 0.1)"
-            stroke="#9ca3af"
-            strokeWidth={0.5}
-            data-zone="neutral"
-          />
-
-          {/* Offensive zone */}
-          <rect
-            x={ICE_SURFACE.ZONES.NEUTRAL_END}
-            y={0}
-            width={ICE_SURFACE.WIDTH - ICE_SURFACE.ZONES.NEUTRAL_END}
-            height={ICE_SURFACE.HEIGHT}
-            fill="rgba(59, 130, 246, 0.1)"
-            stroke="#3b82f6"
-            strokeWidth={0.5}
+            fill="rgba(255, 220, 220, 0.15)"
             data-zone="offensive"
           />
         </>
@@ -153,24 +278,13 @@ export function IceSurface({
           y={ICE_SURFACE.SLOT.MIN_Y}
           width={ICE_SURFACE.SLOT.MAX_X - ICE_SURFACE.SLOT.MIN_X}
           height={ICE_SURFACE.SLOT.MAX_Y - ICE_SURFACE.SLOT.MIN_Y}
-          fill="rgba(239, 68, 68, 0.2)"
-          stroke="#dc2626"
+          fill="rgba(255, 100, 100, 0.2)"
+          stroke="#cc0000"
           strokeWidth={1}
           strokeDasharray="2,2"
           data-slot="true"
         />
       )}
-
-      {/* Center ice line */}
-      <line
-        x1={ICE_SURFACE.CENTER.x}
-        y1={0}
-        x2={ICE_SURFACE.CENTER.x}
-        y2={ICE_SURFACE.HEIGHT}
-        stroke="#9ca3af"
-        strokeWidth={1}
-        strokeDasharray="3,3"
-      />
 
       {/* Event markers */}
       {events.map((event) => {
@@ -185,10 +299,11 @@ export function IceSurface({
             key={event.id}
             cx={event.x}
             cy={event.y}
-            r={2}
+            r={3}
             fill={getEventColor(event.type)}
             stroke="#fff"
-            strokeWidth={0.5}
+            strokeWidth={1}
+            opacity={0.8}
             data-event-marker="true"
             data-event-type={event.type}
           />
