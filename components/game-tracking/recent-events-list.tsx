@@ -2,6 +2,7 @@
 
 import React from 'react'
 import { useGameTrackingStore } from '@/lib/stores/game-tracking-store'
+import { SwipeableItem } from '@/components/ui/swipeable-item'
 
 export function RecentEventsList() {
   const { events, players, undoLastEvent, deleteEvent } = useGameTrackingStore()
@@ -65,60 +66,75 @@ export function RecentEventsList() {
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6">
+    <div className="bg-white rounded-lg shadow-lg p-4 md:p-6">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Recent Events</h2>
+        <h2 className="text-lg md:text-xl font-bold">Recent Events</h2>
         <button
           onClick={undoLastEvent}
-          className="px-3 py-1 text-sm bg-gray-200 hover:bg-gray-300 rounded"
+          className="px-3 py-2 md:py-1 text-xs md:text-sm bg-gray-200 hover:bg-gray-300 rounded transition-colors touch-manipulation"
         >
           Undo Last
         </button>
       </div>
 
+      {/* Hint for mobile users */}
+      <div className="md:hidden text-xs text-gray-500 mb-3 text-center">
+        👈 Swipe left on any event to delete
+      </div>
+
       <div className="space-y-2">
         {recentEvents.map((event) => (
-          <div
+          <SwipeableItem
             key={event.id}
-            className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:bg-gray-50"
+            onSwipeLeft={() => deleteEvent(event.id)}
+            leftAction={{
+              label: 'Delete',
+              icon: '🗑️',
+              color: 'bg-red-500',
+            }}
+            threshold={80}
+            className="rounded-lg overflow-hidden"
           >
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-1">
-                <span
-                  className={`px-2 py-1 text-xs font-medium rounded ${getEventColor(
-                    event.eventType
-                  )}`}
-                >
-                  {event.eventType.replace('_', ' ').toUpperCase()}
-                </span>
-                <span className="text-sm text-gray-600">
-                  P{event.period} • {Math.floor(event.gameTimeSeconds / 60)}:
-                  {(event.gameTimeSeconds % 60).toString().padStart(2, '0')}
-                </span>
+            <div className="flex items-center justify-between p-3 border border-gray-200 bg-white">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 mb-1 flex-wrap">
+                  <span
+                    className={`px-2 py-1 text-xs font-medium rounded ${getEventColor(
+                      event.eventType
+                    )}`}
+                  >
+                    {event.eventType.replace('_', ' ').toUpperCase()}
+                  </span>
+                  <span className="text-xs md:text-sm text-gray-600 whitespace-nowrap">
+                    P{event.period} • {Math.floor(event.gameTimeSeconds / 60)}:
+                    {(event.gameTimeSeconds % 60).toString().padStart(2, '0')}
+                  </span>
+                </div>
+                <p className="text-xs md:text-sm text-gray-700 truncate">{formatEventDetails(event)}</p>
               </div>
-              <p className="text-sm text-gray-700">{formatEventDetails(event)}</p>
-            </div>
 
-            <button
-              onClick={() => deleteEvent(event.id)}
-              className="ml-4 p-2 text-red-600 hover:bg-red-50 rounded"
-              aria-label="Delete event"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+              {/* Delete button - hidden on mobile (use swipe), visible on desktop */}
+              <button
+                onClick={() => deleteEvent(event.id)}
+                className="hidden md:block ml-4 p-2 text-red-600 hover:bg-red-50 rounded transition-colors"
+                aria-label="Delete event"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+          </SwipeableItem>
         ))}
       </div>
 
