@@ -9,6 +9,8 @@ export interface QuickEventButtonsProps {
   compact?: boolean
   eventTypes?: EventType[]
   showIcons?: boolean
+  selectedEventType?: EventType | null
+  sidebarMode?: boolean
 }
 
 interface EventButton {
@@ -72,45 +74,61 @@ export function QuickEventButtons({
   compact = false,
   eventTypes,
   showIcons = false,
+  selectedEventType = null,
+  sidebarMode = false,
 }: QuickEventButtonsProps) {
   // Filter event buttons if specific types are provided
-  const buttons = eventTypes
+  let buttons = eventTypes
     ? defaultEventButtons.filter((btn) => eventTypes.includes(btn.type))
     : defaultEventButtons
+
+  // In sidebar mode, remove Goal and Faceoff buttons
+  if (sidebarMode) {
+    buttons = buttons.filter((btn) =>
+      !(btn.label === 'Goal' || btn.label === 'Faceoff')
+    )
+  }
 
   return (
     <div
       className={`grid ${
-        compact ? 'grid-cols-2 gap-2' : 'grid-cols-2 sm:grid-cols-3 gap-3'
+        compact ? 'grid-cols-2 gap-2' : sidebarMode ? 'grid-cols-1 gap-2' : 'grid-cols-2 sm:grid-cols-3 gap-3'
       } w-full`}
     >
-      {buttons.map((button, index) => (
-        <button
-          key={`${button.type}-${index}`}
-          onClick={() => onEventSelect(button.type, button.prefilledDetails)}
-          disabled={disabled}
-          className={`
-            ${button.color}
-            ${compact ? 'py-3 px-3 text-sm' : 'py-5 md:py-4 px-4 md:px-6 text-base'}
-            font-semibold rounded-lg
-            shadow-md
-            transition-all duration-150
-            active:scale-95
-            disabled:opacity-50 disabled:cursor-not-allowed
-            ${!disabled ? 'hover:shadow-lg' : ''}
-            touch-manipulation
-            min-h-[56px]
-          `}
-          aria-label={button.label}
-        >
-          <div className="flex items-center justify-center gap-2">
-            {showIcons && button.icon && (
-              <span className="text-xl md:text-2xl">{button.icon}</span>
-            )}
-            <span className="text-sm md:text-base">{button.label}</span>
-          </div>
-        </button>
-      ))}
+      {buttons.map((button, index) => {
+        // Check if this button is selected (handle both direct match and Goal button which is shot with result='goal')
+        const isSelected = selectedEventType === button.type &&
+          (!button.prefilledDetails || selectedEventType === 'shot')
+
+        return (
+          <button
+            key={`${button.type}-${index}`}
+            onClick={() => onEventSelect(button.type, button.prefilledDetails)}
+            disabled={disabled}
+            className={`
+              ${button.color}
+              ${sidebarMode ? 'py-2.5 px-2 text-xs' : compact ? 'py-3 px-3 text-sm' : 'py-5 md:py-4 px-4 md:px-6 text-base'}
+              font-semibold rounded-lg
+              shadow-md
+              transition-all duration-150
+              active:scale-95
+              disabled:opacity-50 disabled:cursor-not-allowed
+              ${!disabled ? 'hover:shadow-lg' : ''}
+              touch-manipulation
+              ${sidebarMode ? 'min-h-[48px]' : 'min-h-[56px]'}
+              ${isSelected ? 'ring-[6px] ring-yellow-300 scale-110 shadow-2xl brightness-110' : ''}
+            `}
+            aria-label={button.label}
+          >
+            <div className="flex items-center justify-center gap-1.5">
+              {showIcons && button.icon && !sidebarMode && (
+                <span className='text-xl md:text-2xl'>{button.icon}</span>
+              )}
+              <span className={sidebarMode ? 'text-xs' : 'text-sm md:text-base'}>{button.label}</span>
+            </div>
+          </button>
+        )
+      })}
     </div>
   )
 }

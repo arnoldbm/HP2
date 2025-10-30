@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Custom orientation variants for mobile optimization */
+@variant landscape (@media (orientation: landscape));
+@variant portrait (@media (orientation: portrait));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

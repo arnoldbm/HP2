@@ -87,11 +87,10 @@ export function EventLogger({
     switch (loggingFlow.step) {
       case 'idle':
         return (
-          <div className="space-y-4 md:space-y-6">
-            {/* Ice Surface for visualization */}
-            <div className="bg-white rounded-lg shadow p-3 md:p-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Ice Surface</h3>
-              <div className="w-full">
+          <div className="space-y-2 md:space-y-3 landscape:h-full landscape:flex landscape:flex-col">
+            {/* Ice Surface for visualization - Maximum size */}
+            <div className="bg-white rounded-lg shadow p-2 md:p-3 landscape:p-1.5 landscape:flex-1 landscape:min-h-0">
+              <div className="w-full landscape:h-full landscape:flex landscape:items-center landscape:justify-center">
                 <IceSurface
                   showZones={showZones}
                   showSlot={showSlot}
@@ -106,9 +105,9 @@ export function EventLogger({
               </div>
             </div>
 
-            {/* Quick Event Buttons */}
-            <div className="bg-white rounded-lg shadow p-3 md:p-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Log Event</h3>
+            {/* Quick Event Buttons - Below ice surface in portrait only (hidden in landscape, shown in sidebar) */}
+            <div className="bg-white rounded-lg shadow p-2 md:p-3 landscape:hidden">
+              <h3 className="text-xs font-medium text-gray-700 mb-2">Log Event</h3>
               <QuickEventButtons onEventSelect={handleEventTypeSelect} showIcons={true} />
             </div>
           </div>
@@ -116,15 +115,16 @@ export function EventLogger({
 
       case 'select_location':
         return (
-          <div className="space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
-              <p className="text-blue-900 font-medium text-sm md:text-base">
+          <div className="space-y-2 md:space-y-3 landscape:h-full landscape:flex landscape:flex-col">
+            {/* Prompt - Hidden in landscape, shown in portrait */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 md:p-3 landscape:hidden">
+              <p className="text-blue-900 font-medium text-xs md:text-sm">
                 Tap the ice surface where the {loggingFlow.eventType} occurred
               </p>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-3 md:p-4">
-              <div className="w-full">
+            <div className="bg-white rounded-lg shadow p-2 md:p-3 landscape:p-1.5 landscape:flex-1 landscape:min-h-0">
+              <div className="w-full landscape:h-full landscape:flex landscape:items-center landscape:justify-center">
                 <IceSurface
                   onClick={handleIceClick}
                   showZones={showZones}
@@ -142,7 +142,7 @@ export function EventLogger({
 
             <button
               onClick={cancelEventLogging}
-              className="w-full py-3 md:py-2 text-sm md:text-base text-gray-600 hover:text-gray-800 font-medium"
+              className="w-full py-2 text-xs md:text-sm text-gray-600 hover:text-gray-800 font-medium landscape:hidden"
             >
               Cancel
             </button>
@@ -153,21 +153,22 @@ export function EventLogger({
         // Player selection now happens in bottom sheet
         // Show the ice surface with a prompt
         return (
-          <div className="space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
-              <p className="text-blue-900 font-medium text-sm md:text-base">
+          <div className="space-y-2 md:space-y-3 landscape:h-full landscape:flex landscape:flex-col">
+            {/* Prompt - Hidden in landscape, shown in portrait */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 md:p-3 landscape:hidden">
+              <p className="text-blue-900 font-medium text-xs md:text-sm">
                 Selecting player for {loggingFlow.eventType}...
               </p>
               {loggingFlow.coordinates && (
-                <p className="text-xs md:text-sm text-blue-700 mt-1">
+                <p className="text-xs text-blue-700 mt-1">
                   Location: ({loggingFlow.coordinates.x.toFixed(0)}, {loggingFlow.coordinates.y.toFixed(0)})
                 </p>
               )}
             </div>
 
             {/* Show ice surface with events in background */}
-            <div className="bg-white rounded-lg shadow p-3 md:p-4 opacity-50">
-              <div className="w-full">
+            <div className="bg-white rounded-lg shadow p-2 md:p-3 opacity-50 landscape:opacity-100 landscape:p-1.5 landscape:flex-1 landscape:min-h-0">
+              <div className="w-full landscape:h-full landscape:flex landscape:items-center landscape:justify-center">
                 <IceSurface
                   showZones={showZones}
                   showSlot={showSlot}
@@ -188,46 +189,47 @@ export function EventLogger({
         // Shot result selection
         if (loggingFlow.eventType === 'shot' || loggingFlow.eventType === 'goal') {
           return (
-            <div className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
-                <p className="text-blue-900 font-medium text-sm md:text-base">Select shot result</p>
+            <div className="space-y-2 md:space-y-3 landscape:h-full landscape:flex landscape:flex-col landscape:justify-center">
+              {/* Prompt - Hidden in landscape, shown in portrait */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 md:p-3 landscape:hidden">
+                <p className="text-blue-900 font-medium text-xs md:text-sm">Select shot result</p>
               </div>
 
-              <div className="bg-white rounded-lg shadow p-3 md:p-4">
-                <div className="grid grid-cols-2 gap-3">
+              <div className="bg-white rounded-lg shadow p-2 md:p-3 landscape:p-1.5">
+                <div className="grid grid-cols-2 gap-2">
                   <button
                     onClick={() => handleShotResultSelect('goal')}
-                    className="py-5 md:py-4 px-4 md:px-6 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation"
+                    className="py-4 md:py-5 px-3 md:px-4 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation text-sm md:text-base"
                   >
                     Goal
                   </button>
                   <button
                     onClick={() => handleShotResultSelect('save')}
-                    className="py-5 md:py-4 px-4 md:px-6 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation"
+                    className="py-4 md:py-5 px-3 md:px-4 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation text-sm md:text-base"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => handleShotResultSelect('miss_wide')}
-                    className="py-5 md:py-4 px-4 md:px-6 bg-gray-500 hover:bg-gray-600 active:bg-gray-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation"
+                    className="py-4 md:py-5 px-3 md:px-4 bg-gray-500 hover:bg-gray-600 active:bg-gray-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation text-sm md:text-base"
                   >
                     Miss Wide
                   </button>
                   <button
                     onClick={() => handleShotResultSelect('miss_high')}
-                    className="py-5 md:py-4 px-4 md:px-6 bg-gray-500 hover:bg-gray-600 active:bg-gray-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation"
+                    className="py-4 md:py-5 px-3 md:px-4 bg-gray-500 hover:bg-gray-600 active:bg-gray-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation text-sm md:text-base"
                   >
                     Miss High
                   </button>
                   <button
                     onClick={() => handleShotResultSelect('blocked')}
-                    className="py-5 md:py-4 px-4 md:px-6 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation"
+                    className="py-4 md:py-5 px-3 md:px-4 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation text-sm md:text-base"
                   >
                     Blocked
                   </button>
                   <button
                     onClick={() => handleShotResultSelect('post')}
-                    className="py-5 md:py-4 px-4 md:px-6 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation"
+                    className="py-4 md:py-5 px-3 md:px-4 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation text-sm md:text-base"
                   >
                     Post
                   </button>
@@ -235,7 +237,7 @@ export function EventLogger({
 
                 <button
                   onClick={cancelEventLogging}
-                  className="w-full mt-4 py-3 md:py-2 text-sm md:text-base text-gray-600 hover:text-gray-800 font-medium"
+                  className="w-full mt-2 py-2 text-xs md:text-sm text-gray-600 hover:text-gray-800 font-medium landscape:hidden"
                 >
                   Cancel
                 </button>
