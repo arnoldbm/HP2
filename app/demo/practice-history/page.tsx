@@ -238,46 +238,46 @@ export default function PracticeHistoryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gray-50 p-3 md:p-4 lg:p-6">
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-white rounded-lg shadow p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Practice History</h1>
-              <p className="text-gray-600">
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Practice History</h1>
+              <p className="text-sm md:text-base text-gray-600">
                 View all your saved practice plans and drill selections
               </p>
             </div>
             <Link
               href="/demo/analytics"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-center min-h-[44px] flex items-center justify-center touch-manipulation"
             >
               Back to Analytics
             </Link>
           </div>
 
           {/* Stats Summary */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
-            <div className="bg-blue-50 rounded-lg p-4">
-              <div className="text-sm text-blue-600 uppercase font-semibold">Total Practices</div>
-              <div className="text-3xl font-bold text-blue-900 mt-1">{practices.length}</div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-6">
+            <div className="bg-blue-50 rounded-lg p-3 md:p-4">
+              <div className="text-xs md:text-sm text-blue-600 uppercase font-semibold">Total Practices</div>
+              <div className="text-2xl md:text-3xl font-bold text-blue-900 mt-1">{practices.length}</div>
             </div>
-            <div className="bg-green-50 rounded-lg p-4">
-              <div className="text-sm text-green-600 uppercase font-semibold">AI Generated</div>
-              <div className="text-3xl font-bold text-green-900 mt-1">
+            <div className="bg-green-50 rounded-lg p-3 md:p-4">
+              <div className="text-xs md:text-sm text-green-600 uppercase font-semibold">AI Generated</div>
+              <div className="text-2xl md:text-3xl font-bold text-green-900 mt-1">
                 {practices.filter((p) => p.generated_by_ai).length}
               </div>
             </div>
-            <div className="bg-purple-50 rounded-lg p-4">
-              <div className="text-sm text-purple-600 uppercase font-semibold">Completed</div>
-              <div className="text-3xl font-bold text-purple-900 mt-1">
+            <div className="bg-purple-50 rounded-lg p-3 md:p-4">
+              <div className="text-xs md:text-sm text-purple-600 uppercase font-semibold">Completed</div>
+              <div className="text-2xl md:text-3xl font-bold text-purple-900 mt-1">
                 {practices.filter((p) => p.status === 'completed').length}
               </div>
             </div>
-            <div className="bg-amber-50 rounded-lg p-4">
-              <div className="text-sm text-amber-600 uppercase font-semibold">Planned</div>
-              <div className="text-3xl font-bold text-amber-900 mt-1">
+            <div className="bg-amber-50 rounded-lg p-3 md:p-4">
+              <div className="text-xs md:text-sm text-amber-600 uppercase font-semibold">Planned</div>
+              <div className="text-2xl md:text-3xl font-bold text-amber-900 mt-1">
                 {practices.filter((p) => p.status === 'planned').length}
               </div>
             </div>
@@ -285,10 +285,10 @@ export default function PracticeHistoryPage() {
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">Filters</h2>
-          <div className="flex flex-wrap gap-4">
-            <div className="flex-1 min-w-[200px]">
+        <div className="bg-white rounded-lg shadow p-4 md:p-6">
+          <h2 className="text-base md:text-lg font-semibold mb-3 md:mb-4">Filters</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:flex md:flex-wrap gap-3 md:gap-4">
+            <div className="flex-1 md:min-w-[200px]">
               <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-2">
                 Status
               </label>
@@ -297,7 +297,7 @@ export default function PracticeHistoryPage() {
                 aria-label="Filter by status"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
               >
                 <option value="all">All Statuses</option>
                 <option value="planned">Planned</option>
@@ -307,7 +307,7 @@ export default function PracticeHistoryPage() {
               </select>
             </div>
 
-            <div className="flex-1 min-w-[200px]">
+            <div className="flex-1 md:min-w-[200px]">
               <label htmlFor="type-filter" className="block text-sm font-medium text-gray-700 mb-2">
                 Type
               </label>
@@ -316,7 +316,7 @@ export default function PracticeHistoryPage() {
                 aria-label="Filter by type"
                 value={aiFilter}
                 onChange={(e) => setAiFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
               >
                 <option value="all">All Types</option>
                 <option value="ai">AI Generated</option>
@@ -324,13 +324,13 @@ export default function PracticeHistoryPage() {
               </select>
             </div>
 
-            <div className="flex items-end">
+            <div className="flex items-end sm:col-span-2 md:col-span-1">
               <button
                 onClick={() => {
                   setStatusFilter('all')
                   setAiFilter('all')
                 }}
-                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+                className="w-full md:w-auto px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors touch-manipulation min-h-[44px]"
               >
                 Reset Filters
               </button>
@@ -356,73 +356,153 @@ export default function PracticeHistoryPage() {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Duration
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Type
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Location
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredPractices.map((practice) => {
-                  const practiceDate = new Date(practice.practice_date)
-                  const isUpcoming = practiceDate > new Date()
+          <>
+            {/* Desktop Table View */}
+            <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Duration
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Type
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Location
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredPractices.map((practice) => {
+                    const practiceDate = new Date(practice.practice_date)
+                    const isUpcoming = practiceDate > new Date()
 
-                  return (
-                    <tr
-                      key={practice.id}
-                      className="hover:bg-gray-50 transition-colors cursor-pointer"
-                      onClick={() => loadPracticeDetails(practice)}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                    return (
+                      <tr
+                        key={practice.id}
+                        className="hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => loadPracticeDetails(practice)}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-gray-900">
+                            {practiceDate.toLocaleDateString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              year: 'numeric',
+                            })}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {practiceDate.toLocaleTimeString('en-US', {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                            })}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm text-gray-900">{practice.duration_minutes} min</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {practice.generated_by_ai ? (
+                            <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                              🤖 AI Generated
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                              Manual
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <span
+                            className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                              practice.status === 'completed'
+                                ? 'bg-green-100 text-green-800'
+                                : practice.status === 'in_progress'
+                                ? 'bg-blue-100 text-blue-800'
+                                : practice.status === 'cancelled'
+                                ? 'bg-red-100 text-red-800'
+                                : isUpcoming
+                                ? 'bg-amber-100 text-amber-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
+                            {practice.status === 'planned' && isUpcoming
+                              ? 'Upcoming'
+                              : practice.status.replace('_', ' ')}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {practice.location || '—'}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              loadPracticeDetails(practice)
+                            }}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            View Details
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {filteredPractices.map((practice) => {
+                const practiceDate = new Date(practice.practice_date)
+                const isUpcoming = practiceDate > new Date()
+
+                return (
+                  <div
+                    key={practice.id}
+                    onClick={() => loadPracticeDetails(practice)}
+                    className="bg-white rounded-lg shadow p-4 active:bg-gray-50 transition-colors touch-manipulation"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <div className="text-sm font-bold text-gray-900 mb-1">
                           {practiceDate.toLocaleDateString('en-US', {
+                            weekday: 'short',
                             month: 'short',
                             day: 'numeric',
                             year: 'numeric',
                           })}
                         </div>
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs text-gray-600">
                           {practiceDate.toLocaleTimeString('en-US', {
                             hour: 'numeric',
                             minute: '2-digit',
                           })}
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{practice.duration_minutes} min</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      </div>
+                      <div className="flex flex-col items-end gap-2">
                         {practice.generated_by_ai ? (
-                          <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
-                            🤖 AI Generated
+                          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                            🤖 AI
                           </span>
                         ) : (
-                          <span className="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                          <span className="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
                             Manual
                           </span>
                         )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
                         <span
-                          className={`px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          className={`px-2 py-1 text-xs font-semibold rounded-full ${
                             practice.status === 'completed'
                               ? 'bg-green-100 text-green-800'
                               : practice.status === 'in_progress'
@@ -438,38 +518,46 @@ export default function PracticeHistoryPage() {
                             ? 'Upcoming'
                             : practice.status.replace('_', ' ')}
                         </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {practice.location || '—'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            loadPracticeDetails(practice)
-                          }}
-                          className="text-blue-600 hover:text-blue-900"
-                        >
-                          View Details
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
-          </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm">
+                      <div>
+                        <span className="text-gray-600">Duration:</span>
+                        <span className="ml-1 font-semibold text-gray-900">{practice.duration_minutes} min</span>
+                      </div>
+                      {practice.location && (
+                        <div className="text-xs text-gray-600 truncate max-w-[150px]">
+                          📍 {practice.location}
+                        </div>
+                      )}
+                    </div>
+
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        loadPracticeDetails(practice)
+                      }}
+                      className="mt-3 w-full py-2 text-center text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-md transition-colors min-h-[44px] flex items-center justify-center"
+                    >
+                      View Details →
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
+          </>
         )}
 
         {/* Practice Detail Modal */}
         {selectedPractice && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
-            <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="fixed inset-0 bg-black bg-opacity-50 md:flex md:items-center md:justify-center md:p-4 z-50 overflow-y-auto">
+            <div className="bg-white md:rounded-lg shadow-xl max-w-4xl w-full min-h-full md:min-h-0 md:max-h-[90vh] overflow-y-auto">
               {/* Modal Header */}
-              <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900">Practice Plan Details</h2>
-                  <p className="text-sm text-gray-600 mt-1">
+              <div className="sticky top-0 bg-white border-b border-gray-200 px-4 md:px-6 py-3 md:py-4 flex items-center justify-between z-10">
+                <div className="flex-1 min-w-0">
+                  <h2 className="text-lg md:text-2xl font-bold text-gray-900 truncate">Practice Plan Details</h2>
+                  <p className="text-xs md:text-sm text-gray-600 mt-1">
                     {new Date(selectedPractice.practice_date).toLocaleDateString('en-US', {
                       weekday: 'long',
                       month: 'long',
@@ -480,14 +568,15 @@ export default function PracticeHistoryPage() {
                 </div>
                 <button
                   onClick={() => setSelectedPractice(null)}
-                  className="text-gray-400 hover:text-gray-600 text-2xl font-bold"
+                  className="ml-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
+                  aria-label="Close modal"
                 >
-                  ✕
+                  <span className="text-2xl font-bold">✕</span>
                 </button>
               </div>
 
               {/* Modal Body */}
-              <div className="p-6 space-y-6">
+              <div className="p-4 md:p-6 space-y-4 md:space-y-6">
                 {loadingDetails ? (
                   <div className="text-center py-12">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -496,28 +585,28 @@ export default function PracticeHistoryPage() {
                 ) : (
                   <>
                     {/* Practice Metadata */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div>
-                        <div className="text-sm text-gray-600">Duration</div>
-                        <div className="text-lg font-semibold text-gray-900">
-                          {selectedPractice.duration_minutes} minutes
+                    <div className="grid grid-cols-2 gap-3 md:gap-4">
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <div className="text-xs md:text-sm text-gray-600">Duration</div>
+                        <div className="text-base md:text-lg font-semibold text-gray-900">
+                          {selectedPractice.duration_minutes} min
                         </div>
                       </div>
-                      <div>
-                        <div className="text-sm text-gray-600">Type</div>
-                        <div className="text-lg font-semibold text-gray-900">
-                          {selectedPractice.generated_by_ai ? '🤖 AI Generated' : 'Manual'}
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <div className="text-xs md:text-sm text-gray-600">Type</div>
+                        <div className="text-base md:text-lg font-semibold text-gray-900">
+                          {selectedPractice.generated_by_ai ? '🤖 AI' : 'Manual'}
                         </div>
                       </div>
-                      <div>
-                        <div className="text-sm text-gray-600">Status</div>
-                        <div className="text-lg font-semibold text-gray-900 capitalize">
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <div className="text-xs md:text-sm text-gray-600">Status</div>
+                        <div className="text-base md:text-lg font-semibold text-gray-900 capitalize">
                           {selectedPractice.status.replace('_', ' ')}
                         </div>
                       </div>
-                      <div>
-                        <div className="text-sm text-gray-600">Location</div>
-                        <div className="text-lg font-semibold text-gray-900">
+                      <div className="bg-gray-50 rounded-lg p-3">
+                        <div className="text-xs md:text-sm text-gray-600">Location</div>
+                        <div className="text-base md:text-lg font-semibold text-gray-900 truncate">
                           {selectedPractice.location || '—'}
                         </div>
                       </div>
@@ -538,9 +627,9 @@ export default function PracticeHistoryPage() {
 
                     {/* AI Reasoning */}
                     {selectedPractice.generated_by_ai && selectedPractice.ai_reasoning && (
-                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                        <h3 className="text-lg font-semibold text-purple-900 mb-3">
-                          AI Analysis
+                      <div className="bg-purple-50 border border-purple-200 rounded-lg p-3 md:p-4">
+                        <h3 className="text-base md:text-lg font-semibold text-purple-900 mb-3">
+                          🤖 AI Analysis
                         </h3>
 
                         {selectedPractice.ai_reasoning.overall_assessment && (
@@ -585,9 +674,9 @@ export default function PracticeHistoryPage() {
                     {/* Objectives & Notes */}
                     {selectedPractice.objectives && (
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Objectives</h3>
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <p className="text-gray-700 whitespace-pre-line">
+                        <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">Objectives</h3>
+                        <div className="bg-gray-50 rounded-lg p-3 md:p-4">
+                          <p className="text-sm md:text-base text-gray-700 whitespace-pre-line">
                             {selectedPractice.objectives}
                           </p>
                         </div>
@@ -596,9 +685,9 @@ export default function PracticeHistoryPage() {
 
                     {selectedPractice.notes && (
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Notes</h3>
-                        <div className="bg-gray-50 rounded-lg p-4">
-                          <p className="text-gray-700 whitespace-pre-line">
+                        <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-2">Notes</h3>
+                        <div className="bg-gray-50 rounded-lg p-3 md:p-4">
+                          <p className="text-sm md:text-base text-gray-700 whitespace-pre-line">
                             {selectedPractice.notes}
                           </p>
                         </div>
@@ -607,7 +696,7 @@ export default function PracticeHistoryPage() {
 
                     {/* Drills by Section */}
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Drills</h3>
+                      <h3 className="text-base md:text-lg font-semibold text-gray-900 mb-3 md:mb-4">Drills</h3>
 
                       {practiceDrills.length === 0 ? (
                         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-center">
@@ -689,10 +778,10 @@ export default function PracticeHistoryPage() {
               </div>
 
               {/* Modal Footer */}
-              <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-6 py-4 flex justify-end gap-3">
+              <div className="sticky bottom-0 bg-gray-50 border-t border-gray-200 px-4 md:px-6 py-3 md:py-4 flex justify-end gap-3 z-10">
                 <button
                   onClick={() => setSelectedPractice(null)}
-                  className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+                  className="w-full md:w-auto px-6 py-3 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors touch-manipulation min-h-[56px] font-semibold"
                 >
                   Close
                 </button>

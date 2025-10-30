@@ -328,18 +328,18 @@ export default function PracticeBuilderPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gray-50 p-3 md:p-4 lg:p-6">
+      <div className="max-w-7xl mx-auto space-y-4 md:space-y-6">
         {/* Header */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-white rounded-lg shadow p-4 md:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Practice Plan Builder</h1>
-              <p className="text-gray-600">Create a custom practice plan by selecting drills from the library</p>
+              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Practice Plan Builder</h1>
+              <p className="text-sm md:text-base text-gray-600">Create a custom practice plan by selecting drills from the library</p>
             </div>
             <Link
               href="/demo/practice-history"
-              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+              className="px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors text-center whitespace-nowrap min-h-[44px] flex items-center justify-center touch-manipulation"
             >
               View History
             </Link>
@@ -439,8 +439,11 @@ export default function PracticeBuilderPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Drill Library */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow p-6 sticky top-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Drill Library</h2>
+            <div className="bg-white rounded-lg shadow p-4 md:p-6 lg:sticky lg:top-6">
+              <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4">📚 Drill Library</h2>
+              <p className="text-sm text-gray-600 mb-4 md:hidden">
+                Tap the colored buttons to add drills to your practice sections
+              </p>
 
               {/* Search and Filter */}
               <div className="space-y-3 mb-4">
@@ -491,7 +494,7 @@ export default function PracticeBuilderPage() {
                         </span>
                       </div>
                       <p className="text-xs text-gray-600 line-clamp-2 mb-2">{drill.description}</p>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 mb-3">
                         <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
                           {drill.category}
                         </span>
@@ -500,6 +503,49 @@ export default function PracticeBuilderPage() {
                             {drill.skill_level}
                           </span>
                         )}
+                      </div>
+
+                      {/* Mobile-friendly "Add to Section" buttons */}
+                      <div className="grid grid-cols-3 gap-2 mt-2">
+                        <button
+                          onClick={() => handleDropOnSection('warm_up')}
+                          onClickCapture={(e) => {
+                            e.stopPropagation()
+                            setDraggedDrill(drill)
+                            setDraggedFrom('library')
+                          }}
+                          className="flex items-center justify-center gap-1 py-2 px-2 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-md text-xs font-semibold text-amber-900 transition-colors touch-manipulation active:scale-95 min-h-[44px]"
+                          title="Add to Warm-up"
+                        >
+                          <span className="text-sm">🔥</span>
+                          <span className="hidden sm:inline">Warm-up</span>
+                        </button>
+                        <button
+                          onClick={() => handleDropOnSection('main')}
+                          onClickCapture={(e) => {
+                            e.stopPropagation()
+                            setDraggedDrill(drill)
+                            setDraggedFrom('library')
+                          }}
+                          className="flex items-center justify-center gap-1 py-2 px-2 bg-blue-50 hover:bg-blue-100 border border-blue-300 rounded-md text-xs font-semibold text-blue-900 transition-colors touch-manipulation active:scale-95 min-h-[44px]"
+                          title="Add to Main"
+                        >
+                          <span className="text-sm">⚡</span>
+                          <span className="hidden sm:inline">Main</span>
+                        </button>
+                        <button
+                          onClick={() => handleDropOnSection('cool_down')}
+                          onClickCapture={(e) => {
+                            e.stopPropagation()
+                            setDraggedDrill(drill)
+                            setDraggedFrom('library')
+                          }}
+                          className="flex items-center justify-center gap-1 py-2 px-2 bg-green-50 hover:bg-green-100 border border-green-300 rounded-md text-xs font-semibold text-green-900 transition-colors touch-manipulation active:scale-95 min-h-[44px]"
+                          title="Add to Cool-down"
+                        >
+                          <span className="text-sm">❄️</span>
+                          <span className="hidden sm:inline">Cool-down</span>
+                        </button>
                       </div>
                     </div>
                   ))
@@ -555,8 +601,8 @@ export default function PracticeBuilderPage() {
         </div>
 
         {/* Save Button */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
+        <div className="bg-white rounded-lg shadow p-4 md:p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <p className="text-sm text-gray-600">
                 Total: {totalAllocatedTime} min allocated of {practiceMetadata.duration_minutes} min
@@ -576,10 +622,10 @@ export default function PracticeBuilderPage() {
             <button
               onClick={savePracticePlan}
               disabled={saving || practiceDrills.length === 0 || !practiceMetadata.practice_date}
-              className={`px-6 py-3 rounded-md font-semibold transition-colors ${
+              className={`w-full md:w-auto px-6 py-3 rounded-md font-semibold transition-colors touch-manipulation min-h-[56px] ${
                 saving || practiceDrills.length === 0 || !practiceMetadata.practice_date
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800'
               }`}
             >
               {saving ? 'Saving...' : 'Save Practice Plan'}
@@ -617,27 +663,39 @@ function PracticeSection({
   onUpdateNotes,
   onDragStart,
 }: PracticeSectionProps) {
+  const sectionEmoji = section === 'warm_up' ? '🔥' : section === 'main' ? '⚡' : '❄️'
+  const sectionColor = section === 'warm_up' ? 'amber' : section === 'main' ? 'blue' : 'green'
+
   return (
-    <div className="bg-white rounded-lg shadow p-6">
+    <div className="bg-white rounded-lg shadow p-4 md:p-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-gray-900">{title}</h2>
-        <span className="text-sm font-semibold text-gray-600">
-          {totalTime} min total
+        <h2 className="text-lg md:text-xl font-bold text-gray-900 flex items-center gap-2">
+          <span>{sectionEmoji}</span>
+          <span>{title}</span>
+          <span className="text-sm md:text-base font-semibold text-gray-600">
+            ({drills.length})
+          </span>
+        </h2>
+        <span className="text-xs md:text-sm font-semibold text-gray-600 bg-gray-100 px-2 md:px-3 py-1 rounded-full">
+          {totalTime} min
         </span>
       </div>
 
       <div
         onDragOver={onDragOver}
         onDrop={onDrop}
-        className={`min-h-[200px] border-2 border-dashed rounded-lg p-4 ${
+        className={`min-h-[150px] md:min-h-[200px] border-2 border-dashed rounded-lg p-3 md:p-4 ${
           drills.length === 0
             ? 'border-gray-300 bg-gray-50'
-            : 'border-blue-300 bg-blue-50'
+            : `border-${sectionColor}-300 bg-${sectionColor}-50`
         }`}
       >
         {drills.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-gray-500">Drag drills here to add to {title.toLowerCase()}</p>
+          <div className="text-center py-8 md:py-12">
+            <p className="text-sm md:text-base text-gray-500">
+              <span className="hidden md:inline">Drag drills here or use the buttons above to add to {title.toLowerCase()}</span>
+              <span className="md:hidden">Tap buttons on drill cards to add to {title.toLowerCase()}</span>
+            </p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -646,30 +704,36 @@ function PracticeSection({
                 key={`${pd.drillId}-${section}`}
                 draggable
                 onDragStart={() => onDragStart(pd, 'practice')}
-                className="bg-white border border-gray-300 rounded-md p-4 cursor-move hover:border-blue-400 hover:shadow-md transition-all"
+                className="bg-white border border-gray-300 rounded-md p-3 md:p-4 cursor-move hover:border-blue-400 hover:shadow-md transition-all"
               >
                 <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-xs font-bold text-gray-500">#{idx + 1}</span>
-                      <h3 className="font-semibold text-gray-900">{pd.drill.title}</h3>
+                      <h3 className="font-semibold text-gray-900 text-sm md:text-base truncate">{pd.drill.title}</h3>
                     </div>
-                    <p className="text-sm text-gray-600 mb-2">{pd.drill.description}</p>
-                    <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
-                      {pd.drill.category}
-                    </span>
+                    <p className="text-xs md:text-sm text-gray-600 mb-2 line-clamp-2">{pd.drill.description}</p>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded">
+                        {pd.drill.category}
+                      </span>
+                      <span className="text-xs text-gray-600 font-semibold">
+                        {pd.duration_minutes} min
+                      </span>
+                    </div>
                   </div>
 
                   <button
                     onClick={() => onRemoveDrill(pd.drillId, section)}
-                    className="ml-4 text-red-600 hover:text-red-800 text-xl font-bold"
+                    className="ml-3 p-2 text-red-600 hover:bg-red-50 rounded-md transition-colors touch-manipulation min-h-[44px] min-w-[44px] flex items-center justify-center"
                     title="Remove drill"
+                    aria-label="Remove drill"
                   >
-                    ×
+                    <span className="text-xl font-bold">×</span>
                   </button>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mt-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3">
                   <div>
                     <label className="block text-xs font-medium text-gray-700 mb-1">
                       Duration (min)
@@ -680,7 +744,7 @@ function PracticeSection({
                       max="60"
                       value={pd.duration_minutes}
                       onChange={(e) => onUpdateDuration(pd.drillId, section, parseInt(e.target.value) || 1)}
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                     />
                   </div>
 
@@ -692,8 +756,8 @@ function PracticeSection({
                       type="text"
                       value={pd.notes}
                       onChange={(e) => onUpdateNotes(pd.drillId, section, e.target.value)}
-                      placeholder="Modifications, focus points..."
-                      className="w-full px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Modifications, focus..."
+                      className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[44px]"
                     />
                   </div>
                 </div>
