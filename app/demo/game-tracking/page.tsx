@@ -30,11 +30,30 @@ export default function GameTrackingDemoPage() {
   // Check authentication status
   useEffect(() => {
     async function checkAuth() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
-      setIsAuthenticated(!!user)
-      setCheckingAuth(false)
+      try {
+        const {
+          data: { user },
+          error,
+        } = await supabase.auth.getUser()
+
+        // If there's an error (like 403), clear the session
+        if (error) {
+          console.log('Auth error, clearing session:', error)
+          await supabase.auth.signOut()
+          setIsAuthenticated(false)
+          setCheckingAuth(false)
+          return
+        }
+
+        setIsAuthenticated(!!user)
+        setCheckingAuth(false)
+      } catch (err) {
+        console.error('Auth check failed:', err)
+        // Clear any invalid session
+        await supabase.auth.signOut()
+        setIsAuthenticated(false)
+        setCheckingAuth(false)
+      }
 
       // Listen for auth changes
       const {

@@ -71,7 +71,16 @@ export default function PracticeHistoryPage() {
       // Get current user
       const {
         data: { user },
+        error: userError,
       } = await supabase.auth.getUser()
+
+      if (userError) {
+        console.log('Auth error, clearing session:', userError)
+        await supabase.auth.signOut()
+        setError('Please sign in to view practice history')
+        setLoading(false)
+        return
+      }
 
       if (!user) {
         setError('Please sign in to view practice history')
@@ -280,8 +289,12 @@ export default function PracticeHistoryPage() {
           <h2 className="text-lg font-semibold mb-4">Filters</h2>
           <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <label htmlFor="status-filter" className="block text-sm font-medium text-gray-700 mb-2">
+                Status
+              </label>
               <select
+                id="status-filter"
+                aria-label="Filter by status"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -295,8 +308,12 @@ export default function PracticeHistoryPage() {
             </div>
 
             <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
+              <label htmlFor="type-filter" className="block text-sm font-medium text-gray-700 mb-2">
+                Type
+              </label>
               <select
+                id="type-filter"
+                aria-label="Filter by type"
                 value={aiFilter}
                 onChange={(e) => setAiFilter(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"

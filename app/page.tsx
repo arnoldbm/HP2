@@ -73,6 +73,18 @@ export default function Home() {
                     Interactive ice surface component demo
                   </p>
                 </a>
+
+                <a
+                  href="/demo/practice-builder"
+                  className="block p-6 bg-teal-50 border border-teal-200 rounded-lg hover:bg-teal-100 transition-colors"
+                >
+                  <h3 className="text-lg font-semibold text-teal-900 mb-2">
+                    ⚙️ Practice Builder
+                  </h3>
+                  <p className="text-teal-700 text-sm">
+                    Create custom practice plans with drag-and-drop drills
+                  </p>
+                </a>
               </div>
             </div>
 
