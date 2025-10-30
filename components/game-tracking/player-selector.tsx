@@ -48,46 +48,49 @@ export function PlayerSelector({
 
   return (
     <div className="w-full">
-      {/* Title */}
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-      </div>
+      {/* Title - Only show if not in modal/sheet with title */}
+      {!quickSelect && title && (
+        <div className="mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        </div>
+      )}
 
-      {/* Player Grid */}
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+      {/* Player Grid - Optimized for mobile touch */}
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 md:gap-3 p-4">
         {sortedPlayers.map((player) => (
           <button
             key={player.id}
             onClick={() => onSelect(player.id)}
             className={`
               flex flex-col items-center justify-center
-              p-4 rounded-lg border-2 border-gray-300
+              p-3 md:p-4 rounded-lg border-2 border-gray-300
               hover:border-blue-500 hover:bg-blue-50
-              active:bg-blue-100
-              transition-colors duration-150
-              ${quickSelect ? 'min-h-[80px]' : 'min-h-[70px]'}
+              active:bg-blue-100 active:border-blue-600
+              transition-all duration-150
+              touch-manipulation
+              ${quickSelect ? 'min-h-[88px]' : 'min-h-[80px]'}
             `}
             aria-label={`Player ${player.jerseyNumber} ${player.lastName}`}
           >
-            {/* Jersey Number */}
+            {/* Jersey Number - Larger on mobile for easier scanning */}
             <span
               className={`
                 font-bold text-gray-900
-                ${quickSelect ? 'text-3xl' : 'text-2xl'}
+                ${quickSelect ? 'text-3xl md:text-4xl' : 'text-2xl md:text-3xl'}
               `}
             >
               {player.jerseyNumber}
             </span>
 
             {/* Player Name */}
-            <span className="text-xs text-gray-600 mt-1 text-center truncate w-full">
+            <span className="text-xs md:text-sm text-gray-600 mt-1 text-center truncate w-full px-1">
               {player.lastName}
             </span>
 
             {/* Position Badge */}
             <span
               className={`
-                text-[10px] uppercase font-medium mt-1
+                text-[10px] md:text-xs uppercase font-medium mt-1
                 ${
                   player.position === 'forward'
                     ? 'text-blue-600'
@@ -103,12 +106,12 @@ export function PlayerSelector({
         ))}
       </div>
 
-      {/* Cancel Button */}
-      {onCancel && (
-        <div className="mt-6 flex justify-center">
+      {/* Cancel Button - Hidden when using bottom sheet (bottom sheet has its own close) */}
+      {onCancel && !quickSelect && (
+        <div className="mt-4 mb-4 flex justify-center px-4">
           <button
             onClick={onCancel}
-            className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
+            className="w-full md:w-auto px-6 py-3 md:py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
           >
             Cancel
           </button>

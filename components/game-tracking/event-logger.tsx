@@ -1,10 +1,11 @@
 'use client'
 
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { useGameTrackingStore } from '@/lib/stores/game-tracking-store'
 import { IceSurface } from './ice-surface'
 import { PlayerSelector } from './player-selector'
 import { QuickEventButtons } from './quick-event-buttons'
+import { BottomSheet } from '@/components/ui/bottom-sheet'
 import type { Coordinates } from '@/lib/utils/ice-surface-coordinates'
 import type { ShotResult } from '@/lib/stores/game-tracking-store'
 
@@ -30,6 +31,18 @@ export function EventLogger({
     cancelEventLogging,
   } = useGameTrackingStore()
 
+  // Control bottom sheet for player selection
+  const [showPlayerSheet, setShowPlayerSheet] = useState(false)
+
+  // Open player selection bottom sheet when step changes to select_player
+  useEffect(() => {
+    if (loggingFlow.step === 'select_player') {
+      setShowPlayerSheet(true)
+    } else {
+      setShowPlayerSheet(false)
+    }
+  }, [loggingFlow.step])
+
   // Handle ice surface click
   const handleIceClick = (coords: Coordinates) => {
     if (loggingFlow.step === 'select_location') {
@@ -45,6 +58,7 @@ export function EventLogger({
   // Handle player selection
   const handlePlayerSelect = (playerId: string) => {
     setPlayer(playerId)
+    setShowPlayerSheet(false) // Close the bottom sheet
 
     // If this is not a shot, complete immediately
     // For shots with pre-filled result (like goal), also complete immediately
@@ -54,6 +68,12 @@ export function EventLogger({
         completeEvent()
       }, 100)
     }
+  }
+
+  // Handle bottom sheet close
+  const handlePlayerSheetClose = () => {
+    setShowPlayerSheet(false)
+    cancelEventLogging()
   }
 
   // Handle shot result selection
@@ -130,26 +150,36 @@ export function EventLogger({
         )
 
       case 'select_player':
+        // Player selection now happens in bottom sheet
+        // Show the ice surface with a prompt
         return (
           <div className="space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <p className="text-blue-900 font-medium">
-                Select player for {loggingFlow.eventType}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4">
+              <p className="text-blue-900 font-medium text-sm md:text-base">
+                Selecting player for {loggingFlow.eventType}...
               </p>
               {loggingFlow.coordinates && (
-                <p className="text-sm text-blue-700 mt-1">
-                  Location: ({loggingFlow.coordinates.x}, {loggingFlow.coordinates.y})
+                <p className="text-xs md:text-sm text-blue-700 mt-1">
+                  Location: ({loggingFlow.coordinates.x.toFixed(0)}, {loggingFlow.coordinates.y.toFixed(0)})
                 </p>
               )}
             </div>
 
-            <div className="bg-white rounded-lg shadow p-4">
-              <PlayerSelector
-                players={players}
-                onSelect={handlePlayerSelect}
-                onCancel={cancelEventLogging}
-                quickSelect={true}
-              />
+            {/* Show ice surface with events in background */}
+            <div className="bg-white rounded-lg shadow p-3 md:p-4 opacity-50">
+              <div className="w-full">
+                <IceSurface
+                  showZones={showZones}
+                  showSlot={showSlot}
+                  responsive={true}
+                  events={events.map((e) => ({
+                    id: e.id,
+                    x: e.coordinates?.x || 0,
+                    y: e.coordinates?.y || 0,
+                    type: e.eventType as any,
+                  }))}
+                />
+              </div>
             </div>
           </div>
         )
@@ -220,5 +250,25 @@ export function EventLogger({
     }
   }
 
-  return <div className="w-full">{renderContent()}</div>
+  return (
+    <>
+      <div className="w-full">{renderContent()}</div>
+
+      {/* Bottom Sheet for Player Selection */}
+      <BottomSheet
+        isOpen={showPlayerSheet}
+        onClose={handlePlayerSheetClose}
+        title="Select Player"
+        snapPoint={70}
+        showHandle={true}
+        closeOnBackdropClick={true}
+      >
+        <PlayerSelector
+          players={players}
+          onSelect={handlePlayerSelect}
+          quickSelect={true}
+        />
+      </BottomSheet>
+    </>
+  )
 }
