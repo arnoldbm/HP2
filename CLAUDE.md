@@ -26,9 +26,11 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `docs/DEV_SETUP_AND_DATA_MODELS.md` | Dev environment setup, database schema, TDD approach | 2024-01-XX |
 | `docs/CHANGELOG.md` | Complete project changelog with all changes by phase | 2025-10-28 |
 | `docs/AI_PRACTICE_PLAN_GENERATION.md` | Complete guide to AI practice plan generation (workflow, prompts, algorithms, testing) | 2025-10-29 |
-| `docs/PRACTICE_HISTORY.md` | **NEW** Practice history feature with filtering, stats, and detail modal | 2025-10-30 |
-| `docs/PRACTICE_BUILDER.md` | **NEW** Manual practice builder with drag-and-drop drills | 2025-10-30 |
-| `docs/TESTING_GUIDE.md` | **NEW** Testing philosophy, patterns, and best practices | 2025-10-30 |
+| `docs/PRACTICE_HISTORY.md` | Practice history feature with filtering, stats, and detail modal | 2025-10-30 |
+| `docs/PRACTICE_BUILDER.md` | Manual practice builder with drag-and-drop drills | 2025-10-30 |
+| `docs/TESTING_GUIDE.md` | Testing philosophy, patterns, and best practices | 2025-10-30 |
+| `docs/MOBILE_FIRST_ASSESSMENT.md` | **NEW** Mobile UX assessment, roadmap, and design patterns | 2025-10-30 |
+| `docs/GAME_TRACKING_MOBILE.md` | **NEW** Game tracking mobile optimization (Week 1 complete - 8/10 score) | 2025-10-30 |
 
 ### Database & Architecture
 | File | Purpose | Status |
@@ -77,15 +79,17 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
   - Game event persistence: 11 tests
   - Practice planning: 21 tests
 
-### Game Tracking Components
+### Game Tracking Components (Mobile-Optimized 8/10)
 | Component | Purpose | Tests | Status |
 |-----------|---------|-------|--------|
-| `components/game-tracking/ice-surface.tsx` | Interactive SVG ice surface with tap-to-log | 20 | ✅ DONE |
-| `components/game-tracking/player-selector.tsx` | Quick player selection grid by jersey # | 17 | ✅ DONE |
-| `components/game-tracking/quick-event-buttons.tsx` | 6 event type buttons (shot, turnover, etc.) | 16 | ✅ DONE |
-| `components/game-tracking/event-logger.tsx` | Multi-step event logging orchestrator | - | ✅ DONE |
-| `components/game-tracking/live-stats.tsx` | Real-time stats dashboard | - | ✅ DONE |
-| `components/game-tracking/recent-events-list.tsx` | Event list with undo/delete | - | ✅ DONE |
+| `components/game-tracking/ice-surface.tsx` | Interactive SVG ice surface with tap-to-log (responsive) | 20 | ✅ DONE + 📱 MOBILE |
+| `components/game-tracking/player-selector.tsx` | Quick player selection grid by jersey # (88px touch targets) | 17 | ✅ DONE + 📱 MOBILE |
+| `components/game-tracking/quick-event-buttons.tsx` | 6 event type buttons (56px+ touch targets) | 16 | ✅ DONE + 📱 MOBILE |
+| `components/game-tracking/event-logger.tsx` | Multi-step event logging orchestrator (bottom sheet) | - | ✅ DONE + 📱 MOBILE |
+| `components/game-tracking/live-stats.tsx` | Real-time stats dashboard (collapsible accordion) | - | ✅ DONE + 📱 MOBILE |
+| `components/game-tracking/recent-events-list.tsx` | Event list with undo/delete (swipe gestures) | - | ✅ DONE + 📱 MOBILE |
+| `components/ui/bottom-sheet.tsx` | **NEW** Mobile bottom sheet with swipe-down dismiss | - | ✅ DONE |
+| `components/ui/swipeable-item.tsx` | **NEW** Swipe gesture wrapper for mobile actions | - | ✅ DONE |
 | `lib/stores/game-tracking-store.ts` | Zustand state management with DB persistence | - | ✅ DONE |
 | `lib/db/game-event-persistence.ts` | Save/load events from Supabase with optimistic updates | 11 | ✅ DONE |
 
@@ -466,6 +470,12 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 509-574)
 | Store AI reasoning in JSONB field | Preserves full context for future reference | `practices.ai_reasoning` stores focus areas, assessment, goals |
 | Case-insensitive drill matching | Handles variations in AI-generated titles | Map-based lookup with normalized keys |
 | Save AI practice plans to database | Coaches need to reference plans across sessions | Full persistence with drill associations and sections |
+| **Mobile-first design approach** | Coaches track games at rinks on phones | Base styles for mobile, progressive enhancement with `md:` breakpoints |
+| **Bottom sheets for mobile modals** | Native iOS/Android pattern, thumb-friendly | Player selector uses bottom sheet instead of full-screen modal |
+| **56px+ touch targets** | iOS (44px) and Android (48px) guidelines | All buttons 56px minimum, player cards 88px for frequent use |
+| **Swipe-to-delete for events** | Familiar mobile gesture, faster than tapping small X button | SwipeableItem component with 80px threshold |
+| **Collapsible stats panel** | Save screen space on mobile | Accordion pattern: collapsed by default mobile, always expanded desktop |
+| **Responsive SVG ice surface** | Ice surface needs to work on 320px-1920px screens | viewBox with preserveAspectRatio, 100% width with auto height |
 
 ### To Decide 🤔
 - [ ] Game situation detection (PP/PK): Manual buttons or auto-detect from penalties?
