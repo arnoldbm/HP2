@@ -21,11 +21,14 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | File | Purpose | Last Updated |
 |------|---------|--------------|
 | `README.md` | GitHub repository overview, project status, quick start | 2025-10-28 |
-| `CLAUDE.md` | This file - central documentation hub for AI context | 2025-10-29 |
+| `CLAUDE.md` | This file - central documentation hub for AI context | 2025-10-30 |
 | `docs/HOCKEY_PRACTICE_APP_PLAN.md` | Complete product plan, features, user flows, monetization | 2024-01-XX |
 | `docs/DEV_SETUP_AND_DATA_MODELS.md` | Dev environment setup, database schema, TDD approach | 2024-01-XX |
 | `docs/CHANGELOG.md` | Complete project changelog with all changes by phase | 2025-10-28 |
-| `docs/AI_PRACTICE_PLAN_GENERATION.md` | **NEW** Complete guide to AI practice plan generation (workflow, prompts, algorithms, testing) | 2025-10-29 |
+| `docs/AI_PRACTICE_PLAN_GENERATION.md` | Complete guide to AI practice plan generation (workflow, prompts, algorithms, testing) | 2025-10-29 |
+| `docs/PRACTICE_HISTORY.md` | **NEW** Practice history feature with filtering, stats, and detail modal | 2025-10-30 |
+| `docs/PRACTICE_BUILDER.md` | **NEW** Manual practice builder with drag-and-drop drills | 2025-10-30 |
+| `docs/TESTING_GUIDE.md` | **NEW** Testing philosophy, patterns, and best practices | 2025-10-30 |
 
 ### Database & Architecture
 | File | Purpose | Status |
@@ -41,6 +44,7 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `supabase/migrations/20251028_fix_team_members_rls.sql` | Fixed RLS policies on team_members (added SELECT policies) | ✅ DONE |
 | `supabase/migrations/20251028230000_practice_planning_schema.sql` | Practice planning schema (drills, practices, practice_drills with RLS) | ✅ DONE |
 | `supabase/seeds/drills.sql` | 255 hockey drills with AI metadata (addresses_situations JSONB) | ✅ DONE |
+| `supabase/migrations/20251031000000_seed_sample_drills.sql` | **NEW** 27 sample drills for practice builder demo | ✅ DONE |
 | `lib/types/database.ts` | Auto-generated TypeScript types from Supabase | ✅ DONE |
 | Architecture diagram | System architecture overview | TODO |
 
@@ -61,15 +65,17 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `tests/unit/analytics.test.ts` | Analytics calculation functions | ✅ DONE (21 tests) |
 | `tests/integration/game-events.test.ts` | Game event CRUD with RLS | ✅ DONE (23 tests, 2 skipped) |
 | `tests/integration/game-event-persistence.test.ts` | Event save/load with optimistic updates | ✅ DONE (11 tests) |
-| `tests/integration/practice-planning.test.ts` | **NEW** Practice plan CRUD, drill associations, drill matching, RLS | ✅ DONE (21 tests) |
+| `tests/integration/practice-planning.test.ts` | Practice plan CRUD, drill associations, drill matching, RLS | ✅ DONE (21 tests) |
+| `tests/unit/practice-history.test.tsx` | **NEW** Practice history UI, filtering, modal, auth | ✅ DONE (19 tests) |
 | `tests/e2e/game-tracking.spec.ts` | Live tracking E2E tests | TODO |
 
-**Current Test Count: 255 tests passing (2 skipped) = 257 total**
-- Unit: 200 tests
+**Current Test Count: 274 tests passing (2 skipped) = 276 total**
+- Unit: 219 tests
+  - Practice history: 19 tests ✨ NEW
 - Integration: 55 tests (2 skipped due to JWT limitation)
   - Game events: 23 tests (2 skipped)
   - Game event persistence: 11 tests
-  - Practice planning: 21 tests ✨ NEW
+  - Practice planning: 21 tests
 
 ### Game Tracking Components
 | Component | Purpose | Tests | Status |
@@ -98,7 +104,9 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 |-----------|---------|-------|--------|
 | `app/demo/drills/page.tsx` | Drill library with search, filters, and pagination | - | ✅ DONE |
 | `components/drills/drill-card.tsx` | Individual drill display card | - | ✅ DONE |
-| `app/api/generate-practice-plan/route.ts` | AI practice plan generation API (OpenAI GPT-4o) | - | ✅ DONE |
+| `app/demo/practice-history/page.tsx` | **NEW** Practice history with filtering, stats dashboard, and detail modal | 19 | ✅ DONE |
+| `app/demo/practice-builder/page.tsx` | **NEW** Manual practice builder with drag-and-drop drills | - | ✅ DONE |
+| `app/api/generate-practice-plan/route.ts` | AI practice plan generation endpoint with GPT-4 integration | - | ✅ DONE |
 
 ### Authentication Components
 | Component | Purpose | Status |
@@ -381,7 +389,7 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 501-528)
 - [x] Local email testing via Mailpit (localhost:54324)
 - [x] Updated Supabase config for password reset redirects
 
-### Phase 4-6: Practice Planning & AI 🚧 **IN PROGRESS** (~70% COMPLETE)
+### Phase 4-6: Practice Planning & AI ✅ **COMPLETE** (~95% COMPLETE)
 
 **Database Foundation:** ✅ **COMPLETE**
 - [x] Database schema (drills, practices, practice_drills tables)
@@ -392,9 +400,9 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 501-528)
   - Each drill includes: title, description, duration, age range, skill level
   - AI metadata: `addresses_situations` JSONB field mapping drills to game analytics issues
   - Searchable tags array for filtering
-- [x] Seed data loaded into database (255 drills)
+- [x] Seed data loaded into database (255 drills + 27 sample drills for practice builder)
 
-**UI & Features:** ✅ **MAJOR PROGRESS**
+**UI & Features:** ✅ **COMPLETE**
 - [x] **Drill library UI** with search and filters (`/demo/drills`)
   - Search by title, description, tags
   - Filter by category, skill level, age range, duration
@@ -411,10 +419,23 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 501-528)
   - Displays AI reasoning (top 3 focus areas, goals)
   - Shows drill recommendations by section (warm-up, skills, scrimmage, cool-down)
   - Links recommendations to specific game stats
-- [ ] **Practice plan saving** to database (practices, practice_drills tables)
-- [ ] **Manual practice plan builder** (drag-and-drop drill selection)
-- [ ] **Practice history view** (view past practices)
-- [ ] **Mobile-friendly practice plan display**
+  - Saves to database with drill associations
+- [x] **Practice history view** (`/demo/practice-history`) 📋 **NEW**
+  - Stats dashboard (total, AI-generated, completed, planned counts)
+  - Advanced filtering by status and type
+  - Practice detail modal with full drill breakdown
+  - AI reasoning display for AI-generated plans
+  - Source game information
+  - 19 unit tests (100% passing)
+- [x] **Manual practice plan builder** (`/demo/practice-builder`) ⚙️ **NEW**
+  - Drag-and-drop drill selection from library
+  - 27 sample drills across 11 categories
+  - Three practice sections (warm-up, main, cool-down)
+  - Real-time duration tracking
+  - Custom drill duration and notes
+  - Save to database with drill associations
+  - Searchable drill library with category filters
+- [ ] **Mobile-friendly practice plan display** (planned next)
 
 See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 509-574)
 
