@@ -20,6 +20,7 @@ export function EventLogger({
   showSlot = true,
 }: EventLoggerProps) {
   const {
+    gameState,
     loggingFlow,
     players,
     events,
@@ -30,6 +31,9 @@ export function EventLogger({
     completeEvent,
     cancelEventLogging,
   } = useGameTrackingStore()
+
+  // Filter events to only show current period
+  const currentPeriodEvents = events.filter(e => e.period === gameState.period)
 
   // Control bottom sheet for player selection
   const [showPlayerSheet, setShowPlayerSheet] = useState(false)
@@ -82,12 +86,33 @@ export function EventLogger({
     completeEvent()
   }
 
+  // Check if game is completed
+  const isGameCompleted = gameState.status === 'completed'
+
   // Render based on current step
   const renderContent = () => {
     switch (loggingFlow.step) {
       case 'idle':
         return (
           <div className="space-y-2 md:space-y-3 landscape:h-full landscape:flex landscape:flex-col">
+            {/* Game Completed Message */}
+            {isGameCompleted && (
+              <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-3 md:p-4">
+                <div className="flex items-start gap-2">
+                  <span className="text-2xl">🏁</span>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-yellow-900 text-sm md:text-base mb-1">
+                      Game Ended
+                    </h3>
+                    <p className="text-xs md:text-sm text-yellow-800">
+                      This game has been ended. You cannot add new events to a completed game.
+                      Use the "New Game" button to start tracking a new game.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Ice Surface for visualization - Maximum size */}
             <div className="bg-white rounded-lg shadow p-2 md:p-3 landscape:p-1.5 landscape:flex-1 landscape:min-h-0">
               <div className="w-full landscape:h-full landscape:flex landscape:items-center landscape:justify-center">
@@ -95,7 +120,7 @@ export function EventLogger({
                   showZones={showZones}
                   showSlot={showSlot}
                   responsive={true}
-                  events={events.map((e) => ({
+                  events={currentPeriodEvents.map((e) => ({
                     id: e.id,
                     x: e.coordinates?.x || 0,
                     y: e.coordinates?.y || 0,
@@ -106,10 +131,12 @@ export function EventLogger({
             </div>
 
             {/* Quick Event Buttons - Below ice surface in portrait only (hidden in landscape, shown in sidebar) */}
-            <div className="bg-white rounded-lg shadow p-2 md:p-3 landscape:hidden">
-              <h3 className="text-xs font-medium text-gray-700 mb-2">Log Event</h3>
-              <QuickEventButtons onEventSelect={handleEventTypeSelect} showIcons={true} />
-            </div>
+            {!isGameCompleted && (
+              <div className="bg-white rounded-lg shadow p-2 md:p-3 landscape:hidden">
+                <h3 className="text-xs font-medium text-gray-700 mb-2">Log Event</h3>
+                <QuickEventButtons onEventSelect={handleEventTypeSelect} showIcons={true} />
+              </div>
+            )}
           </div>
         )
 
@@ -130,7 +157,7 @@ export function EventLogger({
                   showZones={showZones}
                   showSlot={showSlot}
                   responsive={true}
-                  events={events.map((e) => ({
+                  events={currentPeriodEvents.map((e) => ({
                     id: e.id,
                     x: e.coordinates?.x || 0,
                     y: e.coordinates?.y || 0,
@@ -173,7 +200,7 @@ export function EventLogger({
                   showZones={showZones}
                   showSlot={showSlot}
                   responsive={true}
-                  events={events.map((e) => ({
+                  events={currentPeriodEvents.map((e) => ({
                     id: e.id,
                     x: e.coordinates?.x || 0,
                     y: e.coordinates?.y || 0,

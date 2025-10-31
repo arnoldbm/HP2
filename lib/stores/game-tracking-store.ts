@@ -20,6 +20,7 @@ export type EventType =
 export type ShotResult = 'goal' | 'save' | 'miss_high' | 'miss_wide' | 'blocked' | 'post'
 export type ShotType = 'wrist' | 'slap' | 'snap' | 'backhand' | 'deflection' | 'one_timer'
 export type GameSituation = 'even_strength' | 'power_play' | 'penalty_kill' | 'empty_net'
+export type GameStatus = 'scheduled' | 'in_progress' | 'completed' | 'cancelled'
 
 export interface GameEvent {
   id: string
@@ -49,6 +50,7 @@ export interface GameState {
   gameTimeSeconds: number
   score: { us: number; them: number }
   situation: GameSituation
+  status: GameStatus
 }
 
 interface EventLoggingFlow {
@@ -121,6 +123,7 @@ export const useGameTrackingStore = create<GameTrackingStore>((set, get) => ({
     gameTimeSeconds: 1200, // 20:00
     score: { us: 0, them: 0 },
     situation: 'even_strength',
+    status: 'in_progress',
   },
   players: [],
   events: [],

@@ -5,6 +5,7 @@ import { useGameTrackingStore } from '@/lib/stores/game-tracking-store'
 import { EventLogger } from '@/components/game-tracking/event-logger'
 import { RecentEventsList } from '@/components/game-tracking/recent-events-list'
 import { QuickEventButtons } from '@/components/game-tracking/quick-event-buttons'
+import { GameControls } from '@/components/game-tracking/game-controls'
 import { AuthModal } from '@/components/auth/auth-modal'
 import { setupDemoGameData } from '@/app/actions/demo-setup'
 import { supabase } from '@/lib/db/supabase'
@@ -26,6 +27,9 @@ export default function GameTrackingDemoPage() {
   const [editOpponentName, setEditOpponentName] = useState('')
   const [editLocation, setEditLocation] = useState('')
   const [savingGameInfo, setSavingGameInfo] = useState(false)
+
+  // Check if game is completed
+  const isGameCompleted = gameState.status === 'completed'
 
   // Check authentication status
   useEffect(() => {
@@ -163,6 +167,13 @@ export default function GameTrackingDemoPage() {
           console.log('✅ Created new default game:', gameId)
         }
 
+        // Fetch game status from database
+        const { data: gameData } = await supabase
+          .from('games')
+          .select('status')
+          .eq('id', gameId)
+          .single()
+
         // Initialize game state
         setGameState({
           gameId,
@@ -170,6 +181,7 @@ export default function GameTrackingDemoPage() {
           gameTimeSeconds: 1200,
           score: { us: 0, them: 0 },
           situation: 'even_strength',
+          status: gameData?.status || 'in_progress',
         })
 
         // Load players
@@ -445,18 +457,40 @@ export default function GameTrackingDemoPage() {
 
           {/* Right Sidebar - Event Buttons & Events in landscape */}
           <div className="portrait:hidden landscape:flex landscape:flex-col landscape:border-l landscape:border-gray-300 landscape:bg-white landscape:overflow-y-auto landscape:p-2 landscape:space-y-2">
+            {/* Game Completed Message */}
+            {isGameCompleted && (
+              <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-2">
+                <div className="flex items-start gap-1">
+                  <span className="text-lg">🏁</span>
+                  <div className="flex-1">
+                    <h3 className="font-bold text-yellow-900 text-xs mb-0.5">
+                      Game Ended
+                    </h3>
+                    <p className="text-[10px] text-yellow-800 leading-tight">
+                      Start a new game to add events
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Quick Event Buttons - Top of sidebar in landscape */}
-            <div className="bg-white rounded-lg shadow p-2">
-              <h3 className="text-xs font-medium text-gray-700 mb-2">Log Event</h3>
-              <QuickEventButtons
-                onEventSelect={(eventType, prefilledDetails) => {
-                  useGameTrackingStore.getState().startEventLogging(eventType as any, undefined, prefilledDetails)
-                }}
-                showIcons={true}
-                sidebarMode={true}
-                selectedEventType={loggingFlow.step !== 'idle' ? loggingFlow.eventType : null}
-              />
-            </div>
+            {!isGameCompleted && (
+              <div className="bg-white rounded-lg shadow p-2">
+                <h3 className="text-xs font-medium text-gray-700 mb-2">Log Event</h3>
+                <QuickEventButtons
+                  onEventSelect={(eventType, prefilledDetails) => {
+                    useGameTrackingStore.getState().startEventLogging(eventType as any, undefined, prefilledDetails)
+                  }}
+                  showIcons={true}
+                  sidebarMode={true}
+                  selectedEventType={loggingFlow.step !== 'idle' ? loggingFlow.eventType : null}
+                />
+              </div>
+            )}
+
+            {/* Game Controls */}
+            <GameControls />
 
             {/* Recent Events */}
             <RecentEventsList />
@@ -464,6 +498,9 @@ export default function GameTrackingDemoPage() {
 
           {/* Portrait Mode - Buttons & Events below ice */}
           <div className="landscape:hidden portrait:p-3 portrait:md:p-4 portrait:space-y-4">
+            {/* Game Controls */}
+            <GameControls />
+
             {/* Recent Events */}
             <RecentEventsList />
           </div>
