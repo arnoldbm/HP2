@@ -24,6 +24,7 @@ export interface IceSurfaceProps {
   events?: IceEvent[]
   className?: string
   responsive?: boolean // New prop for responsive behavior
+  endsSwapped?: boolean // New prop to flip offensive/defensive ends
 }
 
 export function IceSurface({
@@ -35,6 +36,7 @@ export function IceSurface({
   events = [],
   className = '',
   responsive = true, // Default to responsive
+  endsSwapped = false,
 }: IceSurfaceProps) {
   const svgRef = useRef<SVGSVGElement>(null)
 
@@ -272,19 +274,74 @@ export function IceSurface({
       )}
 
       {/* High danger zone (slot) */}
-      {showSlot && (
-        <rect
-          x={ICE_SURFACE.SLOT.MIN_X}
-          y={ICE_SURFACE.SLOT.MIN_Y}
-          width={ICE_SURFACE.SLOT.MAX_X - ICE_SURFACE.SLOT.MIN_X}
-          height={ICE_SURFACE.SLOT.MAX_Y - ICE_SURFACE.SLOT.MIN_Y}
-          fill="rgba(255, 100, 100, 0.2)"
-          stroke="#cc0000"
-          strokeWidth={1}
-          strokeDasharray="2,2"
-          data-slot="true"
-        />
-      )}
+      {showSlot && (() => {
+        // Calculate slot position based on whether ends are swapped
+        const slotMinX = endsSwapped ? (200 - ICE_SURFACE.SLOT.MAX_X) : ICE_SURFACE.SLOT.MIN_X
+        const slotMaxX = endsSwapped ? (200 - ICE_SURFACE.SLOT.MIN_X) : ICE_SURFACE.SLOT.MAX_X
+        const slotWidth = slotMaxX - slotMinX
+        const slotCenterX = slotMinX + slotWidth / 2
+
+        return (
+          <>
+            <rect
+              x={slotMinX}
+              y={ICE_SURFACE.SLOT.MIN_Y}
+              width={slotWidth}
+              height={ICE_SURFACE.SLOT.MAX_Y - ICE_SURFACE.SLOT.MIN_Y}
+              fill="rgba(255, 100, 100, 0.2)"
+              stroke="#cc0000"
+              strokeWidth={1}
+              strokeDasharray="2,2"
+              data-slot="true"
+            />
+            <text
+              x={slotCenterX}
+              y={ICE_SURFACE.SLOT.MIN_Y - 2}
+              fontSize="4"
+              fill="#cc0000"
+              textAnchor="middle"
+              fontWeight="bold"
+            >
+              HIGH DANGER
+            </text>
+          </>
+        )
+      })()}
+
+      {/* Zone labels */}
+      <text
+        x={32}
+        y={8}
+        fontSize="6"
+        fill="#666"
+        textAnchor="middle"
+        fontWeight="bold"
+        opacity={0.7}
+      >
+        {endsSwapped ? 'OFFENSIVE ZONE' : 'DEFENSIVE ZONE'}
+      </text>
+      <text
+        x={100}
+        y={8}
+        fontSize="6"
+        fill="#666"
+        textAnchor="middle"
+        fontWeight="bold"
+        opacity={0.7}
+      >
+        NEUTRAL ZONE
+      </text>
+      <text
+        x={168}
+        y={8}
+        fontSize="6"
+        fill="#666"
+        textAnchor="middle"
+        fontWeight="bold"
+        opacity={0.7}
+      >
+        {endsSwapped ? 'DEFENSIVE ZONE' : 'OFFENSIVE ZONE'}
+      </text>
 
       {/* Event markers */}
       {events.map((event) => {

@@ -5,7 +5,6 @@ import { useGameTrackingStore } from '@/lib/stores/game-tracking-store'
 import { EventLogger } from '@/components/game-tracking/event-logger'
 import { RecentEventsList } from '@/components/game-tracking/recent-events-list'
 import { QuickEventButtons } from '@/components/game-tracking/quick-event-buttons'
-import { GameControls } from '@/components/game-tracking/game-controls'
 import { AuthModal } from '@/components/auth/auth-modal'
 import { setupDemoGameData } from '@/app/actions/demo-setup'
 import { supabase } from '@/lib/db/supabase'
@@ -27,6 +26,11 @@ export default function GameTrackingDemoPage() {
   const [editOpponentName, setEditOpponentName] = useState('')
   const [editLocation, setEditLocation] = useState('')
   const [savingGameInfo, setSavingGameInfo] = useState(false)
+  const [creatingGame, setCreatingGame] = useState(false)
+  const [showNewGameForm, setShowNewGameForm] = useState(false)
+  const [newGameOpponent, setNewGameOpponent] = useState('')
+  const [newGameLocation, setNewGameLocation] = useState('')
+  const [endsSwapped, setEndsSwapped] = useState(false)
 
   // Check if game is completed
   const isGameCompleted = gameState.status === 'completed'
@@ -291,6 +295,124 @@ export default function GameTrackingDemoPage() {
     setIsAuthenticated(false)
   }
 
+  const handleEndPeriod = () => {
+    if (gameState.period < 3) {
+      setGameState({ period: gameState.period + 1 })
+    } else {
+      alert('Game is over! (Period 3 complete)')
+    }
+  }
+
+  const handleEndGame = async () => {
+    if (!gameState.gameId) return
+
+    if (confirm('Are you sure you want to end the game? You can still view analytics but cannot add new events.')) {
+      try {
+        const { error } = await supabase
+          .from('games')
+          .update({ status: 'completed' })
+          .eq('id', gameState.gameId)
+
+        if (error) throw error
+
+        setGameState({ status: 'completed' })
+        alert('Game ended! Go to Analytics page to view post-game data and generate AI practice plan.')
+      } catch (error) {
+        console.error('❌ Error ending game:', error)
+        alert('Failed to end game. Please try again.')
+      }
+    }
+  }
+
+  const handleNewGameClick = () => {
+    const { events } = useGameTrackingStore.getState()
+    if (events.length > 0) {
+      const confirmed = confirm('Starting a new game will save the current game and start fresh. Continue?')
+      if (!confirmed) return
+    }
+    setNewGameOpponent('')
+    setNewGameLocation('')
+    setShowNewGameForm(true)
+  }
+
+  const handleCreateGame = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!newGameOpponent.trim()) {
+      alert('Please enter an opponent name')
+      return
+    }
+
+    try {
+      setCreatingGame(true)
+
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        alert('Please sign in to create a new game')
+        return
+      }
+
+      const { data: teamMember } = await supabase
+        .from('team_members')
+        .select('team_id')
+        .eq('user_id', user.id)
+        .single()
+
+      if (!teamMember) {
+        alert('No team found for user')
+        return
+      }
+
+      const { data: newGame, error } = await supabase
+        .from('games')
+        .insert({
+          team_id: teamMember.team_id,
+          opponent_name: newGameOpponent.trim(),
+          game_date: new Date().toISOString(),
+          location: newGameLocation.trim() !== '' ? newGameLocation.trim() : null,
+          status: 'in_progress',
+        })
+        .select()
+        .single()
+
+      if (error) throw error
+
+      console.log('✅ New game created:', newGame.id, 'vs', newGameOpponent)
+
+      const storageKey = `current_game_${user.id}`
+      localStorage.setItem(storageKey, newGame.id)
+
+      setGameState({
+        gameId: newGame.id,
+        period: 1,
+        gameTimeSeconds: 1200,
+        score: { us: 0, them: 0 },
+        situation: 'even_strength',
+        status: 'in_progress',
+      })
+
+      await loadEvents(newGame.id)
+
+      // Update game info state
+      setGameInfo({
+        opponent_name: newGameOpponent.trim(),
+        game_date: newGame.game_date,
+        location: newGameLocation.trim() !== '' ? newGameLocation.trim() : null,
+      })
+
+      setShowNewGameForm(false)
+      setNewGameOpponent('')
+      setNewGameLocation('')
+
+      alert(`New game created vs ${newGameOpponent.trim()}! Ready to track events.`)
+    } catch (error) {
+      console.error('❌ Error creating new game:', error)
+      alert('Failed to create new game. Please try again.')
+    } finally {
+      setCreatingGame(false)
+    }
+  }
+
   const handleEditGameInfo = () => {
     if (gameInfo) {
       setEditOpponentName(gameInfo.opponent_name)
@@ -345,8 +467,8 @@ export default function GameTrackingDemoPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto">
         {/* Compact Header - Fixed at top on mobile landscape */}
-        <div className="sticky top-0 z-20 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-2 md:p-4 shadow-lg landscape:py-1">
-          <div className="flex items-center justify-between gap-2">
+        <div className="sticky top-0 z-20 bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-2 md:p-4 shadow-lg landscape:py-1.5">
+          <div className="flex items-center justify-between gap-2 md:gap-3">
             <div className="flex-1 min-w-0">
               {gameInfo && (
                 <div className="flex items-center gap-2 landscape:gap-1">
@@ -368,9 +490,42 @@ export default function GameTrackingDemoPage() {
                 </div>
               )}
             </div>
+
+            {/* Game Controls */}
+            <div className="flex items-center gap-1.5 md:gap-2">
+              <button
+                onClick={() => setEndsSwapped(!endsSwapped)}
+                className="px-2 py-1 bg-white/20 hover:bg-white/30 rounded text-[10px] md:text-xs font-medium transition-colors whitespace-nowrap"
+                title="Swap offensive/defensive ends"
+              >
+                🔄 Swap
+              </button>
+              <button
+                onClick={handleEndPeriod}
+                disabled={gameState.period >= 3 || isGameCompleted}
+                className="px-2 py-1 bg-white/20 hover:bg-white/30 rounded text-[10px] md:text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                {gameState.period >= 3 ? 'P3 ✓' : `End P${gameState.period}`}
+              </button>
+              <button
+                onClick={handleEndGame}
+                disabled={isGameCompleted}
+                className="px-2 py-1 bg-white/20 hover:bg-white/30 rounded text-[10px] md:text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                {isGameCompleted ? 'Ended' : 'End Game'}
+              </button>
+              <button
+                onClick={handleNewGameClick}
+                disabled={creatingGame}
+                className="px-2 py-1 bg-purple-500/80 hover:bg-purple-600 rounded text-[10px] md:text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              >
+                🆕 New
+              </button>
+            </div>
+
             <div className="flex items-center gap-2 landscape:gap-1">
               <div className="text-right">
-                <div className="text-xs text-blue-100 landscape:hidden">Period {gameState.period}</div>
+                <div className="text-xs text-blue-100 font-semibold">Period {gameState.period}</div>
                 <div className="text-xl md:text-2xl font-bold landscape:text-base">
                   {gameState.score.us}-{gameState.score.them}
                 </div>
@@ -448,11 +603,67 @@ export default function GameTrackingDemoPage() {
           </div>
         )}
 
+        {/* New Game Modal */}
+        {showNewGameForm && (
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+              <h3 className="text-xl font-bold mb-4">Create New Game</h3>
+              <form onSubmit={handleCreateGame} className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Opponent Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={newGameOpponent}
+                    onChange={(e) => setNewGameOpponent(e.target.value)}
+                    placeholder="e.g., Hawks, Red Wings"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    disabled={creatingGame}
+                    autoFocus
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Location (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={newGameLocation}
+                    onChange={(e) => setNewGameLocation(e.target.value)}
+                    placeholder="e.g., Home Arena, Away Rink"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    disabled={creatingGame}
+                  />
+                </div>
+                <div className="flex items-center gap-3 mt-6">
+                  <button
+                    type="submit"
+                    disabled={creatingGame || !newGameOpponent.trim()}
+                    className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {creatingGame ? 'Creating...' : 'Create Game'}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowNewGameForm(false)}
+                    disabled={creatingGame}
+                    className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors font-medium disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
         {/* Main Layout - Ice Surface First, Optimized for Landscape */}
         <div className="portrait:block landscape:grid landscape:grid-cols-[1fr_200px] landscape:h-[calc(100vh-48px)] landscape:gap-0">
           {/* Ice Surface - Takes maximum space in landscape */}
           <div className="portrait:p-3 portrait:md:p-4 landscape:overflow-auto landscape:p-2">
-            <EventLogger />
+            <EventLogger endsSwapped={endsSwapped} />
           </div>
 
           {/* Right Sidebar - Event Buttons & Events in landscape */}
@@ -489,18 +700,12 @@ export default function GameTrackingDemoPage() {
               </div>
             )}
 
-            {/* Game Controls */}
-            <GameControls />
-
             {/* Recent Events */}
             <RecentEventsList />
           </div>
 
           {/* Portrait Mode - Buttons & Events below ice */}
           <div className="landscape:hidden portrait:p-3 portrait:md:p-4 portrait:space-y-4">
-            {/* Game Controls */}
-            <GameControls />
-
             {/* Recent Events */}
             <RecentEventsList />
           </div>

@@ -12,12 +12,14 @@ import type { ShotResult } from '@/lib/stores/game-tracking-store'
 export interface EventLoggerProps {
   showZones?: boolean
   showSlot?: boolean
+  endsSwapped?: boolean
   // Remove fixed width/height props - now fully responsive
 }
 
 export function EventLogger({
   showZones = true,
   showSlot = true,
+  endsSwapped = false,
 }: EventLoggerProps) {
   const {
     gameState,
@@ -35,6 +37,18 @@ export function EventLogger({
   // Filter events to only show current period
   const currentPeriodEvents = events.filter(e => e.period === gameState.period)
 
+  // Coordinate transformation for swapped ends
+  const transformCoords = (coords: Coordinates): Coordinates => {
+    if (!endsSwapped) return coords
+    return { x: 200 - coords.x, y: coords.y }
+  }
+
+  // Inverse transformation (when user clicks to log event)
+  const inverseTransformCoords = (coords: Coordinates): Coordinates => {
+    if (!endsSwapped) return coords
+    return { x: 200 - coords.x, y: coords.y }
+  }
+
   // Control bottom sheet for player selection
   const [showPlayerSheet, setShowPlayerSheet] = useState(false)
 
@@ -50,7 +64,9 @@ export function EventLogger({
   // Handle ice surface click
   const handleIceClick = (coords: Coordinates) => {
     if (loggingFlow.step === 'select_location') {
-      setCoordinates(coords)
+      // Transform coordinates if ends are swapped (convert back to canonical form)
+      const canonicalCoords = inverseTransformCoords(coords)
+      setCoordinates(canonicalCoords)
     }
   }
 
@@ -120,12 +136,16 @@ export function EventLogger({
                   showZones={showZones}
                   showSlot={showSlot}
                   responsive={true}
-                  events={currentPeriodEvents.map((e) => ({
-                    id: e.id,
-                    x: e.coordinates?.x || 0,
-                    y: e.coordinates?.y || 0,
-                    type: e.eventType as any,
-                  }))}
+                  endsSwapped={endsSwapped}
+                  events={currentPeriodEvents.map((e) => {
+                    const coords = e.coordinates ? transformCoords(e.coordinates) : { x: 0, y: 0 }
+                    return {
+                      id: e.id,
+                      x: coords.x,
+                      y: coords.y,
+                      type: e.eventType as any,
+                    }
+                  })}
                 />
               </div>
             </div>
@@ -157,12 +177,16 @@ export function EventLogger({
                   showZones={showZones}
                   showSlot={showSlot}
                   responsive={true}
-                  events={currentPeriodEvents.map((e) => ({
-                    id: e.id,
-                    x: e.coordinates?.x || 0,
-                    y: e.coordinates?.y || 0,
-                    type: e.eventType as any,
-                  }))}
+                  endsSwapped={endsSwapped}
+                  events={currentPeriodEvents.map((e) => {
+                    const coords = e.coordinates ? transformCoords(e.coordinates) : { x: 0, y: 0 }
+                    return {
+                      id: e.id,
+                      x: coords.x,
+                      y: coords.y,
+                      type: e.eventType as any,
+                    }
+                  })}
                 />
               </div>
             </div>
@@ -200,12 +224,16 @@ export function EventLogger({
                   showZones={showZones}
                   showSlot={showSlot}
                   responsive={true}
-                  events={currentPeriodEvents.map((e) => ({
-                    id: e.id,
-                    x: e.coordinates?.x || 0,
-                    y: e.coordinates?.y || 0,
-                    type: e.eventType as any,
-                  }))}
+                  endsSwapped={endsSwapped}
+                  events={currentPeriodEvents.map((e) => {
+                    const coords = e.coordinates ? transformCoords(e.coordinates) : { x: 0, y: 0 }
+                    return {
+                      id: e.id,
+                      x: coords.x,
+                      y: coords.y,
+                      type: e.eventType as any,
+                    }
+                  })}
                 />
               </div>
             </div>
