@@ -31,9 +31,10 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `docs/TESTING_GUIDE.md` | Testing philosophy, patterns, and best practices | 2025-10-30 |
 | `docs/MOBILE_FIRST_ASSESSMENT.md` | Mobile UX assessment, roadmap, and design patterns | 2025-10-30 |
 | `docs/GAME_TRACKING_MOBILE.md` | Game tracking mobile optimization (Week 1 complete - 8/10 score) | 2025-10-30 |
-| `docs/GAME_TRACKING_UX_IMPROVEMENTS.md` | **NEW** Ice-first flow, view toggle, period management, PWA setup (Oct 31, 2025) | 2025-10-31 |
-| `docs/PWA_INSTALLATION_GUIDE.md` | **NEW** End-user guide for installing PWA on iOS, Android, and Desktop | 2025-10-31 |
-| `docs/SESSION_SUMMARY_2025-10-31.md` | **NEW** Session summary: UX improvements, PWA setup, documentation created | 2025-10-31 |
+| `docs/GAME_TRACKING_UX_IMPROVEMENTS.md` | Ice-first flow, view toggle, period management, PWA setup (Oct 31, 2025) | 2025-10-31 |
+| `docs/PWA_INSTALLATION_GUIDE.md` | End-user guide for installing PWA on iOS, Android, and Desktop | 2025-10-31 |
+| `docs/SESSION_SUMMARY_2025-10-31.md` | Session summary: UX improvements, PWA setup, documentation created | 2025-10-31 |
+| `docs/TEAM_ROSTER_MANAGEMENT_TDD_PLAN.md` | **NEW** Comprehensive TDD plan for team/organization/roster management (6 milestones, 183 tests) | 2025-11-01 |
 
 ### Database & Architecture
 | File | Purpose | Status |
@@ -71,16 +72,28 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `tests/integration/game-events.test.ts` | Game event CRUD with RLS | ✅ DONE (23 tests, 2 skipped) |
 | `tests/integration/game-event-persistence.test.ts` | Event save/load with optimistic updates | ✅ DONE (11 tests) |
 | `tests/integration/practice-planning.test.ts` | Practice plan CRUD, drill associations, drill matching, RLS | ✅ DONE (21 tests) |
-| `tests/unit/practice-history.test.tsx` | **NEW** Practice history UI, filtering, modal, auth | ✅ DONE (19 tests) |
+| `tests/unit/practice-history.test.tsx` | Practice history UI, filtering, modal, auth | ✅ DONE (19 tests) |
+| `tests/unit/organization-setup.test.ts` | **NEW** Organization slug generation utilities | ✅ DONE (17 tests) |
+| `tests/components/team-form.test.tsx` | **NEW** Team creation form component | ✅ DONE (20 tests, 4 skipped) |
+| `tests/integration/organization-crud.test.ts` | **NEW** Organization CRUD operations with RLS | ✅ DONE (7 tests, 3 skipped) |
+| `tests/integration/team-crud.test.ts` | **NEW** Team CRUD operations with RLS | ✅ DONE (16 tests) |
+| `tests/integration/player-crud.test.ts` | **NEW** Player CRUD operations with RLS & jersey uniqueness | ✅ DONE (17 tests) |
+| `tests/components/player-form.test.tsx` | **NEW** Player form component (add/edit with validation) | ✅ DONE (18 tests, 4 skipped) |
 | `tests/e2e/game-tracking.spec.ts` | Live tracking E2E tests | TODO |
 
-**Current Test Count: 274 tests passing (2 skipped) = 276 total**
-- Unit: 219 tests
-  - Practice history: 19 tests ✨ NEW
-- Integration: 55 tests (2 skipped due to JWT limitation)
-  - Game events: 23 tests (2 skipped)
+**Current Test Count: 351 tests passing (13 skipped) = 364 total** ✨ **UPDATED Nov 1 (Milestone 3)**
+- Unit: 270 tests
+  - Practice history: 19 tests
+  - Organization setup: 17 tests
+  - Team form: 20 tests (4 skipped)
+  - Player form: 18 tests (4 skipped) ✨ **NEW**
+- Integration: 81 tests (5 skipped)
+  - Game events: 23 tests (2 skipped due to JWT limitation)
   - Game event persistence: 11 tests
   - Practice planning: 21 tests
+  - Organization CRUD: 7 tests (3 skipped due to auth user requirement)
+  - Team CRUD: 16 tests
+  - Player CRUD: 17 tests ✨ **NEW**
 
 ### Game Tracking Components (Mobile-Optimized 8/10)
 | Component | Purpose | Tests | Status |
@@ -132,6 +145,40 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 - Local email testing via Mailpit (localhost:54324)
 - User-specific data isolation via team memberships
 - Auto-signout on RLS policy violations
+
+### Team & Roster Management Components ✨ **NEW** (Nov 1, 2025)
+| Component | Purpose | Tests | Status |
+|-----------|---------|-------|--------|
+| `lib/utils/organization-setup.ts` | Slug generation utilities for organizations | 17 | ✅ DONE |
+| `app/actions/organizations.ts` | Organization setup server action (idempotent) | 7 | ✅ DONE |
+| `lib/validation/team-schemas.ts` | Zod schemas for team creation/update with season helpers | - | ✅ DONE |
+| `components/teams/team-form.tsx` | Team creation form with React Hook Form + Zod | 20 | ✅ DONE |
+| `app/actions/teams.ts` | Team CRUD server actions (create, read, update, delete) | 16 | ✅ DONE |
+| `app/demo/teams/page.tsx` | Teams list page with empty state and team cards | - | ✅ DONE |
+| `app/demo/teams/new/page.tsx` | Team creation page with org initialization | - | ✅ DONE |
+| `lib/validation/player-schemas.ts` | **NEW** Zod schemas for player creation/update with position enum | - | ✅ DONE |
+| `app/actions/players.ts` | **NEW** Player CRUD server actions with jersey uniqueness validation | 17 | ✅ DONE |
+| `components/teams/player-form.tsx` | **NEW** Player creation/edit form with position button group | 18 | ✅ DONE (4 skipped) |
+| `components/teams/roster-list.tsx` | **NEW** Roster display (mobile cards with swipe-to-delete, desktop table) | - | ✅ DONE |
+| `app/demo/teams/[teamId]/roster/page.tsx` | **NEW** Roster management page with add/edit/delete functionality | - | ✅ DONE |
+
+**Team Management Features** (Milestones 1-3 Complete):
+- Auto-create organization for new users (slug generation with conflict resolution)
+- Team creation form with age group selector (USA vs Canada format switching)
+- Skill level selection (House, Travel, A, AA, AAA)
+- Season input (auto-populates with current season YYYY-YY format)
+- User automatically added as head_coach when creating team
+- Teams list page with card layout showing team details
+- Empty state with "Create Your First Team" CTA
+- **Player roster management** (Milestone 3 ✨ **NEW**):
+  - Add/edit/delete players with jersey number (1-99), name, position, birthdate
+  - Position selection (Forward, Defense, Goalie) with button group UI
+  - Jersey number uniqueness enforced per team (same number OK on different teams)
+  - Mobile-first responsive design (swipeable cards on mobile, table on desktop)
+  - Bottom sheet modals for add/edit forms on mobile
+  - Empty state with "Add Your First Player" CTA
+- Mobile-first responsive design
+- 84 tests passing (77 passing, 7 skipped) ✨ **UPDATED**
 
 ---
 
@@ -684,9 +731,9 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
 
 ## 📊 PROJECT STATUS
 
-**Current Status**: Phase 4-6 In Progress - AI Practice Plan Generation Live! 🤖✨
-**Next Milestone**: Practice Plan Saving & History Views
-**Target MVP Completion**: On track! ~80% complete 🎉
+**Current Status**: Phase 7 - Team & Roster Management (Milestones 1-3 Complete!) 🎉
+**Next Milestone**: Milestone 4 - Team Selector & Context
+**Target MVP Completion**: On track! ~90% complete 🎯
 **Target Beta Launch**: 10-12 weeks from start
 
 **Progress Tracker**:
@@ -711,7 +758,7 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
   - [x] Session management and RLS security
   - [x] Game management (create games, switch between games)
   - [x] 21 analytics tests
-- [ ] **Phase 4-6: Practice Planning & AI (70%)** 🚧
+- [x] **Phase 4-6: Practice Planning & AI (95%)** ✅
   - [x] Database schema (drills, practices, practice_drills)
   - [x] 255-drill library with AI metadata loaded
   - [x] RLS policies for multi-tenant practice planning
@@ -719,25 +766,36 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
   - [x] **OpenAI GPT-4o integration** for AI-generated plans
   - [x] **AI practice plan generation** button in analytics
   - [x] **Practice plan display** with AI reasoning & drill recommendations
-  - [ ] Practice plan saving to database
-  - [ ] Manual practice plan builder
-  - [ ] Practice history views
+  - [x] **Practice history view** with filtering and stats dashboard
+  - [x] **Manual practice plan builder** with drag-and-drop drills
+- [ ] **Phase 7: Team & Roster Management (50%)** 🚧 **IN PROGRESS**
+  - [x] **Milestone 1**: Organization auto-creation (21 tests passing) ✅
+  - [x] **Milestone 2**: Team creation UI (32 tests passing) ✅
+  - [x] **Milestone 3**: Player roster management (31 tests passing) ✅ **NEW**
+  - [ ] **Milestone 4**: Team selector & context (20 tests planned)
+  - [ ] **Milestone 5**: Enhanced RLS policies (25 tests planned)
+  - [ ] **Milestone 6**: Team list & management UI (27 tests planned)
 
 **Demo Pages Available**:
 - 🎨 `/demo/ice-surface` - Interactive ice surface visualization
 - 🏒 `/demo/game-tracking` - Complete event logger with live stats & database persistence (requires auth)
 - 📊 `/demo/analytics` - Post-game analytics dashboard with charts, insights, & AI practice plans
 - 📚 `/demo/drills` - Drill library with 255 drills, search, and filters
+- 🏒 `/demo/practice-history` - Practice history with filtering, stats, and detail modal
+- ⚙️ `/demo/practice-builder` - Manual practice plan builder with drag-and-drop drills
+- 🏆 `/demo/teams` - Teams list with cards and empty state
+- ➕ `/demo/teams/new` - Team creation form
+- 👥 `/demo/teams/[teamId]/roster` - **NEW** Player roster management (add/edit/delete players) ✨
 
 **Local Development Tools**:
 - 🗄️ http://localhost:54323 - Supabase Studio (database GUI)
 - 📧 http://localhost:54324 - Mailpit (email inbox for testing auth flows)
 
-**Test Coverage**: 234/236 tests passing (99.2% success rate)
+**Test Coverage**: 351/364 tests passing (96.4% success rate) ⬆️ **+77 tests from Milestones 1-3**
 
 ---
 
-**Last Updated**: 2025-10-31
+**Last Updated**: 2025-11-01
 **Maintained By**: Brock Arnold + Claude
 **Project Name**: HP2 (Hockey Practice Planner v2)
 
@@ -773,24 +831,40 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
   - Analyzes game data (shots, breakouts, turnovers)
   - Recommends drills by section (warm-up, skills, scrimmage, cool-down)
   - Explains reasoning (focus areas, expected improvements)
+- ✅ **Practice management**
+  - Practice history with filtering and stats
+  - Manual practice builder with drag-and-drop drills
+- ✅ **Team & Organization Management** ✨ **NEW Nov 1**
+  - Auto-create organization for new users
+  - Team creation form (age groups, skill levels, seasons)
+  - Teams list page with cards
+  - USA vs Canada age group formatting
+  - **Player roster management** (Milestone 3 ✨ **JUST COMPLETED**):
+    - Add/edit/delete players with jersey number, name, position, birthdate
+    - Jersey number uniqueness per team (1-99)
+    - Mobile-first responsive design (swipeable cards, bottom sheet forms)
+    - Empty state with "Add Your First Player" CTA
 - ✅ **PWA support** with fullscreen mode
   - Add to home screen on iOS/Android
   - Fullscreen button (Android/Desktop)
   - Landscape-optimized orientation
-- ✅ 234/236 tests passing
-- ✅ 4 demo pages: ice surface, game tracking, analytics, drills
+- ✅ 351/364 tests passing (96.4%) ⬆️ **+31 tests from Milestone 3**
+- ✅ 9 demo pages: ice surface, game tracking, analytics, drills, practice history, practice builder, teams, team creation, roster
 
 **Try it:**
-- `npm run dev` → http://localhost:3000/demo/game-tracking
-- Create a new game, track some events
-- View analytics at `/demo/analytics`
-- Click "Generate AI Practice Plan" to see AI recommendations
-- Browse drills at `/demo/drills`
+- `npm run dev` → http://localhost:3000
+- **Teams**: `/demo/teams` - Create teams with age groups and skill levels
+- **Roster**: `/demo/teams/[teamId]/roster` - Manage player rosters (add/edit/delete players) ✨ **NEW**
+- **Game Tracking**: `/demo/game-tracking` - Track live games with ice-click-first flow
+- **Analytics**: `/demo/analytics` - View shot charts, breakout analysis, and AI practice plans
+- **Practice Builder**: `/demo/practice-builder` - Build custom practices with drag-and-drop
+- **Practice History**: `/demo/practice-history` - Review past practices and AI-generated plans
+- **Drills**: `/demo/drills` - Browse 255 hockey drills with search and filters
 
-**Next steps:**
-- Practice plan saving (persist AI plans to database)
-- Manual practice plan builder (drag-and-drop)
-- Practice history view
-- Mobile-friendly practice display
+**Next steps** (Milestone 4):
+- Team selector component (switch between teams in nav)
+- Team context provider (current team state management)
+- Team-specific game/practice/roster filtering
+- 20 tests planned
 
 **Ask the user**: "What would you like to work on next?"

@@ -158,7 +158,7 @@ export function BottomSheet({
 
         {/* Content */}
         <div
-          className="overflow-y-auto"
+          className="overflow-y-auto pb-6"
           style={{
             maxHeight: title
               ? `calc(${snapPoint}vh - 60px)` // Account for header
