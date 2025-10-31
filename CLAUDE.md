@@ -34,7 +34,8 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `docs/GAME_TRACKING_UX_IMPROVEMENTS.md` | Ice-first flow, view toggle, period management, PWA setup (Oct 31, 2025) | 2025-10-31 |
 | `docs/PWA_INSTALLATION_GUIDE.md` | End-user guide for installing PWA on iOS, Android, and Desktop | 2025-10-31 |
 | `docs/SESSION_SUMMARY_2025-10-31.md` | Session summary: UX improvements, PWA setup, documentation created | 2025-10-31 |
-| `docs/TEAM_ROSTER_MANAGEMENT_TDD_PLAN.md` | **NEW** Comprehensive TDD plan for team/organization/roster management (6 milestones, 183 tests) | 2025-11-01 |
+| `docs/TEAM_ROSTER_MANAGEMENT_TDD_PLAN.md` | Comprehensive TDD plan for team/organization/roster management (6 milestones, 183 tests) | 2025-11-01 |
+| `docs/ROSTER_MANAGEMENT.md` | **NEW** Complete player roster management documentation (CRUD, validation, mobile UX, testing) | 2025-11-01 |
 
 ### Database & Architecture
 | File | Purpose | Status |
