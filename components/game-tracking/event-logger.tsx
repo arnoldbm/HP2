@@ -27,7 +27,9 @@ export function EventLogger({
     players,
     events,
     startEventLogging,
+    startLocationFirst,
     setCoordinates,
+    setEventType,
     setPlayer,
     setEventDetails,
     completeEvent,
@@ -63,16 +65,29 @@ export function EventLogger({
 
   // Handle ice surface click
   const handleIceClick = (coords: Coordinates) => {
-    if (loggingFlow.step === 'select_location') {
+    if (loggingFlow.step === 'idle' || loggingFlow.step === 'select_location') {
       // Transform coordinates if ends are swapped (convert back to canonical form)
       const canonicalCoords = inverseTransformCoords(coords)
+
+      // If in idle state, start the location-first flow
+      if (loggingFlow.step === 'idle') {
+        startLocationFirst()
+      }
+
+      // Set the coordinates
       setCoordinates(canonicalCoords)
     }
   }
 
   // Handle event type selection
   const handleEventTypeSelect = (eventType: string, prefilledDetails?: Record<string, unknown>) => {
-    startEventLogging(eventType as any, undefined, prefilledDetails)
+    // If we're in the select_event_type step (after clicking ice), use setEventType
+    if (loggingFlow.step === 'select_event_type') {
+      setEventType(eventType as any, prefilledDetails)
+    } else {
+      // Old flow: start with event type first
+      startEventLogging(eventType as any, undefined, prefilledDetails)
+    }
   }
 
   // Handle player selection
@@ -110,10 +125,10 @@ export function EventLogger({
     switch (loggingFlow.step) {
       case 'idle':
         return (
-          <div className="space-y-2 md:space-y-3 landscape:h-full landscape:flex landscape:flex-col">
+          <div className="h-full flex flex-col">
             {/* Game Completed Message */}
             {isGameCompleted && (
-              <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-3 md:p-4">
+              <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-3 md:p-4 mb-2">
                 <div className="flex items-start gap-2">
                   <span className="text-2xl">🏁</span>
                   <div className="flex-1">
@@ -129,10 +144,11 @@ export function EventLogger({
               </div>
             )}
 
-            {/* Ice Surface for visualization - Maximum size */}
-            <div className="bg-white rounded-lg shadow p-2 md:p-3 landscape:p-1.5 landscape:flex-1 landscape:min-h-0">
-              <div className="w-full landscape:h-full landscape:flex landscape:items-center landscape:justify-center">
+            {/* Ice Surface - Clickable and fills remaining space */}
+            <div className={`${isGameCompleted ? 'flex-1' : 'h-full'} bg-white rounded-lg shadow p-2 md:p-3 min-h-0`}>
+              <div className="w-full h-full flex items-center justify-center">
                 <IceSurface
+                  onClick={!isGameCompleted ? handleIceClick : undefined}
                   showZones={showZones}
                   showSlot={showSlot}
                   responsive={true}
@@ -149,14 +165,6 @@ export function EventLogger({
                 />
               </div>
             </div>
-
-            {/* Quick Event Buttons - Below ice surface in portrait only (hidden in landscape, shown in sidebar) */}
-            {!isGameCompleted && (
-              <div className="bg-white rounded-lg shadow p-2 md:p-3 landscape:hidden">
-                <h3 className="text-xs font-medium text-gray-700 mb-2">Log Event</h3>
-                <QuickEventButtons onEventSelect={handleEventTypeSelect} showIcons={true} />
-              </div>
-            )}
           </div>
         )
 
@@ -197,6 +205,57 @@ export function EventLogger({
             >
               Cancel
             </button>
+          </div>
+        )
+
+      case 'select_event_type':
+        return (
+          <div className="h-full flex flex-col">
+            {/* Prompt */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 md:p-3 mb-2">
+              <p className="text-blue-900 font-medium text-xs md:text-sm text-center">
+                What type of event occurred?
+              </p>
+              {loggingFlow.coordinates && (
+                <p className="text-xs text-blue-700 mt-1 text-center">
+                  Location: ({loggingFlow.coordinates.x.toFixed(0)}, {loggingFlow.coordinates.y.toFixed(0)})
+                </p>
+              )}
+            </div>
+
+            {/* Event Type Buttons */}
+            <div className="bg-white rounded-lg shadow p-3 md:p-4">
+              <QuickEventButtons onEventSelect={handleEventTypeSelect} showIcons={true} />
+            </div>
+
+            {/* Cancel Button */}
+            <button
+              onClick={cancelEventLogging}
+              className="mt-2 w-full py-2 text-xs md:text-sm text-gray-600 hover:text-gray-800 font-medium"
+            >
+              Cancel
+            </button>
+
+            {/* Ice Surface in background - smaller, for reference */}
+            <div className="flex-1 mt-2 bg-white rounded-lg shadow p-2 opacity-50 min-h-0">
+              <div className="w-full h-full flex items-center justify-center">
+                <IceSurface
+                  showZones={showZones}
+                  showSlot={showSlot}
+                  responsive={true}
+                  endsSwapped={endsSwapped}
+                  events={currentPeriodEvents.map((e) => {
+                    const coords = e.coordinates ? transformCoords(e.coordinates) : { x: 0, y: 0 }
+                    return {
+                      id: e.id,
+                      x: coords.x,
+                      y: coords.y,
+                      type: e.eventType as any,
+                    }
+                  })}
+                />
+              </div>
+            </div>
           </div>
         )
 

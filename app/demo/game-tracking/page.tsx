@@ -31,9 +31,72 @@ export default function GameTrackingDemoPage() {
   const [newGameOpponent, setNewGameOpponent] = useState('')
   const [newGameLocation, setNewGameLocation] = useState('')
   const [endsSwapped, setEndsSwapped] = useState(false)
+  const [mobileView, setMobileView] = useState<'ice' | 'events'>('ice')
+  const [showPeriodEndConfirm, setShowPeriodEndConfirm] = useState(false)
+  const [showPeriod3EndDialog, setShowPeriod3EndDialog] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [supportsFullscreen, setSupportsFullscreen] = useState(false)
 
   // Check if game is completed
   const isGameCompleted = gameState.status === 'completed'
+
+  // Check if fullscreen is supported
+  useEffect(() => {
+    const doc = document as any
+    const docEl = document.documentElement as any
+    const isSupported = !!(
+      docEl.requestFullscreen ||
+      docEl.webkitRequestFullscreen ||
+      docEl.mozRequestFullScreen ||
+      docEl.msRequestFullscreen
+    )
+    setSupportsFullscreen(isSupported)
+  }, [])
+
+  // Handle fullscreen changes
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      const doc = document as any
+      setIsFullscreen(!!(document.fullscreenElement || doc.webkitFullscreenElement))
+    }
+
+    // Listen to both standard and webkit fullscreen events (for Safari)
+    document.addEventListener('fullscreenchange', handleFullscreenChange)
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange)
+
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange)
+      document.removeEventListener('webkitfullscreenchange', handleFullscreenChange)
+    }
+  }, [])
+
+  // Toggle fullscreen mode
+  const toggleFullscreen = async () => {
+    try {
+      const doc = document as any
+      const docEl = document.documentElement as any
+
+      if (!document.fullscreenElement && !doc.webkitFullscreenElement) {
+        // Enter fullscreen
+        if (docEl.requestFullscreen) {
+          await docEl.requestFullscreen()
+        } else if (docEl.webkitRequestFullscreen) {
+          // Safari iOS
+          await docEl.webkitRequestFullscreen()
+        }
+      } else {
+        // Exit fullscreen
+        if (doc.exitFullscreen) {
+          await doc.exitFullscreen()
+        } else if (doc.webkitExitFullscreen) {
+          // Safari iOS
+          await doc.webkitExitFullscreen()
+        }
+      }
+    } catch (err) {
+      console.error('Fullscreen error:', err)
+    }
+  }
 
   // Check authentication status
   useEffect(() => {
@@ -295,32 +358,53 @@ export default function GameTrackingDemoPage() {
     setIsAuthenticated(false)
   }
 
-  const handleEndPeriod = () => {
-    if (gameState.period < 3) {
+  const handleEndPeriodClick = () => {
+    // Show confirmation dialog
+    setShowPeriodEndConfirm(true)
+  }
+
+  const handleConfirmEndPeriod = () => {
+    setShowPeriodEndConfirm(false)
+
+    // If ending period 3, show overtime/end game dialog
+    if (gameState.period === 3) {
+      setShowPeriod3EndDialog(true)
+    } else if (gameState.period === 4) {
+      // Ending overtime ends the game
+      handleEndGame()
+    } else if (gameState.period < 4) {
+      // Normal period end (periods 1, 2)
       setGameState({ period: gameState.period + 1 })
+    }
+  }
+
+  const handlePeriod3Choice = (choice: 'overtime' | 'end') => {
+    setShowPeriod3EndDialog(false)
+
+    if (choice === 'overtime') {
+      // Go to overtime (period 4)
+      setGameState({ period: 4 })
     } else {
-      alert('Game is over! (Period 3 complete)')
+      // End game
+      handleEndGame()
     }
   }
 
   const handleEndGame = async () => {
     if (!gameState.gameId) return
 
-    if (confirm('Are you sure you want to end the game? You can still view analytics but cannot add new events.')) {
-      try {
-        const { error } = await supabase
-          .from('games')
-          .update({ status: 'completed' })
-          .eq('id', gameState.gameId)
+    try {
+      const { error } = await supabase
+        .from('games')
+        .update({ status: 'completed' })
+        .eq('id', gameState.gameId)
 
-        if (error) throw error
+      if (error) throw error
 
-        setGameState({ status: 'completed' })
-        alert('Game ended! Go to Analytics page to view post-game data and generate AI practice plan.')
-      } catch (error) {
-        console.error('❌ Error ending game:', error)
-        alert('Failed to end game. Please try again.')
-      }
+      setGameState({ status: 'completed' })
+    } catch (error) {
+      console.error('❌ Error ending game:', error)
+      alert('Failed to end game. Please try again.')
     }
   }
 
@@ -491,28 +575,43 @@ export default function GameTrackingDemoPage() {
               )}
             </div>
 
+            {/* View Toggle - Single button to switch between ice and events */}
+            <button
+              onClick={() => setMobileView(mobileView === 'ice' ? 'events' : 'ice')}
+              className={`px-2 py-1 rounded text-[10px] md:text-xs font-medium transition-colors whitespace-nowrap ${
+                mobileView === 'events'
+                  ? 'bg-white text-blue-600'
+                  : 'bg-white/20 hover:bg-white/30 text-white'
+              }`}
+            >
+              📋 Events
+            </button>
+
             {/* Game Controls */}
             <div className="flex items-center gap-1.5 md:gap-2">
+              {/* Fullscreen Toggle - Mobile Only (if supported) */}
+              {supportsFullscreen && (
+                <button
+                  onClick={toggleFullscreen}
+                  className="md:hidden px-2 py-1 bg-white/20 hover:bg-white/30 rounded text-[10px] font-medium transition-colors whitespace-nowrap"
+                  title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+                >
+                  {isFullscreen ? '⬇️' : '⬆️'}
+                </button>
+              )}
               <button
                 onClick={() => setEndsSwapped(!endsSwapped)}
                 className="px-2 py-1 bg-white/20 hover:bg-white/30 rounded text-[10px] md:text-xs font-medium transition-colors whitespace-nowrap"
-                title="Swap offensive/defensive ends"
+                title="Change which end is offensive/defensive"
               >
-                🔄 Swap
+                🔄 Change Ends
               </button>
               <button
-                onClick={handleEndPeriod}
-                disabled={gameState.period >= 3 || isGameCompleted}
+                onClick={handleEndPeriodClick}
+                disabled={gameState.period > 4 || isGameCompleted}
                 className="px-2 py-1 bg-white/20 hover:bg-white/30 rounded text-[10px] md:text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
               >
-                {gameState.period >= 3 ? 'P3 ✓' : `End P${gameState.period}`}
-              </button>
-              <button
-                onClick={handleEndGame}
-                disabled={isGameCompleted}
-                className="px-2 py-1 bg-white/20 hover:bg-white/30 rounded text-[10px] md:text-xs font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-              >
-                {isGameCompleted ? 'Ended' : 'End Game'}
+                {isGameCompleted ? 'Ended ✓' : gameState.period === 4 ? 'End OT' : `End P${gameState.period}`}
               </button>
               <button
                 onClick={handleNewGameClick}
@@ -525,7 +624,9 @@ export default function GameTrackingDemoPage() {
 
             <div className="flex items-center gap-2 landscape:gap-1">
               <div className="text-right">
-                <div className="text-xs text-blue-100 font-semibold">Period {gameState.period}</div>
+                <div className="text-xs text-blue-100 font-semibold">
+                  {gameState.period === 4 ? 'Overtime' : `Period ${gameState.period}`}
+                </div>
                 <div className="text-xl md:text-2xl font-bold landscape:text-base">
                   {gameState.score.us}-{gameState.score.them}
                 </div>
@@ -659,15 +760,86 @@ export default function GameTrackingDemoPage() {
           </div>
         )}
 
-        {/* Main Layout - Ice Surface First, Optimized for Landscape */}
-        <div className="portrait:block landscape:grid landscape:grid-cols-[1fr_200px] landscape:h-[calc(100vh-48px)] landscape:gap-0">
-          {/* Ice Surface - Takes maximum space in landscape */}
-          <div className="portrait:p-3 portrait:md:p-4 landscape:overflow-auto landscape:p-2">
+        {/* Period End Confirmation Modal */}
+        {showPeriodEndConfirm && (
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+              <h3 className="text-xl font-bold mb-4">
+                End {gameState.period === 4 ? 'Overtime' : `Period ${gameState.period}`}?
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {gameState.period === 4 ? (
+                  'End overtime and complete the game?'
+                ) : (
+                  `End period ${gameState.period} and continue to ${
+                    gameState.period === 1 ? 'period 2' : gameState.period === 2 ? 'period 3' : 'the next period'
+                  }?`
+                )}
+              </p>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleConfirmEndPeriod}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium"
+                >
+                  Yes, End Period
+                </button>
+                <button
+                  onClick={() => setShowPeriodEndConfirm(false)}
+                  className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Period 3 End: Overtime or End Game Dialog */}
+        {showPeriod3EndDialog && (
+          <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+              <h3 className="text-xl font-bold mb-4">Period 3 Complete</h3>
+              <p className="text-gray-600 mb-6">
+                Is this the end of the game, or will there be overtime?
+              </p>
+              <div className="space-y-3">
+                <button
+                  onClick={() => handlePeriod3Choice('end')}
+                  className="w-full px-4 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium text-left"
+                >
+                  <div className="font-semibold">End Game</div>
+                  <div className="text-sm text-green-100">Game is complete</div>
+                </button>
+                <button
+                  onClick={() => handlePeriod3Choice('overtime')}
+                  className="w-full px-4 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors font-medium text-left"
+                >
+                  <div className="font-semibold">Overtime</div>
+                  <div className="text-sm text-blue-100">Continue to overtime period</div>
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Main Layout - Toggle-based view */}
+        <div className="h-[calc(100vh-48px)]">
+          {/* Ice Surface - Shown when ice view is selected */}
+          <div className={`h-full overflow-auto p-3 ${
+            mobileView === 'ice' ? 'block' : 'hidden'
+          }`}>
             <EventLogger endsSwapped={endsSwapped} />
           </div>
 
-          {/* Right Sidebar - Event Buttons & Events in landscape */}
-          <div className="portrait:hidden landscape:flex landscape:flex-col landscape:border-l landscape:border-gray-300 landscape:bg-white landscape:overflow-y-auto landscape:p-2 landscape:space-y-2">
+          {/* Recent Events - Shown when events view is selected */}
+          <div className={`h-full overflow-auto p-3 ${
+            mobileView === 'events' ? 'block' : 'hidden'
+          }`}>
+            <RecentEventsList />
+          </div>
+
+          {/* Right Sidebar - No longer used (toggle replaces it) */}
+          <div className="hidden">
             {/* Game Completed Message */}
             {isGameCompleted && (
               <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-2">
@@ -700,12 +872,6 @@ export default function GameTrackingDemoPage() {
               </div>
             )}
 
-            {/* Recent Events */}
-            <RecentEventsList />
-          </div>
-
-          {/* Portrait Mode - Buttons & Events below ice */}
-          <div className="landscape:hidden portrait:p-3 portrait:md:p-4 portrait:space-y-4">
             {/* Recent Events */}
             <RecentEventsList />
           </div>

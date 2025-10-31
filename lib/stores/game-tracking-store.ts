@@ -54,7 +54,7 @@ export interface GameState {
 }
 
 interface EventLoggingFlow {
-  step: 'idle' | 'select_location' | 'select_player' | 'select_details' | 'complete'
+  step: 'idle' | 'select_location' | 'select_event_type' | 'select_player' | 'select_details' | 'complete'
   eventType: EventType | null
   coordinates: Coordinates | null
   playerId: string | null
@@ -76,7 +76,9 @@ interface GameTrackingStore {
 
   // Event logging flow
   startEventLogging: (eventType: EventType, coordinates?: Coordinates, prefilledDetails?: Record<string, unknown>) => void
+  startLocationFirst: () => void // New: Start flow by clicking ice first
   setCoordinates: (coordinates: Coordinates) => void
+  setEventType: (eventType: EventType, prefilledDetails?: Record<string, unknown>) => void // New: Set event type after location
   setPlayer: (playerId: string) => void
   setEventDetails: (details: Record<string, unknown>) => void
   completeEvent: () => Promise<void>
@@ -149,11 +151,35 @@ export const useGameTrackingStore = create<GameTrackingStore>((set, get) => ({
       },
     }),
 
+  // New: Start flow by allowing user to click ice first
+  startLocationFirst: () =>
+    set({
+      loggingFlow: {
+        step: 'select_location',
+        eventType: null,
+        coordinates: null,
+        playerId: null,
+        details: {},
+      },
+    }),
+
   setCoordinates: (coordinates) =>
     set((prev) => ({
       loggingFlow: {
         ...prev.loggingFlow,
         coordinates,
+        // If event type is already set, go to player; otherwise, select event type
+        step: prev.loggingFlow.eventType ? 'select_player' : 'select_event_type',
+      },
+    })),
+
+  // New: Set event type after location has been selected
+  setEventType: (eventType, prefilledDetails) =>
+    set((prev) => ({
+      loggingFlow: {
+        ...prev.loggingFlow,
+        eventType,
+        details: prefilledDetails || {},
         step: 'select_player',
       },
     })),

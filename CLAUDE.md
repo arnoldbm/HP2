@@ -21,7 +21,7 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | File | Purpose | Last Updated |
 |------|---------|--------------|
 | `README.md` | GitHub repository overview, project status, quick start | 2025-10-28 |
-| `CLAUDE.md` | This file - central documentation hub for AI context | 2025-10-30 |
+| `CLAUDE.md` | This file - central documentation hub for AI context | 2025-10-31 |
 | `docs/HOCKEY_PRACTICE_APP_PLAN.md` | Complete product plan, features, user flows, monetization | 2024-01-XX |
 | `docs/DEV_SETUP_AND_DATA_MODELS.md` | Dev environment setup, database schema, TDD approach | 2024-01-XX |
 | `docs/CHANGELOG.md` | Complete project changelog with all changes by phase | 2025-10-28 |
@@ -29,8 +29,11 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `docs/PRACTICE_HISTORY.md` | Practice history feature with filtering, stats, and detail modal | 2025-10-30 |
 | `docs/PRACTICE_BUILDER.md` | Manual practice builder with drag-and-drop drills | 2025-10-30 |
 | `docs/TESTING_GUIDE.md` | Testing philosophy, patterns, and best practices | 2025-10-30 |
-| `docs/MOBILE_FIRST_ASSESSMENT.md` | **NEW** Mobile UX assessment, roadmap, and design patterns | 2025-10-30 |
-| `docs/GAME_TRACKING_MOBILE.md` | **NEW** Game tracking mobile optimization (Week 1 complete - 8/10 score) | 2025-10-30 |
+| `docs/MOBILE_FIRST_ASSESSMENT.md` | Mobile UX assessment, roadmap, and design patterns | 2025-10-30 |
+| `docs/GAME_TRACKING_MOBILE.md` | Game tracking mobile optimization (Week 1 complete - 8/10 score) | 2025-10-30 |
+| `docs/GAME_TRACKING_UX_IMPROVEMENTS.md` | **NEW** Ice-first flow, view toggle, period management, PWA setup (Oct 31, 2025) | 2025-10-31 |
+| `docs/PWA_INSTALLATION_GUIDE.md` | **NEW** End-user guide for installing PWA on iOS, Android, and Desktop | 2025-10-31 |
+| `docs/SESSION_SUMMARY_2025-10-31.md` | **NEW** Session summary: UX improvements, PWA setup, documentation created | 2025-10-31 |
 
 ### Database & Architecture
 | File | Purpose | Status |
@@ -476,6 +479,13 @@ See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 509-574)
 | **Swipe-to-delete for events** | Familiar mobile gesture, faster than tapping small X button | SwipeableItem component with 80px threshold |
 | **Collapsible stats panel** | Save screen space on mobile | Accordion pattern: collapsed by default mobile, always expanded desktop |
 | **Responsive SVG ice surface** | Ice surface needs to work on 320px-1920px screens | viewBox with preserveAspectRatio, 100% width with auto height |
+| **Ice-click-first event logging** | Ice surface is primary interaction, maximizes screen space | New flow: tap ice → select event type → select player → details |
+| **Single toggle button for views** | Clearer mental model, works on all screen sizes | "📋 Events" button toggles between ice and events view |
+| **Consolidated period/game controls** | Reduces header clutter, prevents accidental actions | Single dynamic button with confirmation dialogs |
+| **Overtime support (period 4)** | Youth hockey games often go to overtime | After P3, choice dialog: overtime or end game |
+| **"Change Ends" terminology** | Proper hockey language | Renamed from "Swap" to match what hockey coaches say |
+| **PWA with fullscreen support** | iOS Safari doesn't support fullscreen API in browser | Add to home screen enables fullscreen mode on iOS |
+| **Feature detection for fullscreen** | Only show what works | Fullscreen button hidden when browser doesn't support it |
 
 ### To Decide 🤔
 - [ ] Game situation detection (PP/PK): Manual buttons or auto-detect from penalties?
@@ -727,7 +737,7 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
 
 ---
 
-**Last Updated**: 2025-10-29 (evening)
+**Last Updated**: 2025-10-31
 **Maintained By**: Brock Arnold + Claude
 **Project Name**: HP2 (Hockey Practice Planner v2)
 
@@ -752,6 +762,9 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
 
 **What's working now?**
 - ✅ Live game tracking with 6 event types
+  - **NEW**: Ice-click-first flow (tap ice → select event → select player)
+  - **NEW**: Single toggle button (ice ↔ events view)
+  - **NEW**: Period management with overtime support
 - ✅ Database persistence (save/load from Supabase)
 - ✅ Post-game analytics dashboard (shot charts, breakout analysis, trends)
 - ✅ Game management (create games, switch between games)
@@ -760,6 +773,10 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
   - Analyzes game data (shots, breakouts, turnovers)
   - Recommends drills by section (warm-up, skills, scrimmage, cool-down)
   - Explains reasoning (focus areas, expected improvements)
+- ✅ **PWA support** with fullscreen mode
+  - Add to home screen on iOS/Android
+  - Fullscreen button (Android/Desktop)
+  - Landscape-optimized orientation
 - ✅ 234/236 tests passing
 - ✅ 4 demo pages: ice surface, game tracking, analytics, drills
 
