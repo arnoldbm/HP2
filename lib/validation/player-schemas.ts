@@ -37,9 +37,9 @@ export const playerCreateSchema = z.object({
     .trim(),
   position: playerPositionEnum,
   birthdate: z
-    .string()
+    .union([z.string(), z.null()])
     .optional()
-    .transform((val) => (val === '' ? undefined : val))
+    .transform((val) => (val === '' || val === null ? undefined : val))
     .pipe(z.string().date().optional()),
 })
 
@@ -70,9 +70,9 @@ export const playerUpdateSchema = z.object({
     .optional(),
   position: playerPositionEnum.optional(),
   birthdate: z
-    .string()
+    .union([z.string(), z.null()])
     .optional()
-    .transform((val) => (val === '' ? undefined : val))
+    .transform((val) => (val === '' || val === null ? undefined : val))
     .pipe(z.string().date().optional()),
 })
 
