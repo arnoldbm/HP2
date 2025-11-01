@@ -35,7 +35,8 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `docs/PWA_INSTALLATION_GUIDE.md` | End-user guide for installing PWA on iOS, Android, and Desktop | 2025-10-31 |
 | `docs/SESSION_SUMMARY_2025-10-31.md` | Session summary: UX improvements, PWA setup, documentation created | 2025-10-31 |
 | `docs/TEAM_ROSTER_MANAGEMENT_TDD_PLAN.md` | Comprehensive TDD plan for team/organization/roster management (6 milestones, 183 tests) | 2025-11-01 |
-| `docs/ROSTER_MANAGEMENT.md` | **NEW** Complete player roster management documentation (CRUD, validation, mobile UX, testing) | 2025-11-01 |
+| `docs/ROSTER_MANAGEMENT.md` | Complete player roster management documentation (CRUD, validation, mobile UX, testing) | 2025-11-01 |
+| `docs/PHASE_7_PROGRESS.md` | **NEW** Phase 7 implementation progress tracker (Milestones 1-6 status, test counts, next steps) | 2025-11-01 |
 
 ### Database & Architecture
 | File | Purpose | Status |
@@ -78,23 +79,28 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `tests/components/team-form.test.tsx` | **NEW** Team creation form component | ✅ DONE (20 tests, 4 skipped) |
 | `tests/integration/organization-crud.test.ts` | **NEW** Organization CRUD operations with RLS | ✅ DONE (7 tests, 3 skipped) |
 | `tests/integration/team-crud.test.ts` | **NEW** Team CRUD operations with RLS | ✅ DONE (16 tests) |
-| `tests/integration/player-crud.test.ts` | **NEW** Player CRUD operations with RLS & jersey uniqueness | ✅ DONE (17 tests) |
-| `tests/components/player-form.test.tsx` | **NEW** Player form component (add/edit with validation) | ✅ DONE (18 tests, 4 skipped) |
+| `tests/integration/player-crud.test.ts` | Player CRUD operations with RLS & jersey uniqueness | ✅ DONE (17 tests) |
+| `tests/components/player-form.test.tsx` | Player form component (add/edit with validation) | ✅ DONE (18 tests, 4 skipped) |
+| `tests/unit/team-context.test.tsx` | **NEW** TeamContext provider & useTeam hook | ✅ DONE (15 tests) |
+| `tests/components/team-selector.test.tsx` | **NEW** TeamSelector dropdown component | ✅ DONE (17 tests, 2 skipped) |
 | `tests/e2e/game-tracking.spec.ts` | Live tracking E2E tests | TODO |
 
-**Current Test Count: 351 tests passing (13 skipped) = 364 total** ✨ **UPDATED Nov 1 (Milestone 3)**
-- Unit: 270 tests
+**Current Test Count: 381 tests passing (15 skipped) = 396 total** ✨ **UPDATED Nov 1 (Milestone 4)**
+- Unit: 285 tests (2 skipped)
   - Practice history: 19 tests
   - Organization setup: 17 tests
   - Team form: 20 tests (4 skipped)
-  - Player form: 18 tests (4 skipped) ✨ **NEW**
+  - Player form: 18 tests (4 skipped)
+  - Team context: 15 tests ✨ **NEW**
+- Component: 17 tests (2 skipped)
+  - Team selector: 17 tests (2 skipped) ✨ **NEW**
 - Integration: 81 tests (5 skipped)
   - Game events: 23 tests (2 skipped due to JWT limitation)
   - Game event persistence: 11 tests
   - Practice planning: 21 tests
   - Organization CRUD: 7 tests (3 skipped due to auth user requirement)
   - Team CRUD: 16 tests
-  - Player CRUD: 17 tests ✨ **NEW**
+  - Player CRUD: 17 tests
 
 ### Game Tracking Components (Mobile-Optimized 8/10)
 | Component | Purpose | Tests | Status |
@@ -160,10 +166,13 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 | `lib/validation/player-schemas.ts` | **NEW** Zod schemas for player creation/update with position enum | - | ✅ DONE |
 | `app/actions/players.ts` | **NEW** Player CRUD server actions with jersey uniqueness validation | 17 | ✅ DONE |
 | `components/teams/player-form.tsx` | **NEW** Player creation/edit form with position button group | 18 | ✅ DONE (4 skipped) |
-| `components/teams/roster-list.tsx` | **NEW** Roster display (mobile cards with swipe-to-delete, desktop table) | - | ✅ DONE |
-| `app/demo/teams/[teamId]/roster/page.tsx` | **NEW** Roster management page with add/edit/delete functionality | - | ✅ DONE |
+| `components/teams/roster-list.tsx` | Roster display (mobile cards with swipe-to-delete, desktop table) | - | ✅ DONE |
+| `app/demo/teams/[teamId]/roster/page.tsx` | Roster management page with add/edit/delete functionality | - | ✅ DONE |
+| `lib/contexts/team-context.tsx` | **NEW** TeamContext provider with localStorage persistence | 15 | ✅ DONE (Milestone 4) |
+| `components/teams/team-selector.tsx` | **NEW** TeamSelector dropdown with touch-friendly UI | 17 | ✅ DONE (Milestone 4, 2 skipped) |
+| `app/demo/layout.tsx` | **NEW** Demo layout with navigation bar and team selector | - | ✅ DONE (Milestone 4) |
 
-**Team Management Features** (Milestones 1-3 Complete):
+**Team Management Features** (Milestones 1-4 Complete - 60% of Phase 7 ✨):
 - Auto-create organization for new users (slug generation with conflict resolution)
 - Team creation form with age group selector (USA vs Canada format switching)
 - Skill level selection (House, Travel, A, AA, AAA)
@@ -171,15 +180,23 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 - User automatically added as head_coach when creating team
 - Teams list page with card layout showing team details
 - Empty state with "Create Your First Team" CTA
-- **Player roster management** (Milestone 3 ✨ **NEW**):
+- **Player roster management** (Milestone 3):
   - Add/edit/delete players with jersey number (1-99), name, position, birthdate
   - Position selection (Forward, Defense, Goalie) with button group UI
   - Jersey number uniqueness enforced per team (same number OK on different teams)
   - Mobile-first responsive design (swipeable cards on mobile, table on desktop)
   - Bottom sheet modals for add/edit forms on mobile
   - Empty state with "Add Your First Player" CTA
-- Mobile-first responsive design
-- 84 tests passing (77 passing, 7 skipped) ✨ **UPDATED**
+- **Team selector & context** (Milestone 4 ✨ **NEW**):
+  - Global team state management with React Context
+  - localStorage persistence per user (`current_team_{userId}`)
+  - Dropdown selector in navigation bar (hidden on teams list/create pages)
+  - Touch-friendly UI (56px minimum height)
+  - Click-outside-to-close behavior
+  - Navigation links: Teams, Track Game, Analytics, Practices
+  - Active link highlighting
+- Mobile-first responsive design throughout
+- **116 tests passing (107 passing, 9 skipped)** ✨ **UPDATED Milestone 4**
 
 ---
 
@@ -732,10 +749,10 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
 
 ## 📊 PROJECT STATUS
 
-**Current Status**: Phase 7 - Team & Roster Management (Milestones 1-3 Complete!) 🎉
-**Next Milestone**: Milestone 4 - Team Selector & Context
-**Target MVP Completion**: On track! ~90% complete 🎯
-**Target Beta Launch**: 10-12 weeks from start
+**Current Status**: Phase 7 - Team & Roster Management (Milestones 1-4 Complete!) 🎉
+**Next Milestone**: Milestone 5 - Roster Integration with Game Tracking
+**Target MVP Completion**: On track! ~92% complete 🎯
+**Target Beta Launch**: 8-10 weeks from start
 
 **Progress Tracker**:
 - [x] Product planning (features, user flows, monetization)
@@ -769,13 +786,13 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
   - [x] **Practice plan display** with AI reasoning & drill recommendations
   - [x] **Practice history view** with filtering and stats dashboard
   - [x] **Manual practice plan builder** with drag-and-drop drills
-- [ ] **Phase 7: Team & Roster Management (50%)** 🚧 **IN PROGRESS**
+- [ ] **Phase 7: Team & Roster Management (60%)** 🚧 **IN PROGRESS**
   - [x] **Milestone 1**: Organization auto-creation (21 tests passing) ✅
   - [x] **Milestone 2**: Team creation UI (32 tests passing) ✅
-  - [x] **Milestone 3**: Player roster management (31 tests passing) ✅ **NEW**
-  - [ ] **Milestone 4**: Team selector & context (20 tests planned)
-  - [ ] **Milestone 5**: Enhanced RLS policies (25 tests planned)
-  - [ ] **Milestone 6**: Team list & management UI (27 tests planned)
+  - [x] **Milestone 3**: Player roster management (31 tests passing) ✅
+  - [x] **Milestone 4**: Team selector & context (32 tests passing) ✅ **NEW Nov 1**
+  - [ ] **Milestone 5**: Roster integration (~30 tests planned)
+  - [ ] **Milestone 6**: User settings & team switching (~40 tests planned)
 
 **Demo Pages Available**:
 - 🎨 `/demo/ice-surface` - Interactive ice surface visualization
@@ -792,7 +809,7 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
 - 🗄️ http://localhost:54323 - Supabase Studio (database GUI)
 - 📧 http://localhost:54324 - Mailpit (email inbox for testing auth flows)
 
-**Test Coverage**: 351/364 tests passing (96.4% success rate) ⬆️ **+77 tests from Milestones 1-3**
+**Test Coverage**: 381/396 tests passing (96.2% success rate) ⬆️ **+116 tests from Milestones 1-4**
 
 ---
 
@@ -809,7 +826,7 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
 1. This is a hockey practice planning app with live game tracking
 2. We're using TDD (tests first, always!)
 3. Key docs: `docs/HOCKEY_PRACTICE_APP_PLAN.md` + `docs/DEV_SETUP_AND_DATA_MODELS.md`
-4. **Current phase: Phase 4-6 (70% complete)** 🚧 - AI Practice Plan Generation LIVE!
+4. **Current phase: Phase 7 (60% complete)** 🚧 - Team & Roster Management (Milestones 1-4 Complete!)
 5. Critical decisions:
    - Age groups stored as integers, formatted by region
    - Goal is a shot with result='goal' (not separate event type)
@@ -835,21 +852,28 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
 - ✅ **Practice management**
   - Practice history with filtering and stats
   - Manual practice builder with drag-and-drop drills
-- ✅ **Team & Organization Management** ✨ **NEW Nov 1**
+- ✅ **Team & Organization Management** ✨ **NEW Nov 1** (Milestones 1-4)
   - Auto-create organization for new users
   - Team creation form (age groups, skill levels, seasons)
   - Teams list page with cards
   - USA vs Canada age group formatting
-  - **Player roster management** (Milestone 3 ✨ **JUST COMPLETED**):
+  - **Player roster management** (Milestone 3):
     - Add/edit/delete players with jersey number, name, position, birthdate
     - Jersey number uniqueness per team (1-99)
     - Mobile-first responsive design (swipeable cards, bottom sheet forms)
     - Empty state with "Add Your First Player" CTA
+  - **Team selector & context** (Milestone 4 ✨ **JUST COMPLETED**):
+    - Global team state management with React Context
+    - localStorage persistence per user
+    - Navigation bar with team dropdown selector
+    - Navigation links: Teams, Track Game, Analytics, Practices
+    - Active link highlighting
+    - Touch-friendly UI (56px minimum height)
 - ✅ **PWA support** with fullscreen mode
   - Add to home screen on iOS/Android
   - Fullscreen button (Android/Desktop)
   - Landscape-optimized orientation
-- ✅ 351/364 tests passing (96.4%) ⬆️ **+31 tests from Milestone 3**
+- ✅ 381/396 tests passing (96.2%) ⬆️ **+116 tests from Milestones 1-4**
 - ✅ 9 demo pages: ice surface, game tracking, analytics, drills, practice history, practice builder, teams, team creation, roster
 
 **Try it:**
@@ -862,10 +886,14 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
 - **Practice History**: `/demo/practice-history` - Review past practices and AI-generated plans
 - **Drills**: `/demo/drills` - Browse 255 hockey drills with search and filters
 
-**Next steps** (Milestone 4):
-- Team selector component (switch between teams in nav)
-- Team context provider (current team state management)
-- Team-specific game/practice/roster filtering
-- 20 tests planned
+**Next steps** (Milestone 5 - Roster Integration):
+- Update game tracking page to use real player roster data
+- Replace hardcoded demo players with roster from selected team
+- Filter players by position for position-specific events
+- Show player names in event lists (not just jersey numbers)
+- Update analytics to use real player data
+- ~30 integration tests planned
+
+**For next session**: See `docs/PHASE_7_PROGRESS.md` for detailed Milestone 5 plan!
 
 **Ask the user**: "What would you like to work on next?"
