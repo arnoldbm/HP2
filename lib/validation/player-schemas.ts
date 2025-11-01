@@ -36,7 +36,11 @@ export const playerCreateSchema = z.object({
     .max(50, 'Last name must be at most 50 characters')
     .trim(),
   position: playerPositionEnum,
-  birthdate: z.string().date().optional(),
+  birthdate: z
+    .string()
+    .optional()
+    .transform((val) => (val === '' ? undefined : val))
+    .pipe(z.string().date().optional()),
 })
 
 export type PlayerCreateInput = z.infer<typeof playerCreateSchema>
@@ -65,7 +69,11 @@ export const playerUpdateSchema = z.object({
     .trim()
     .optional(),
   position: playerPositionEnum.optional(),
-  birthdate: z.string().date().optional(),
+  birthdate: z
+    .string()
+    .optional()
+    .transform((val) => (val === '' ? undefined : val))
+    .pipe(z.string().date().optional()),
 })
 
 export type PlayerUpdateInput = z.infer<typeof playerUpdateSchema>
