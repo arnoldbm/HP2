@@ -190,6 +190,76 @@ export async function getUserTeams(userId: string): Promise<{
 }
 
 /**
+ * Get Team by ID
+ *
+ * Fetch a single team by ID (with user access check)
+ */
+export async function getTeamById(
+  teamId: string,
+  userId: string
+): Promise<{
+  success: boolean
+  team?: {
+    id: string
+    name: string
+    age_years: number
+    age_group_display: string
+    level: string
+    season: string
+    region: string
+    organization_id: string
+    role: string
+  }
+  error?: string
+}> {
+  try {
+    // First verify the user has access to this team
+    const { data: membership, error: membershipError } = await supabaseAdmin
+      .from('team_members')
+      .select('role')
+      .eq('team_id', teamId)
+      .eq('user_id', userId)
+      .single()
+
+    if (membershipError || !membership) {
+      return {
+        success: false,
+        error: 'Team not found or you do not have access',
+      }
+    }
+
+    // Fetch team with formatted age group
+    const { data: team, error: teamError } = await supabaseAdmin
+      .from('teams_with_age_display')
+      .select('*')
+      .eq('id', teamId)
+      .single()
+
+    if (teamError || !team) {
+      console.error('Failed to fetch team:', teamError)
+      return {
+        success: false,
+        error: 'Failed to fetch team details',
+      }
+    }
+
+    return {
+      success: true,
+      team: {
+        ...team,
+        role: membership.role,
+      },
+    }
+  } catch (error) {
+    console.error('Unexpected error in getTeamById:', error)
+    return {
+      success: false,
+      error: 'An unexpected error occurred',
+    }
+  }
+}
+
+/**
  * Update Team
  *
  * Update team details (name, level, season)

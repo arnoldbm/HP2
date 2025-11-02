@@ -8,6 +8,7 @@ import { QuickEventButtons } from '@/components/game-tracking/quick-event-button
 import { AuthModal } from '@/components/auth/auth-modal'
 import { setupDemoGameData } from '@/app/actions/demo-setup'
 import { supabase } from '@/lib/db/supabase'
+import { useTeam } from '@/lib/contexts/team-context'
 
 interface GameInfo {
   opponent_name: string
@@ -17,6 +18,7 @@ interface GameInfo {
 
 export default function GameTrackingDemoPage() {
   const { gameState, setGameState, setPlayers, loadEvents, loggingFlow } = useGameTrackingStore()
+  const { selectedTeamId, selectTeam } = useTeam()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -159,30 +161,47 @@ export default function GameTrackingDemoPage() {
         // Set up demo data (creates org, team, players if they don't exist)
         const { players } = await setupDemoGameData(user.id)
 
-        // Get user's team
-        const { data: teamMember } = await supabase
-          .from('team_members')
-          .select('team_id')
-          .eq('user_id', user.id)
-          .single()
+        // Determine which team to use
+        let teamId: string
 
-        if (!teamMember) {
-          throw new Error('No team found for user')
+        if (selectedTeamId) {
+          // Use the selected team from context
+          teamId = selectedTeamId
+        } else {
+          // No team selected - get user's first team and auto-select it
+          const { data: teamMembers, error: teamError } = await supabase
+            .from('team_members')
+            .select('team_id')
+            .eq('user_id', user.id)
+            .limit(1)
+
+          if (teamError) {
+            console.error('Error fetching team membership:', teamError)
+            throw new Error(`Failed to fetch team membership: ${teamError.message}`)
+          }
+
+          if (!teamMembers || teamMembers.length === 0) {
+            throw new Error('No team found for user')
+          }
+
+          teamId = teamMembers[0].team_id
+          // Auto-select this team in context
+          selectTeam(teamId)
         }
 
         let gameId: string | null = null
 
-        // 1. Try to load the current game from localStorage (user-specific)
-        const storageKey = `current_game_${user.id}`
+        // 1. Try to load the current game from localStorage (team-specific)
+        const storageKey = `current_game_${teamId}`
         const storedGameId = localStorage.getItem(storageKey)
 
         if (storedGameId) {
-          // Verify the stored game still exists and belongs to this user's team
+          // Verify the stored game still exists and belongs to this team
           const { data: storedGame } = await supabase
             .from('games')
             .select('id')
             .eq('id', storedGameId)
-            .eq('team_id', teamMember.team_id)
+            .eq('team_id', teamId)
             .maybeSingle()
 
           if (storedGame) {
@@ -200,7 +219,7 @@ export default function GameTrackingDemoPage() {
           const { data: recentGame } = await supabase
             .from('games')
             .select('id')
-            .eq('team_id', teamMember.team_id)
+            .eq('team_id', teamId)
             .order('created_at', { ascending: false })
             .limit(1)
             .maybeSingle()
@@ -218,7 +237,7 @@ export default function GameTrackingDemoPage() {
           const { data: newGame, error: gameError } = await supabase
             .from('games')
             .insert({
-              team_id: teamMember.team_id,
+              team_id: teamId,
               opponent_name: 'Rival Team',
               game_date: new Date().toISOString(),
               is_home: true,
@@ -266,7 +285,7 @@ export default function GameTrackingDemoPage() {
     }
 
     initializeDemo()
-  }, [isAuthenticated, setGameState, setPlayers, loadEvents])
+  }, [isAuthenticated, selectedTeamId, setGameState, setPlayers, loadEvents, selectTeam])
 
   // Fetch game info when gameId is available
   useEffect(() => {

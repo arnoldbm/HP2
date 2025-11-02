@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/db/supabase'
+import { useTeam } from '@/lib/contexts/team-context'
 import Link from 'next/link'
 
 // Types
@@ -35,8 +36,8 @@ interface PracticeMetadata {
 
 export default function PracticeBuilderPage() {
   // Auth & Team state
+  const { selectedTeamId, selectTeam } = useTeam()
   const [userId, setUserId] = useState<string | null>(null)
-  const [teamId, setTeamId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -87,20 +88,23 @@ export default function PracticeBuilderPage() {
 
         setUserId(user.id)
 
-        // Get user's team
-        const { data: teamMember, error: teamError } = await supabase
-          .from('team_members')
-          .select('team_id')
-          .eq('user_id', user.id)
-          .single()
+        // Auto-select first team if none selected
+        if (!selectedTeamId) {
+          const { data: teamMembers, error: teamError } = await supabase
+            .from('team_members')
+            .select('team_id')
+            .eq('user_id', user.id)
+            .limit(1)
 
-        if (teamError || !teamMember) {
-          setError('No team found. Please join a team first.')
-          setLoading(false)
-          return
+          if (teamError || !teamMembers || teamMembers.length === 0) {
+            setError('No team found. Please join a team first.')
+            setLoading(false)
+            return
+          }
+
+          selectTeam(teamMembers[0].team_id)
         }
 
-        setTeamId(teamMember.team_id)
         setLoading(false)
       } catch (err) {
         console.error('Auth error:', err)
@@ -115,7 +119,7 @@ export default function PracticeBuilderPage() {
   // Load drills
   useEffect(() => {
     async function loadDrills() {
-      if (!teamId) return
+      if (!selectedTeamId) return
 
       setLoadingDrills(true)
       try {
@@ -139,7 +143,7 @@ export default function PracticeBuilderPage() {
     }
 
     loadDrills()
-  }, [teamId])
+  }, [selectedTeamId])
 
   // Filter drills based on search and category
   useEffect(() => {
@@ -227,7 +231,7 @@ export default function PracticeBuilderPage() {
 
   // Save practice plan
   const savePracticePlan = async () => {
-    if (!teamId || !userId) return
+    if (!selectedTeamId || !userId) return
 
     setSaving(true)
     setSaveSuccess(false)
@@ -237,7 +241,7 @@ export default function PracticeBuilderPage() {
       const { data: practice, error: practiceError } = await supabase
         .from('practices')
         .insert({
-          team_id: teamId,
+          team_id: selectedTeamId,
           practice_date: practiceMetadata.practice_date,
           duration_minutes: practiceMetadata.duration_minutes,
           location: practiceMetadata.location || null,

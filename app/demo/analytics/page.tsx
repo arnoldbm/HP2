@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { useGameTrackingStore } from '@/lib/stores/game-tracking-store'
 import { supabase } from '@/lib/db/supabase'
+import { useTeam } from '@/lib/contexts/team-context'
 import {
   extractShotData,
   calculateShotQualityStats,
@@ -51,6 +52,7 @@ interface Game {
 
 export default function AnalyticsDemoPage() {
   const { events, gameState, loadEvents, setGameState } = useGameTrackingStore()
+  const { selectedTeamId, selectTeam } = useTeam()
   const [selectedPeriod, setSelectedPeriod] = useState<number | 'all'>('all')
   const [selectedSituation, setSelectedSituation] = useState<string | 'all'>('all')
   const [generatingPlan, setGeneratingPlan] = useState(false)
@@ -80,23 +82,35 @@ export default function AnalyticsDemoPage() {
           return
         }
 
-        // Get user's team membership
-        const { data: teamMember } = await supabase
-          .from('team_members')
-          .select('team_id')
-          .eq('user_id', user.id)
-          .single()
+        // Determine which team to use
+        let teamId: string
 
-        if (!teamMember) {
-          console.log('❌ No team found for user')
-          return
+        if (selectedTeamId) {
+          // Use the selected team from context
+          teamId = selectedTeamId
+        } else {
+          // No team selected - get user's first team and auto-select it
+          const { data: teamMembers } = await supabase
+            .from('team_members')
+            .select('team_id')
+            .eq('user_id', user.id)
+            .limit(1)
+
+          if (!teamMembers || teamMembers.length === 0) {
+            console.log('❌ No team found for user')
+            return
+          }
+
+          teamId = teamMembers[0].team_id
+          // Auto-select this team in context
+          selectTeam(teamId)
         }
 
         // Get all games for this team
         const { data: games } = await supabase
           .from('games')
           .select('id, opponent_name, game_date, location')
-          .eq('team_id', teamMember.team_id)
+          .eq('team_id', teamId)
           .order('game_date', { ascending: false })
 
         if (games && games.length > 0) {
@@ -126,7 +140,7 @@ export default function AnalyticsDemoPage() {
       }
     }
     loadAvailableGames()
-  }, [])
+  }, [selectedTeamId, selectTeam])
 
   // Handle game selection change
   const handleGameChange = async (newGameId: string) => {

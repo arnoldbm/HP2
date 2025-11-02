@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '@/lib/db/supabase'
 import Link from 'next/link'
+import { useTeam } from '@/lib/contexts/team-context'
 
 // Types
 interface Practice {
@@ -47,6 +48,7 @@ interface Game {
 }
 
 export default function PracticeHistoryPage() {
+  const { selectedTeamId, selectTeam } = useTeam()
   const [practices, setPractices] = useState<Practice[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -61,7 +63,7 @@ export default function PracticeHistoryPage() {
 
   useEffect(() => {
     loadPractices()
-  }, [])
+  }, [selectedTeamId])
 
   async function loadPractices() {
     try {
@@ -88,25 +90,43 @@ export default function PracticeHistoryPage() {
         return
       }
 
-      // Get user's team
-      const { data: teamMember, error: teamError } = await supabase
-        .from('team_members')
-        .select('team_id')
-        .eq('user_id', user.id)
-        .single()
+      // Determine which team to use
+      let teamId: string
 
-      if (teamError) {
-        console.error('Error fetching team:', teamError)
-        setError('Could not find your team')
-        setLoading(false)
-        return
+      if (selectedTeamId) {
+        // Use the selected team from context
+        teamId = selectedTeamId
+      } else {
+        // No team selected - get user's first team and auto-select it
+        const { data: teamMembers, error: teamError } = await supabase
+          .from('team_members')
+          .select('team_id')
+          .eq('user_id', user.id)
+          .limit(1)
+
+        if (teamError) {
+          console.error('Error fetching team:', teamError)
+          setError('Could not find your team')
+          setLoading(false)
+          return
+        }
+
+        if (!teamMembers || teamMembers.length === 0) {
+          setError('Could not find your team')
+          setLoading(false)
+          return
+        }
+
+        teamId = teamMembers[0].team_id
+        // Auto-select this team in context
+        selectTeam(teamId)
       }
 
       // Fetch all practices for this team
       const { data: practicesData, error: practicesError } = await supabase
         .from('practices')
         .select('*')
-        .eq('team_id', teamMember.team_id)
+        .eq('team_id', teamId)
         .order('practice_date', { ascending: false })
 
       if (practicesError) {
