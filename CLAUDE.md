@@ -1,815 +1,236 @@
-# 🤖 CLAUDE.md - AI Assistant Context & Documentation Hub
+# 🤖 CLAUDE.md - AI Assistant Quick Start
 
-**PURPOSE**: This file helps Claude (and you!) quickly reference critical project documentation, decisions, and architecture. Update this IMMEDIATELY when creating important docs to prevent context loss across sessions.
-
----
-
-## 📚 CRITICAL DOCUMENTATION PATTERN
-**ALWAYS ADD IMPORTANT DOCS HERE!** When you create or discover:
-- Architecture diagrams → Add reference path here
-- Database schemas → Add reference path here
-- Problem solutions → Add reference path here
-- Setup guides → Add reference path here
-
-This prevents context loss! Update this file IMMEDIATELY when creating important docs.
-
----
-
-## 📂 CORE DOCUMENTATION FILES
-
-### Planning & Product Specs
-| File | Purpose | Last Updated |
-|------|---------|--------------|
-| `README.md` | GitHub repository overview, project status, quick start | 2025-10-28 |
-| `CLAUDE.md` | This file - central documentation hub for AI context | 2025-10-31 |
-| `docs/HOCKEY_PRACTICE_APP_PLAN.md` | Complete product plan, features, user flows, monetization | 2024-01-XX |
-| `docs/DEV_SETUP_AND_DATA_MODELS.md` | Dev environment setup, database schema, TDD approach | 2024-01-XX |
-| `docs/CHANGELOG.md` | Complete project changelog with all changes by phase | 2025-10-28 |
-| `docs/AI_PRACTICE_PLAN_GENERATION.md` | Complete guide to AI practice plan generation (workflow, prompts, algorithms, testing) | 2025-10-29 |
-| `docs/PRACTICE_HISTORY.md` | Practice history feature with filtering, stats, and detail modal | 2025-10-30 |
-| `docs/PRACTICE_BUILDER.md` | Manual practice builder with drag-and-drop drills | 2025-10-30 |
-| `docs/TESTING_GUIDE.md` | Testing philosophy, patterns, and best practices | 2025-10-30 |
-| `docs/MOBILE_FIRST_ASSESSMENT.md` | Mobile UX assessment, roadmap, and design patterns | 2025-10-30 |
-| `docs/GAME_TRACKING_MOBILE.md` | Game tracking mobile optimization (Week 1 complete - 8/10 score) | 2025-10-30 |
-| `docs/GAME_TRACKING_UX_IMPROVEMENTS.md` | Ice-first flow, view toggle, period management, PWA setup (Oct 31, 2025) | 2025-10-31 |
-| `docs/PWA_INSTALLATION_GUIDE.md` | End-user guide for installing PWA on iOS, Android, and Desktop | 2025-10-31 |
-| `docs/SESSION_SUMMARY_2025-10-31.md` | Session summary: UX improvements, PWA setup, documentation created | 2025-10-31 |
-| `docs/TEAM_ROSTER_MANAGEMENT_TDD_PLAN.md` | Comprehensive TDD plan for team/organization/roster management (6 milestones, 183 tests) | 2025-11-01 |
-| `docs/ROSTER_MANAGEMENT.md` | Complete player roster management documentation (CRUD, validation, mobile UX, testing) | 2025-11-01 |
-| `docs/PHASE_7_PROGRESS.md` | **NEW** Phase 7 implementation progress tracker (Milestones 1-6 status, test counts, next steps) | 2025-11-01 |
-
-### Database & Architecture
-| File | Purpose | Status |
-|------|---------|--------|
-| `supabase/migrations/20251024144107_initial_schema.sql` | Organizations, teams, players, age groups | ✅ DONE |
-| `supabase/migrations/20251027165031_game_tracking_tables.sql` | Games, events, analytics, audit logging | ✅ DONE |
-| `supabase/migrations/20251027172535_fix_audit_logging_trigger.sql` | Nullable edited_by for service role | ✅ DONE |
-| `supabase/migrations/20251027175443_fix_event_edit_history_fk.sql` | FK SET NULL for deleted events | ✅ DONE |
-| `supabase/migrations/20251027180845_add_service_role_bypass_policies.sql` | Service role RLS bypass | ✅ DONE |
-| `supabase/migrations/20251027181536_fix_audit_trigger_delete.sql` | Audit log for deletes | ✅ DONE |
-| `supabase/migrations/20251027235333_remove_goal_event_type.sql` | Remove 'goal' event type (use shot with result='goal') | ✅ DONE |
-| `supabase/migrations/20251028104517_add_demo_game_support.sql` | Demo game support for testing | ✅ DONE |
-| `supabase/migrations/20251028_fix_team_members_rls.sql` | Fixed RLS policies on team_members (added SELECT policies) | ✅ DONE |
-| `supabase/migrations/20251028230000_practice_planning_schema.sql` | Practice planning schema (drills, practices, practice_drills with RLS) | ✅ DONE |
-| `supabase/seeds/drills.sql` | 255 hockey drills with AI metadata (addresses_situations JSONB) | ✅ DONE |
-| `supabase/migrations/20251031000000_seed_sample_drills.sql` | **NEW** 27 sample drills for practice builder demo | ✅ DONE |
-| `lib/types/database.ts` | Auto-generated TypeScript types from Supabase | ✅ DONE |
-| Architecture diagram | System architecture overview | TODO |
-
-### Testing
-| File | Purpose | Status |
-|------|---------|--------|
-| `vitest.config.ts` | Vitest test configuration | ✅ DONE |
-| `playwright.config.ts` | E2E test configuration | ✅ DONE |
-| `tests/unit/setup.test.ts` | Smoke test for Vitest | ✅ DONE (2 tests) |
-| `tests/unit/age-groups.test.ts` | Age group utilities tests | ✅ DONE (9 tests) |
-| `tests/unit/shot-quality.test.ts` | Shot quality calculator | ✅ DONE (16 tests) |
-| `tests/unit/ice-surface-coordinates.test.ts` | Ice coordinate utilities | ✅ DONE (49 tests) |
-| `tests/unit/event-validation.test.ts` | Zod event schemas | ✅ DONE (33 tests) |
-| `tests/unit/breakout-analytics.test.ts` | Breakout statistics | ✅ DONE (17 tests) |
-| `tests/unit/ice-surface.test.tsx` | Ice surface component | ✅ DONE (20 tests) |
-| `tests/unit/player-selector.test.tsx` | Player selector component | ✅ DONE (17 tests) |
-| `tests/unit/quick-event-buttons.test.tsx` | Quick event buttons | ✅ DONE (16 tests) |
-| `tests/unit/analytics.test.ts` | Analytics calculation functions | ✅ DONE (21 tests) |
-| `tests/integration/game-events.test.ts` | Game event CRUD with RLS | ✅ DONE (23 tests, 2 skipped) |
-| `tests/integration/game-event-persistence.test.ts` | Event save/load with optimistic updates | ✅ DONE (11 tests) |
-| `tests/integration/practice-planning.test.ts` | Practice plan CRUD, drill associations, drill matching, RLS | ✅ DONE (21 tests) |
-| `tests/unit/practice-history.test.tsx` | Practice history UI, filtering, modal, auth | ✅ DONE (19 tests) |
-| `tests/unit/organization-setup.test.ts` | **NEW** Organization slug generation utilities | ✅ DONE (17 tests) |
-| `tests/components/team-form.test.tsx` | **NEW** Team creation form component | ✅ DONE (20 tests, 4 skipped) |
-| `tests/integration/organization-crud.test.ts` | **NEW** Organization CRUD operations with RLS | ✅ DONE (7 tests, 3 skipped) |
-| `tests/integration/team-crud.test.ts` | **NEW** Team CRUD operations with RLS | ✅ DONE (16 tests) |
-| `tests/integration/player-crud.test.ts` | Player CRUD operations with RLS & jersey uniqueness | ✅ DONE (17 tests) |
-| `tests/components/player-form.test.tsx` | Player form component (add/edit with validation) | ✅ DONE (18 tests, 4 skipped) |
-| `tests/unit/team-context.test.tsx` | **NEW** TeamContext provider & useTeam hook | ✅ DONE (15 tests) |
-| `tests/components/team-selector.test.tsx` | **NEW** TeamSelector dropdown component | ✅ DONE (17 tests, 2 skipped) |
-| `tests/e2e/game-tracking.spec.ts` | Live tracking E2E tests | TODO |
-
-**Current Test Count: 381 tests passing (15 skipped) = 396 total** ✨ **UPDATED Nov 1 (Milestone 4)**
-- Unit: 285 tests (2 skipped)
-  - Practice history: 19 tests
-  - Organization setup: 17 tests
-  - Team form: 20 tests (4 skipped)
-  - Player form: 18 tests (4 skipped)
-  - Team context: 15 tests ✨ **NEW**
-- Component: 17 tests (2 skipped)
-  - Team selector: 17 tests (2 skipped) ✨ **NEW**
-- Integration: 81 tests (5 skipped)
-  - Game events: 23 tests (2 skipped due to JWT limitation)
-  - Game event persistence: 11 tests
-  - Practice planning: 21 tests
-  - Organization CRUD: 7 tests (3 skipped due to auth user requirement)
-  - Team CRUD: 16 tests
-  - Player CRUD: 17 tests
-
-### Game Tracking Components (Mobile-Optimized 8/10)
-| Component | Purpose | Tests | Status |
-|-----------|---------|-------|--------|
-| `components/game-tracking/ice-surface.tsx` | Interactive SVG ice surface with tap-to-log (responsive) | 20 | ✅ DONE + 📱 MOBILE |
-| `components/game-tracking/player-selector.tsx` | Quick player selection grid by jersey # (88px touch targets) | 17 | ✅ DONE + 📱 MOBILE |
-| `components/game-tracking/quick-event-buttons.tsx` | 6 event type buttons (56px+ touch targets) | 16 | ✅ DONE + 📱 MOBILE |
-| `components/game-tracking/event-logger.tsx` | Multi-step event logging orchestrator (bottom sheet) | - | ✅ DONE + 📱 MOBILE |
-| `components/game-tracking/live-stats.tsx` | Real-time stats dashboard (collapsible accordion) | - | ✅ DONE + 📱 MOBILE |
-| `components/game-tracking/recent-events-list.tsx` | Event list with undo/delete (swipe gestures) | - | ✅ DONE + 📱 MOBILE |
-| `components/ui/bottom-sheet.tsx` | **NEW** Mobile bottom sheet with swipe-down dismiss | - | ✅ DONE |
-| `components/ui/swipeable-item.tsx` | **NEW** Swipe gesture wrapper for mobile actions | - | ✅ DONE |
-| `lib/stores/game-tracking-store.ts` | Zustand state management with DB persistence | - | ✅ DONE |
-| `lib/db/game-event-persistence.ts` | Save/load events from Supabase with optimistic updates | 11 | ✅ DONE |
-
-### Analytics Components
-| Component | Purpose | Tests | Status |
-|-----------|---------|-------|--------|
-| `lib/analytics/game-analytics.ts` | Analytics calculation functions (shots, breakouts, periods) | 21 | ✅ DONE |
-| `components/analytics/shot-chart.tsx` | Shot location visualization on ice surface | - | ✅ DONE |
-| `components/analytics/shot-quality-chart.tsx` | Shot quality breakdown with bar charts | - | ✅ DONE |
-| `components/analytics/breakout-analysis.tsx` | Breakout performance with pie/bar charts | - | ✅ DONE |
-| `components/analytics/period-trends.tsx` | Period-by-period trends with line/bar charts | - | ✅ DONE |
-| `app/demo/analytics/page.tsx` | Analytics dashboard with filters & game selector | - | ✅ DONE |
-
-### Practice Planning Components
-| Component | Purpose | Tests | Status |
-|-----------|---------|-------|--------|
-| `app/demo/drills/page.tsx` | Drill library with search, filters, and pagination | - | ✅ DONE |
-| `components/drills/drill-card.tsx` | Individual drill display card | - | ✅ DONE |
-| `app/demo/practice-history/page.tsx` | **NEW** Practice history with filtering, stats dashboard, and detail modal | 19 | ✅ DONE |
-| `app/demo/practice-builder/page.tsx` | **NEW** Manual practice builder with drag-and-drop drills | - | ✅ DONE |
-| `app/api/generate-practice-plan/route.ts` | AI practice plan generation endpoint with GPT-4 integration | - | ✅ DONE |
-
-### Authentication Components
-| Component | Purpose | Status |
-|-----------|---------|--------|
-| `components/auth/auth-form.tsx` | Reusable auth form with sign up/sign in modes | ✅ DONE |
-| `components/auth/auth-modal.tsx` | Modal wrapper for auth form with mode toggling | ✅ DONE |
-| `app/auth/reset-password/page.tsx` | Password reset page with email verification | ✅ DONE |
-| `app/demo/game-tracking/page.tsx` | Demo page with auth gates and session management | ✅ DONE |
-| `app/actions/demo-setup.ts` | Server action for creating user-specific demo data | ✅ DONE |
-
-**Authentication Features:**
-- Email/password authentication via Supabase Auth
-- Email confirmation required before sign-in
-- Password reset flow with email verification
-- Session management with auto-redirect on 403/RLS errors
-- Local email testing via Mailpit (localhost:54324)
-- User-specific data isolation via team memberships
-- Auto-signout on RLS policy violations
-
-### Team & Roster Management Components ✨ **NEW** (Nov 1, 2025)
-| Component | Purpose | Tests | Status |
-|-----------|---------|-------|--------|
-| `lib/utils/organization-setup.ts` | Slug generation utilities for organizations | 17 | ✅ DONE |
-| `app/actions/organizations.ts` | Organization setup server action (idempotent) | 7 | ✅ DONE |
-| `lib/validation/team-schemas.ts` | Zod schemas for team creation/update with season helpers | - | ✅ DONE |
-| `components/teams/team-form.tsx` | Team creation form with React Hook Form + Zod | 20 | ✅ DONE |
-| `app/actions/teams.ts` | Team CRUD server actions (create, read, update, delete) | 16 | ✅ DONE |
-| `app/demo/teams/page.tsx` | Teams list page with empty state and team cards | - | ✅ DONE |
-| `app/demo/teams/new/page.tsx` | Team creation page with org initialization | - | ✅ DONE |
-| `lib/validation/player-schemas.ts` | **NEW** Zod schemas for player creation/update with position enum | - | ✅ DONE |
-| `app/actions/players.ts` | **NEW** Player CRUD server actions with jersey uniqueness validation | 17 | ✅ DONE |
-| `components/teams/player-form.tsx` | **NEW** Player creation/edit form with position button group | 18 | ✅ DONE (4 skipped) |
-| `components/teams/roster-list.tsx` | Roster display (mobile cards with swipe-to-delete, desktop table) | - | ✅ DONE |
-| `app/demo/teams/[teamId]/roster/page.tsx` | Roster management page with add/edit/delete functionality | - | ✅ DONE |
-| `lib/contexts/team-context.tsx` | **NEW** TeamContext provider with localStorage persistence | 15 | ✅ DONE (Milestone 4) |
-| `components/teams/team-selector.tsx` | **NEW** TeamSelector dropdown with touch-friendly UI | 17 | ✅ DONE (Milestone 4, 2 skipped) |
-| `app/demo/layout.tsx` | **NEW** Demo layout with navigation bar and team selector | - | ✅ DONE (Milestone 4) |
-
-**Team Management Features** (Milestones 1-4 Complete - 60% of Phase 7 ✨):
-- Auto-create organization for new users (slug generation with conflict resolution)
-- Team creation form with age group selector (USA vs Canada format switching)
-- Skill level selection (House, Travel, A, AA, AAA)
-- Season input (auto-populates with current season YYYY-YY format)
-- User automatically added as head_coach when creating team
-- Teams list page with card layout showing team details
-- Empty state with "Create Your First Team" CTA
-- **Player roster management** (Milestone 3):
-  - Add/edit/delete players with jersey number (1-99), name, position, birthdate
-  - Position selection (Forward, Defense, Goalie) with button group UI
-  - Jersey number uniqueness enforced per team (same number OK on different teams)
-  - Mobile-first responsive design (swipeable cards on mobile, table on desktop)
-  - Bottom sheet modals for add/edit forms on mobile
-  - Empty state with "Add Your First Player" CTA
-- **Team selector & context** (Milestone 4 ✨ **NEW**):
-  - Global team state management with React Context
-  - localStorage persistence per user (`current_team_{userId}`)
-  - Dropdown selector in navigation bar (hidden on teams list/create pages)
-  - Touch-friendly UI (56px minimum height)
-  - Click-outside-to-close behavior
-  - Navigation links: Teams, Track Game, Analytics, Practices
-  - Active link highlighting
-- Mobile-first responsive design throughout
-- **116 tests passing (107 passing, 9 skipped)** ✨ **UPDATED Milestone 4**
+**PURPOSE**: Quick reference for AI assistants to understand the project and find detailed documentation.
 
 ---
 
 ## 🎯 PROJECT OVERVIEW
 
-**What are we building?**
-A hockey practice planning app with live game tracking that generates AI-powered, data-driven practice plans for youth hockey coaches.
+**What**: Hockey practice planning app with live game tracking that generates AI-powered, data-driven practice plans
 
-**Key Differentiator**: Real-time game event tracking (shots, breakouts, turnovers) → Objective analytics → AI-generated practice plans targeting specific weaknesses.
+**Key Differentiator**: Real-time game event tracking → Objective analytics → AI-generated practice plans targeting specific weaknesses
 
 **Target Market**: North American youth hockey (ages 8-18, USA & Canada)
 
-**Business Model**: Freemium SaaS
-- Free: 3 tracked games/season
-- Premium: $14.99/mo (unlimited tracking + analytics)
-- Pro: $29.99/mo (season trends + comparative analytics)
+**Business Model**: Freemium SaaS ($14.99/mo Premium, $29.99/mo Pro)
 
 ---
 
-## 🏗️ ARCHITECTURE DECISIONS
+## 📚 DOCUMENTATION INDEX
 
-### Tech Stack
+### Core Planning & Setup
+| Document | Purpose |
+|----------|---------|
+| `README.md` | Repository overview, quick start |
+| `docs/HOCKEY_PRACTICE_APP_PLAN.md` | Complete product plan, features, monetization |
+| `docs/DEV_SETUP_AND_DATA_MODELS.md` | Dev environment, database design, TDD approach |
+| `docs/CHANGELOG.md` | Project changelog by phase |
+
+### Technical Reference
+| Document | Purpose |
+|----------|---------|
+| `docs/DATABASE_REFERENCE.md` | **NEW** Schema, migrations, RLS policies |
+| `docs/COMPONENTS_INVENTORY.md` | **NEW** All components with test coverage |
+| `docs/TROUBLESHOOTING.md` | **NEW** Common problems & solutions |
+| `docs/TESTING_GUIDE.md` | Testing philosophy, patterns, best practices |
+
+### Features & Implementation
+| Document | Purpose |
+|----------|---------|
+| `docs/AI_PRACTICE_PLAN_GENERATION.md` | AI integration, prompts, algorithms |
+| `docs/PRACTICE_HISTORY.md` | Practice history feature |
+| `docs/PRACTICE_BUILDER.md` | Manual practice builder |
+| `docs/MOBILE_FIRST_ASSESSMENT.md` | Mobile UX roadmap |
+| `docs/GAME_TRACKING_MOBILE.md` | Mobile optimization (8/10 score) |
+| `docs/GAME_TRACKING_UX_IMPROVEMENTS.md` | Ice-first flow, PWA setup |
+| `docs/PWA_INSTALLATION_GUIDE.md` | End-user PWA install guide |
+| `docs/ROSTER_MANAGEMENT.md` | Player roster management |
+| `docs/PHASE_7_PROGRESS.md` | Team management progress tracker |
+
+---
+
+## 🏗️ TECH STACK
+
 ```
-Frontend:  Next.js 14+ (App Router, TypeScript strict)
-Backend:   Supabase (PostgreSQL + Auth + RLS + Edge Functions)
-Testing:   Vitest (unit/integration) + Playwright (E2E)
+Frontend:  Next.js 14+ (App Router, TypeScript)
+Backend:   Supabase (PostgreSQL + Auth + RLS)
+Testing:   Vitest + Playwright
 State:     Zustand
 Forms:     React Hook Form + Zod
 UI:        TailwindCSS + shadcn/ui
-Offline:   IndexedDB (Dexie.js) + Service Workers (PWA)
-Canvas:    Konva.js (interactive ice surface)
-Charts:    Recharts (heat maps, analytics)
-AI:        OpenAI GPT-4 (practice plan generation)
-Payments:  Stripe (Checkout + Customer Portal)
+AI:        OpenAI GPT-4o
 ```
 
-### Database Design Philosophy
-- **Polymorphic events table**: Single `game_events` table with JSONB `details` column (easier queries, simpler to extend)
-- **Spatial data**: Ice coordinates (x: 0-200, y: 0-100) for heat maps
-- **Audit trail**: `event_edit_history` table for all event edits
-- **Pre-computed analytics**: `game_analytics` table (avoid expensive real-time calculations)
-- **RLS everywhere**: Row-level security for multi-tenant data isolation
-
-### Age Group Handling (USA vs Canada)
-**Critical decision**: Store age as INTEGER, format on display
-
-| USA | Canada | Stored Value |
-|-----|--------|--------------|
-| 8U  | U9     | 9            |
-| 10U | U11    | 11           |
-| 12U | U13    | 13           |
-
-- Teams have `region` field ('usa' or 'canada')
-- TypeScript utilities: `formatAgeGroup()`, `parseAgeGroup()`
-- Database function: `format_age_group(age_years, region)`
-
-**Why integers?** Single source of truth, easy comparisons, regional formatting at display layer.
-
-See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 241-300, 708-790)
-
 ---
 
-## 🧪 TEST-DRIVEN DEVELOPMENT APPROACH
-
-### TDD Philosophy
-**Write tests FIRST, then implement features**
-
-1. Write failing test
-2. Implement minimal code to pass test
-3. Refactor for quality
-4. Repeat
-
-### Test Coverage Goals
-- Core business logic: **100%**
-- Database operations: **100%**
-- API routes: **95%+**
-- UI components: **80%+**
-- E2E critical paths: **100%**
-
-### Example TDD Files (templates ready)
-- `tests/unit/age-groups.test.ts` - Age group formatting/parsing
-- `tests/unit/shot-quality.test.ts` - Shot quality calculator (high/medium/low danger)
-- `tests/integration/game-events.test.ts` - Event CRUD with RLS
-- `tests/e2e/game-tracking.spec.ts` - Live tracking flow
-
-See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 843-1170)
-
----
-
-## 📊 DATABASE SCHEMA QUICK REFERENCE
-
-### Core Entities Hierarchy
-```
-organizations
-  ├── teams (age_years, region, level)
-  │   ├── players (jersey_number, position)
-  │   ├── games (opponent, date, status)
-  │   │   ├── game_events (type, x/y coords, details JSONB)
-  │   │   └── game_analytics (pre-computed stats)
-  │   └── practices
-  │       └── practice_drills
-  └── users (with roles)
-
-drills (global + org-specific)
-  └── addresses_situations JSONB (links drills to game issues)
-```
-
-### Key Tables
-
-**game_events** (polymorphic design):
-```sql
-- event_type: 'shot' | 'breakout' | 'turnover' | 'zone_entry' | ...
-- x_coord, y_coord (0-200, 0-100)
-- period, game_time_seconds
-- player_id
-- situation: 'even_strength' | 'power_play' | 'penalty_kill'
-- details: JSONB (event-specific data)
-```
-
-**Shot event details**:
-```json
-{
-  "shot_type": "wrist",
-  "result": "save",
-  "shot_quality": "high"
-}
-```
-
-**Breakout event details**:
-```json
-{
-  "success": true,
-  "type": "up_boards",
-  "exit_zone": "left"
-}
-```
-
-### Ice Surface Coordinates
-```
-Defensive Zone ← → Offensive Zone
-(0,0)           (100,100)         (200,100)
-Left corner     Center ice        Right corner
-
-High-danger zone (slot): x: 80-110, y: 35-65
-```
-
-See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 206-702)
-
----
-
-## 🎨 MVP SCOPE (Phase 1 - 6-8 weeks)
-
-### Must-Have Features
-✅ Completed:
-- [x] **User auth (email/password)** - Full authentication system with email confirmation and password reset
-- [x] **Organization + Team + Player management** - Database schema with RLS policies
-- [x] **Live game tracking** - Shots + defensive events (breakouts, turnovers, zone entries, faceoffs)
-- [x] **Interactive ice surface** - SVG with tap-to-log coordinates (0-200 x 0-100)
-- [x] **Live stats during game** - Running totals, success rates, expandable panel
-- [x] **Event editing** - Undo last event, delete specific events during/after games
-- [x] **Post-game analytics** - Shot charts, heat maps, breakout stats, period trends
-- [x] **Game management** - Create games with opponent/location, switch between games in analytics
-- [x] **Game info header** - Display current game details (opponent, date, location, score, period)
-- [x] **Edit game info** - Update opponent name and location with inline form
-- [x] **Game persistence** - User-specific localStorage to remember current game across refreshes
-- [x] **Drill library** - 255 pre-loaded drills with search, filters, and categorization
-- [x] **AI practice plan generation** - OpenAI GPT-4o integration analyzing game data to recommend drills
-
-🚧 In Progress / Deferred:
-- [ ] **Offline support** (PWA + IndexedDB + background sync) - Deferred to post-MVP
-- [ ] **Practice plan saving** - Save AI-generated plans to database (practices, practice_drills tables)
-- [ ] **Manual practice plan builder** - Drag-and-drop drill selection interface
-- [ ] **Practice history** - View past practices with drill details
-
-### Post-MVP (Deferred)
-- [ ] Stripe integration (launch free tier only)
-- [ ] Multi-tracker collaboration (merging data from multiple stat trackers)
-- [ ] Season-long analytics trends
-- [ ] Comparative analytics (vs league benchmarks)
-- [ ] Video drill library
-- [ ] Native mobile apps (PWA sufficient for MVP)
-
-See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 501-528)
-
----
-
-## 🚀 IMPLEMENTATION PHASES
-
-### Phase 0: Planning ✅ **COMPLETE**
-- [x] Product planning document
-- [x] Data model design
-- [x] TDD approach defined
-- [x] Tech stack decisions
-- [x] Project initialization
-
-### Phase 1: Foundation ✅ **COMPLETE**
-- [x] Initialize Next.js project
-- [x] Setup Supabase local dev
-- [x] Configure Vitest + Playwright
-- [x] First migration: organizations, teams, players
-- [x] Setup RLS policies
-- [x] Built core utilities (age groups, shot quality, coordinates, breakout analytics)
-- [x] 114 unit tests passing (100% coverage on utilities)
-- [ ] Auth UI setup (deferred to when needed)
-
-### Phase 2: Game Tracking & Event Logger ✅ **COMPLETE**
-**THE DIFFERENTIATOR FEATURE**
-
-**Database Layer:**
-- [x] Game tracking migration (games, events, analytics, audit log)
-- [x] Polymorphic events table with JSONB details
-- [x] Shot quality auto-calculation trigger
-- [x] Audit logging trigger
-- [x] RLS policies with service role bypass
-- [x] Event validation schemas (Zod)
-- [x] Integration tests (34 passing, 2 skipped)
-- [x] Removed 'goal' event type (now shot with result='goal')
-
-**UI Components & Event Logger:**
-- [x] Interactive SVG ice surface component (20 tests)
-- [x] Screen-to-ice coordinate conversion
-- [x] Event logging state management (Zustand store)
-- [x] Player selector component (17 tests)
-- [x] Quick event buttons (16 tests)
-- [x] Multi-step event logging flow orchestrator
-- [x] Shot tracking interface (tap-to-log flow)
-- [x] Defensive event tracking UI (turnover, breakout, zone entry, faceoff)
-- [x] Live stats display (running totals, success rates)
-- [x] Event editing UI (undo last, delete specific events)
-- [x] Event list view (chronological, recent 10)
-- [x] Demo page: `/demo/game-tracking` - Full working event logger
-- [x] Database persistence (save to Supabase with optimistic updates)
-
-**Deferred to Post-MVP:**
-- [ ] Offline storage (IndexedDB)
-- [ ] Background sync (PWA)
-
-### Phase 3: Post-Game Analytics + Authentication ✅ **COMPLETE**
-
-**Data Analysis & Visualization:**
-- [x] Analytics calculation functions (21 tests)
-- [x] Shot chart with location visualization on ice surface
-- [x] Shot quality breakdown (high/medium/low danger)
-- [x] Breakout analysis (success rates by type)
-- [x] Period-by-period trends (shots, goals, turnovers)
-- [x] Shooting percentage by situation (ES/PP/PK)
-- [x] Analytics dashboard with filters (period, situation)
-- [x] Demo page: `/demo/analytics` - Full analytics dashboard
-- [x] Auto-generated insights (breakout performance, period analysis)
-
-**Authentication System:**
-- [x] Email/password authentication via Supabase Auth
-- [x] User registration with full name field
-- [x] Email confirmation required before sign-in
-- [x] Password reset flow with email verification
-- [x] Password reset page: `/auth/reset-password`
-- [x] Session management with `onAuthStateChange` listeners
-- [x] Auto-redirect on 403/RLS policy violations
-- [x] Auth components: `AuthForm`, `AuthModal`
-- [x] User-specific demo data (each user gets own org/team/game)
-- [x] Fixed RLS policies on `team_members` table (added SELECT policies)
-- [x] Local email testing via Mailpit (localhost:54324)
-- [x] Updated Supabase config for password reset redirects
-
-### Phase 4-6: Practice Planning & AI ✅ **COMPLETE** (~95% COMPLETE)
-
-**Database Foundation:** ✅ **COMPLETE**
-- [x] Database schema (drills, practices, practice_drills tables)
-- [x] Full RLS policies for multi-tenant practice planning
-- [x] Helper functions (calculate_practice_duration, get_practice_drill_counts)
-- [x] 255-drill library with AI integration metadata
-  - 16 categories (shooting, passing, skating, breakouts, forechecking, backchecking, defensive_zone, power_play, penalty_kill, transition, faceoffs, warm_up, cool_down, conditioning, small_area_games, scrimmage)
-  - Each drill includes: title, description, duration, age range, skill level
-  - AI metadata: `addresses_situations` JSONB field mapping drills to game analytics issues
-  - Searchable tags array for filtering
-- [x] Seed data loaded into database (255 drills + 27 sample drills for practice builder)
-
-**UI & Features:** ✅ **COMPLETE**
-- [x] **Drill library UI** with search and filters (`/demo/drills`)
-  - Search by title, description, tags
-  - Filter by category, skill level, age range, duration
-  - 10 drills per page with pagination
-  - Expandable drill details view
-  - RLS-tested with user authentication
-- [x] **OpenAI integration** with GPT-4o model
-  - API route: `/api/generate-practice-plan`
-  - Analyzes game performance data (shots, breakouts, turnovers)
-  - Fetches age-appropriate drills from database
-  - Returns structured practice plans with reasoning
-- [x] **AI practice plan generation** integrated into analytics
-  - "Generate AI Practice Plan" button on analytics page
-  - Displays AI reasoning (top 3 focus areas, goals)
-  - Shows drill recommendations by section (warm-up, skills, scrimmage, cool-down)
-  - Links recommendations to specific game stats
-  - Saves to database with drill associations
-- [x] **Practice history view** (`/demo/practice-history`) 📋 **NEW**
-  - Stats dashboard (total, AI-generated, completed, planned counts)
-  - Advanced filtering by status and type
-  - Practice detail modal with full drill breakdown
-  - AI reasoning display for AI-generated plans
-  - Source game information
-  - 19 unit tests (100% passing)
-- [x] **Manual practice plan builder** (`/demo/practice-builder`) ⚙️ **NEW**
-  - Drag-and-drop drill selection from library
-  - 27 sample drills across 11 categories
-  - Three practice sections (warm-up, main, cool-down)
-  - Real-time duration tracking
-  - Custom drill duration and notes
-  - Save to database with drill associations
-  - Searchable drill library with category filters
-- [ ] **Mobile-friendly practice plan display** (planned next)
-
-See: `docs/HOCKEY_PRACTICE_APP_PLAN.md` (lines 509-574)
-
----
-
-## 🔑 CRITICAL DECISIONS LOG
-
-### Decided ✅
-| Decision | Rationale | Impact |
-|----------|-----------|--------|
-| Polymorphic events table | Simpler queries, easier to extend event types | All events in one table with JSONB details |
-| Age stored as integer | Single source of truth, regional formatting at display layer | USA/Canada both supported seamlessly |
-| MVP includes BOTH shots + defense tracking | Real coach feedback - defensive tracking is crucial | Larger Phase 2, but complete feature |
-| Event editing in MVP | Stat trackers make mistakes during fast-paced games | Edit UI + audit log in MVP |
-| Live stats during game | Coaches want to see progress in real-time | Expandable stats panel |
-| SVG over Canvas for ice surface | Easier tap interactions, accessibility | Use Konva.js or plain SVG |
-| Offline-first with PWA | Rinks often have poor WiFi | IndexedDB + service workers required |
-| Single tracker in MVP | Multi-tracker collaboration is complex | Defer merging to post-MVP |
-| Goal is a shot with result='goal' | Eliminates redundancy, simplifies queries, cleaner data model | Removed 'goal' event type, pre-fill result in UI |
-| Database persistence with optimistic updates | Instant UI feedback, background sync to Supabase | Better UX, handles slow connections |
-| Recharts for analytics | Pre-installed, good docs, sufficient for MVP needs | Bar/line/pie charts for all analytics |
-| AI explains drill choices | Coaches need to trust AI recommendations | Shows focus areas, links drills to specific game stats |
-| Explicit game creation with metadata | Better organization, clearer game history | Create game with opponent name & location before tracking |
-| Game selector in analytics | Support multiple games per team | Dropdown to switch between games, auto-loads most recent |
-| Replace browser dialogs with inline forms | Better UX, editable inputs, mobile-friendly | React forms instead of prompt()/alert() |
-| OpenAI GPT-4o for practice plans | Latest model, best at structured output | JSON mode for reliable parsing |
-| User-specific game persistence with localStorage | Remember current game across page refreshes | Key: `current_game_${userId}` with database verification |
-| Store AI reasoning in JSONB field | Preserves full context for future reference | `practices.ai_reasoning` stores focus areas, assessment, goals |
-| Case-insensitive drill matching | Handles variations in AI-generated titles | Map-based lookup with normalized keys |
-| Save AI practice plans to database | Coaches need to reference plans across sessions | Full persistence with drill associations and sections |
-| **Mobile-first design approach** | Coaches track games at rinks on phones | Base styles for mobile, progressive enhancement with `md:` breakpoints |
-| **Bottom sheets for mobile modals** | Native iOS/Android pattern, thumb-friendly | Player selector uses bottom sheet instead of full-screen modal |
-| **56px+ touch targets** | iOS (44px) and Android (48px) guidelines | All buttons 56px minimum, player cards 88px for frequent use |
-| **Swipe-to-delete for events** | Familiar mobile gesture, faster than tapping small X button | SwipeableItem component with 80px threshold |
-| **Collapsible stats panel** | Save screen space on mobile | Accordion pattern: collapsed by default mobile, always expanded desktop |
-| **Responsive SVG ice surface** | Ice surface needs to work on 320px-1920px screens | viewBox with preserveAspectRatio, 100% width with auto height |
-| **Ice-click-first event logging** | Ice surface is primary interaction, maximizes screen space | New flow: tap ice → select event type → select player → details |
-| **Single toggle button for views** | Clearer mental model, works on all screen sizes | "📋 Events" button toggles between ice and events view |
-| **Consolidated period/game controls** | Reduces header clutter, prevents accidental actions | Single dynamic button with confirmation dialogs |
-| **Overtime support (period 4)** | Youth hockey games often go to overtime | After P3, choice dialog: overtime or end game |
-| **"Change Ends" terminology** | Proper hockey language | Renamed from "Swap" to match what hockey coaches say |
-| **PWA with fullscreen support** | iOS Safari doesn't support fullscreen API in browser | Add to home screen enables fullscreen mode on iOS |
-| **Feature detection for fullscreen** | Only show what works | Fullscreen button hidden when browser doesn't support it |
-
-### To Decide 🤔
-- [ ] Game situation detection (PP/PK): Manual buttons or auto-detect from penalties?
-- [ ] Free tier: 3 games or unlimited tracking with limited analytics?
-- [ ] Premium pricing: $14.99 or $19.99/month?
-- [x] ~~Should AI explain WHY it chose drills (show tracked data)?~~ ✅ YES - implemented with reasoning display
-- [ ] Ice surface: Konva.js or plain SVG + React?
-- [ ] Video hosting: YouTube embeds or self-hosted?
-
----
-
-## 🐛 COMMON PROBLEMS & SOLUTIONS
-
-### Problem: Age group confusion between USA and Canada
-**Solution**: Store as integer (9), format on display based on team's `region` field.
-- USA: `formatAgeGroup(9, 'usa')` → "8U"
-- Canada: `formatAgeGroup(9, 'canada')` → "U9"
-
-See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 708-790)
-
----
-
-### Problem: Game events are diverse (shots, turnovers, breakouts, etc.)
-**Solution**: Polymorphic table with JSONB `details` column instead of separate tables.
-- Easier queries: `SELECT * FROM game_events WHERE game_id = ?`
-- Type-safe with Zod schemas for each event type
-- Easy to add new event types without migrations
-
-See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 362-449)
-
----
-
-### Problem: Should 'Goal' be a separate event type or a shot with result='goal'?
-**Solution**: Treat goal as a shot with result='goal', not a separate event type.
-- Eliminates redundancy in data model
-- Simplifies queries: `WHERE event_type = 'shot' AND details->>'result' = 'goal'`
-- UI preserves UX: Goal button pre-fills result field
-- Migration: Converted existing 'goal' events to 'shot' with result='goal'
-
-See: `supabase/migrations/20251027235333_remove_goal_event_type.sql`
-
----
-
-### Problem: Real-time analytics are expensive to compute
-**Solution**: Pre-compute analytics after game completion, store in `game_analytics` table.
-- Triggered by game status change to 'completed'
-- Includes: shot charts, breakout success rates, AI insights
-- Serve from cache for instant loading
-
-See: `docs/DEV_SETUP_AND_DATA_MODELS.md` (lines 634-675)
-
----
-
-### Problem: Rinks have poor WiFi, need offline tracking
-**Solution**: PWA with IndexedDB + background sync
-- All events stored locally first (IndexedDB via Dexie.js)
-- `sync_queue` table tracks pending changes
-
----
-
-### Problem: AI generates drill titles that don't exactly match database drills
-**Solution**: Case-insensitive drill title matching with Map lookup
-- Fetch all drills: `SELECT id, title FROM drills WHERE is_global = true`
-- Create map: `new Map(drills.map(d => [d.title.toLowerCase(), d.id]))`
-- Match AI titles: `drillTitleMap.get(aiDrillTitle.toLowerCase())`
-- Gracefully skip unmatched drills with console warning
-- Coaches can manually add missing drills later
-
-See: `docs/AI_PRACTICE_PLAN_GENERATION.md` (Drill Matching Algorithm section)
-
----
-
-### Problem: Need to preserve AI reasoning for why drills were chosen
-**Solution**: Store full AI reasoning in JSONB field
-- `practices.ai_reasoning` stores: top_focus_areas, overall_assessment, practice_goals
-- `practice_drills.notes` stores: drill reason + expected improvement
-- Coaches can review AI logic later
-- Future: Use for drill effectiveness analysis
-
-See: `docs/AI_PRACTICE_PLAN_GENERATION.md` (Database Schema section)
-
----
-
-### Problem: Analytics page showing 0 events, how does it know which game?
-**Solution**: Auto-load most recent game and provide game selector dropdown.
-- Analytics page fetches all games for user's team on mount
-- Auto-selects most recent game by game_date
-- Loads events from database for selected game
-- Dropdown allows switching between games
-- Game display format: "vs {opponent_name} - {date} @ {location}"
-- Resolves issue where analytics relied only on Zustand store
-
-See: `app/demo/analytics/page.tsx` (lines 30-80)
-
----
-
-### Problem: Browser dialogs (prompt/alert) are poor UX for game creation
-**Solution**: Replace with inline React forms.
-- Show/hide form with useState toggle
-- Controlled inputs for opponent name (required) and location (optional)
-- Submit button with loading state
-- Cancel button to dismiss form
-- Auto-focus first input for keyboard accessibility
-- Form validation before submission
-- Better mobile experience
-
-See: `components/game-tracking/live-stats.tsx` (lines 36-119, 216-274)
-
----
-
-### Problem: Page refresh forgets which game is being tracked
-**Solution**: User-specific localStorage with database verification.
-- Store current game ID in localStorage with key `current_game_${userId}`
-- On page load: Check localStorage → Verify game exists in DB → Fall back to most recent
-- When creating new game: Save game ID to localStorage
-- Security: Verify stored game belongs to user's team
-- Clear localStorage if game no longer exists
-
-**Benefits**:
-- Game persists across page refreshes
-- User-specific (different users get different games)
-- Database verification prevents stale data
-- Graceful fallback to most recent game
-
-See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking/live-stats.tsx` (line 96)
-
----
-
-## 📝 TODO: HIGH-PRIORITY ITEMS
-
-### Phase 4-6 Next Steps (Practice Planning)
-- [ ] **Implement practice plan saving** - Save AI-generated plans to database (practices, practice_drills tables)
-- [ ] **Build manual practice plan builder** - Drag-and-drop drill selection interface
-- [ ] **Create practice history view** - List all past practices with drill details
-- [ ] **Mobile-friendly practice display** - Responsive practice plan view for mobile devices
-- [ ] **Write tests for practice planning** - Unit tests for AI integration, practice CRUD operations
-
-### Before Launch
-- [x] **Seed drill library with 255 drills** ✅ (exceeded goal!)
-- [x] **Create AI prompt templates for practice plan generation** ✅
-- [x] **Implement AI practice plan generation** ✅
-- [ ] **Design onboarding flow for new coaches**
-- [ ] **Beta test with 3-5 real teams** (full season)
-- [ ] **Performance testing** (can handle 50+ events per game?)
-- [ ] **E2E tests** for critical paths (game tracking, analytics, practice planning)
-
----
-
-## 🔗 EXTERNAL RESOURCES
-
-### Supabase
-- [Local Development Docs](https://supabase.com/docs/guides/cli/local-development)
-- [RLS Policies Guide](https://supabase.com/docs/guides/auth/row-level-security)
-- [TypeScript Type Generation](https://supabase.com/docs/guides/api/generating-types)
-
-### Testing
-- [Vitest Docs](https://vitest.dev/)
-- [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/)
-- [Playwright Docs](https://playwright.dev/)
-
-### Hockey Analytics References
-- Shot quality models (xG - expected goals)
-- Standard ice rink dimensions (200ft x 85ft)
-- Hockey analytics blogs for drill inspiration
-
----
-
-## 💡 TIPS FOR CLAUDE (AI Assistant)
-
-### When starting a new session:
-1. **Always read this file first** to understand project context
-2. Check `docs/HOCKEY_PRACTICE_APP_PLAN.md` for product decisions
-3. Check `docs/DEV_SETUP_AND_DATA_MODELS.md` for technical details
-4. Review "Critical Decisions Log" to avoid re-litigating choices
-
-### When creating new documentation:
-1. **Update this file IMMEDIATELY** with the new doc path
-2. Add to appropriate section (Database, Testing, etc.)
-3. Update "Last Updated" dates
-4. If solving a problem, add to "Common Problems & Solutions"
-
-### When making important decisions:
-1. **Add to "Critical Decisions Log"** with rationale
-2. Update relevant planning docs
-3. Consider impact on testing strategy
-4. Document any tradeoffs made
-
-### TDD Workflow:
-1. Write test first (red)
-2. Implement minimal code (green)
-3. Refactor (clean)
-4. Update docs if needed
-5. Commit with descriptive message
+## 🔑 CRITICAL DECISIONS (Quick Reference)
+
+| Decision | Rationale |
+|----------|-----------|
+| **Polymorphic events table** | Simpler queries, easier to extend event types |
+| **Age stored as integer** | USA/Canada formatting at display layer only |
+| **Goal = shot with result='goal'** | Eliminates redundancy, cleaner data model |
+| **Database persistence + optimistic updates** | Better UX, handles slow connections |
+| **Mobile-first design** | Coaches track games at rinks on phones |
+| **Team context with localStorage** | Multi-team support, persists selection |
+| **Ice-click-first event logging** | Ice surface is primary interaction |
+| **PWA with fullscreen support** | Works offline, fullscreen on iOS via home screen |
+
+**Full list**: See `docs/TROUBLESHOOTING.md` for detailed explanations
 
 ---
 
 ## 📊 PROJECT STATUS
 
-**Current Status**: Phase 7 - Team & Roster Management (Milestones 1-4 Complete!) 🎉
-**Next Milestone**: Milestone 5 - Roster Integration with Game Tracking
-**Target MVP Completion**: On track! ~92% complete 🎯
-**Target Beta Launch**: 8-10 weeks from start
+**Current Phase**: Phase 7 - Team & Roster Management (Milestones 1-4 Complete)
+**MVP Completion**: ~92% complete 🎯
+**Test Coverage**: 381/396 tests passing (96.2%)
 
-**Progress Tracker**:
-- [x] Product planning (features, user flows, monetization)
-- [x] Database schema design
-- [x] TDD approach defined
-- [x] Tech stack decisions
-- [x] Project initialization (100%)
-- [x] **Phase 1: Foundation (100%)** ✅
-  - [x] Next.js + Supabase + Vitest + Playwright
-  - [x] 114 unit tests for core utilities
-- [x] **Phase 2: Game Tracking & Event Logger (100%)** ✅
-  - [x] Database layer with 9 migrations
-  - [x] Event logger UI with 6 components
-  - [x] Live stats and event list
-  - [x] Database persistence with optimistic updates
-  - [x] 234 tests passing (2 skipped)
-- [x] **Phase 3: Post-Game Analytics + Authentication (100%)** ✅
-  - [x] Analytics dashboard with 4 visualization components
-  - [x] Shot charts, breakout analysis, period trends
-  - [x] Full authentication system (email/password, reset flow)
-  - [x] Session management and RLS security
-  - [x] Game management (create games, switch between games)
-  - [x] 21 analytics tests
-- [x] **Phase 4-6: Practice Planning & AI (95%)** ✅
-  - [x] Database schema (drills, practices, practice_drills)
-  - [x] 255-drill library with AI metadata loaded
-  - [x] RLS policies for multi-tenant practice planning
-  - [x] **Drill library UI** with search, filters, pagination
-  - [x] **OpenAI GPT-4o integration** for AI-generated plans
-  - [x] **AI practice plan generation** button in analytics
-  - [x] **Practice plan display** with AI reasoning & drill recommendations
-  - [x] **Practice history view** with filtering and stats dashboard
-  - [x] **Manual practice plan builder** with drag-and-drop drills
-- [ ] **Phase 7: Team & Roster Management (60%)** 🚧 **IN PROGRESS**
-  - [x] **Milestone 1**: Organization auto-creation (21 tests passing) ✅
-  - [x] **Milestone 2**: Team creation UI (32 tests passing) ✅
-  - [x] **Milestone 3**: Player roster management (31 tests passing) ✅
-  - [x] **Milestone 4**: Team selector & context (32 tests passing) ✅ **NEW Nov 1**
-  - [ ] **Milestone 5**: Roster integration (~30 tests planned)
-  - [ ] **Milestone 6**: User settings & team switching (~40 tests planned)
+### Recent Milestones ✅
+- [x] **Milestone 1**: Organization auto-creation
+- [x] **Milestone 2**: Team creation UI
+- [x] **Milestone 3**: Player roster management
+- [x] **Milestone 4**: Team selector & context (multi-team support)
 
-**Demo Pages Available**:
-- 🎨 `/demo/ice-surface` - Interactive ice surface visualization
-- 🏒 `/demo/game-tracking` - Complete event logger with live stats & database persistence (requires auth)
-- 📊 `/demo/analytics` - Post-game analytics dashboard with charts, insights, & AI practice plans
-- 📚 `/demo/drills` - Drill library with 255 drills, search, and filters
-- 🏒 `/demo/practice-history` - Practice history with filtering, stats, and detail modal
-- ⚙️ `/demo/practice-builder` - Manual practice plan builder with drag-and-drop drills
-- 🏆 `/demo/teams` - Teams list with cards and empty state
-- ➕ `/demo/teams/new` - Team creation form
-- 👥 `/demo/teams/[teamId]/roster` - **NEW** Player roster management (add/edit/delete players) ✨
+### Next Up 🚧
+- [ ] **Milestone 5**: Roster integration with game tracking
+- [ ] **Milestone 6**: User settings & team switching
 
-**Local Development Tools**:
-- 🗄️ http://localhost:54323 - Supabase Studio (database GUI)
-- 📧 http://localhost:54324 - Mailpit (email inbox for testing auth flows)
+**See**: `docs/PHASE_7_PROGRESS.md` for detailed plan
 
-**Test Coverage**: 381/396 tests passing (96.2% success rate) ⬆️ **+116 tests from Milestones 1-4**
+---
+
+## 🛠️ LOCAL DEVELOPMENT
+
+### Quick Start
+```bash
+npm run dev          # Start Next.js (http://localhost:3000)
+npx supabase start   # Start local Supabase
+npm run test         # Run Vitest tests
+```
+
+### Demo Pages
+- 🏆 `/demo/teams` - Teams list
+- 👥 `/demo/teams/[teamId]/roster` - Roster management
+- 🏒 `/demo/game-tracking` - Live game tracking
+- 📊 `/demo/analytics` - Post-game analytics
+- 📚 `/demo/drills` - Drill library
+- ⚙️ `/demo/practice-builder` - Manual practice builder
+- 📋 `/demo/practice-history` - Practice history
+
+### Development Tools
+- 🗄️ http://localhost:54323 - Supabase Studio
+- 📧 http://localhost:54324 - Mailpit (email testing)
+
+---
+
+## 💡 QUICK START FOR NEW AI SESSIONS
+
+### 1. First Steps
+1. Read this file for project context
+2. Check `docs/PHASE_7_PROGRESS.md` for current milestone
+3. Review `docs/TROUBLESHOOTING.md` if user reports an issue
+4. See `docs/COMPONENTS_INVENTORY.md` for component locations
+
+### 2. When Adding Features
+- Write tests FIRST (TDD approach)
+- Update `docs/COMPONENTS_INVENTORY.md` if adding components
+- Add common problems to `docs/TROUBLESHOOTING.md`
+- Update phase progress in `docs/PHASE_7_PROGRESS.md`
+
+### 3. When Troubleshooting
+- Check `docs/TROUBLESHOOTING.md` first
+- Verify RLS policies in `docs/DATABASE_REFERENCE.md`
+- Check component tests in `docs/COMPONENTS_INVENTORY.md`
+
+### 4. When Making Decisions
+- Check if already decided (see Critical Decisions above)
+- Document rationale for new decisions
+- Consider impact on mobile UX
+- Update relevant docs
+
+---
+
+## 🧪 TESTING APPROACH
+
+**Philosophy**: Write tests FIRST, then implement features
+
+**Coverage Goals**:
+- Core business logic: 100%
+- Database operations: 100%
+- API routes: 95%+
+- UI components: 80%+
+
+**See**: `docs/TESTING_GUIDE.md` for patterns
+
+---
+
+## 🎨 CURRENT FEATURES
+
+### ✅ Completed
+- User auth (email/password + reset flow)
+- Organization + team + player management
+- Live game tracking (6 event types)
+- Interactive ice surface (tap-to-log)
+- Post-game analytics dashboard
+- AI practice plan generation
+- Practice history & manual builder
+- Team selector with multi-team support
+- PWA with fullscreen mode
+- Mobile-first responsive design
+
+### 🚧 In Progress
+- Roster integration with game tracking
+- User settings & preferences
+
+### 📋 Deferred to Post-MVP
+- Offline support (IndexedDB + sync)
+- Stripe integration
+- Multi-tracker collaboration
+- Season-long trends
+- Comparative analytics
+
+---
+
+## 🐛 COMMON ISSUES
+
+**Quick Links**:
+- Age group confusion → `docs/TROUBLESHOOTING.md` (Age Group System)
+- 406 errors with multiple teams → `docs/TROUBLESHOOTING.md` (Multi-team Support)
+- AI drill matching → `docs/TROUBLESHOOTING.md` (AI & Practice Planning)
+- RLS policy violations → `docs/DATABASE_REFERENCE.md` (RLS Policies)
+
+**Full guide**: `docs/TROUBLESHOOTING.md`
+
+---
+
+## 📝 TODO: HIGH-PRIORITY
+
+### Before Next Session
+- [ ] None - ready to continue!
+
+### Before Launch
+- [ ] Design onboarding flow for new coaches
+- [ ] Beta test with 3-5 real teams (full season)
+- [ ] Performance testing (50+ events per game)
+- [ ] E2E tests for critical paths
+
+---
+
+## 🎯 WHAT TO WORK ON NEXT?
+
+**Current Focus**: Milestone 5 - Roster Integration
+
+**Goal**: Replace hardcoded demo players with real roster data from selected team
+
+**Tasks**:
+1. Update game tracking page to load players from roster
+2. Filter players by position for position-specific events
+3. Show player names in event lists (not just jersey numbers)
+4. Update analytics to use real player data
+5. Write ~30 integration tests
+
+**See**: `docs/PHASE_7_PROGRESS.md` for detailed plan
 
 ---
 
@@ -819,81 +240,19 @@ See: `app/demo/game-tracking/page.tsx` (lines 85-145), `components/game-tracking
 
 ---
 
-## 🎯 QUICK START FOR NEW SESSIONS
+## 💬 ASSISTANT INSTRUCTIONS
 
-**Claude, if you're reading this in a new session:**
+When the user asks what to work on:
+1. Check `docs/PHASE_7_PROGRESS.md` for current milestone
+2. Offer to continue with the next task in the plan
+3. Or ask what specific feature/issue they want to address
 
-1. This is a hockey practice planning app with live game tracking
-2. We're using TDD (tests first, always!)
-3. Key docs: `docs/HOCKEY_PRACTICE_APP_PLAN.md` + `docs/DEV_SETUP_AND_DATA_MODELS.md`
-4. **Current phase: Phase 7 (60% complete)** 🚧 - Team & Roster Management (Milestones 1-4 Complete!)
-5. Critical decisions:
-   - Age groups stored as integers, formatted by region
-   - Goal is a shot with result='goal' (not separate event type)
-   - Database persistence with optimistic updates
-   - AI explains WHY it chose drills (focus areas + game stats)
-   - Explicit game creation with metadata (opponent, location)
-   - Game selector in analytics for multi-game support
-6. MVP scope is locked - see "MVP SCOPE" section above
+When encountering an error:
+1. Check `docs/TROUBLESHOOTING.md` for known issues
+2. Check `docs/DATABASE_REFERENCE.md` for schema/RLS issues
+3. Check `docs/COMPONENTS_INVENTORY.md` for component locations
 
-**What's working now?**
-- ✅ Live game tracking with 6 event types
-  - **NEW**: Ice-click-first flow (tap ice → select event → select player)
-  - **NEW**: Single toggle button (ice ↔ events view)
-  - **NEW**: Period management with overtime support
-- ✅ Database persistence (save/load from Supabase)
-- ✅ Post-game analytics dashboard (shot charts, breakout analysis, trends)
-- ✅ Game management (create games, switch between games)
-- ✅ Drill library with 255 drills (search, filters, pagination)
-- ✅ **AI practice plan generation** (OpenAI GPT-4o)
-  - Analyzes game data (shots, breakouts, turnovers)
-  - Recommends drills by section (warm-up, skills, scrimmage, cool-down)
-  - Explains reasoning (focus areas, expected improvements)
-- ✅ **Practice management**
-  - Practice history with filtering and stats
-  - Manual practice builder with drag-and-drop drills
-- ✅ **Team & Organization Management** ✨ **NEW Nov 1** (Milestones 1-4)
-  - Auto-create organization for new users
-  - Team creation form (age groups, skill levels, seasons)
-  - Teams list page with cards
-  - USA vs Canada age group formatting
-  - **Player roster management** (Milestone 3):
-    - Add/edit/delete players with jersey number, name, position, birthdate
-    - Jersey number uniqueness per team (1-99)
-    - Mobile-first responsive design (swipeable cards, bottom sheet forms)
-    - Empty state with "Add Your First Player" CTA
-  - **Team selector & context** (Milestone 4 ✨ **JUST COMPLETED**):
-    - Global team state management with React Context
-    - localStorage persistence per user
-    - Navigation bar with team dropdown selector
-    - Navigation links: Teams, Track Game, Analytics, Practices
-    - Active link highlighting
-    - Touch-friendly UI (56px minimum height)
-- ✅ **PWA support** with fullscreen mode
-  - Add to home screen on iOS/Android
-  - Fullscreen button (Android/Desktop)
-  - Landscape-optimized orientation
-- ✅ 381/396 tests passing (96.2%) ⬆️ **+116 tests from Milestones 1-4**
-- ✅ 9 demo pages: ice surface, game tracking, analytics, drills, practice history, practice builder, teams, team creation, roster
-
-**Try it:**
-- `npm run dev` → http://localhost:3000
-- **Teams**: `/demo/teams` - Create teams with age groups and skill levels
-- **Roster**: `/demo/teams/[teamId]/roster` - Manage player rosters (add/edit/delete players) ✨ **NEW**
-- **Game Tracking**: `/demo/game-tracking` - Track live games with ice-click-first flow
-- **Analytics**: `/demo/analytics` - View shot charts, breakout analysis, and AI practice plans
-- **Practice Builder**: `/demo/practice-builder` - Build custom practices with drag-and-drop
-- **Practice History**: `/demo/practice-history` - Review past practices and AI-generated plans
-- **Drills**: `/demo/drills` - Browse 255 hockey drills with search and filters
-
-**Next steps** (Milestone 5 - Roster Integration):
-- Update game tracking page to use real player roster data
-- Replace hardcoded demo players with roster from selected team
-- Filter players by position for position-specific events
-- Show player names in event lists (not just jersey numbers)
-- Update analytics to use real player data
-- ~30 integration tests planned
-
-**For next session**: See `docs/PHASE_7_PROGRESS.md` for detailed Milestone 5 plan!
-
-**Ask the user**: "What would you like to work on next?"
+When adding documentation:
+1. Add to appropriate specialized doc (not this file!)
+2. Update the Documentation Index above with a link
+3. Keep this file under 400 lines
