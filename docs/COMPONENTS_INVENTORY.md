@@ -1,6 +1,6 @@
 # Components Inventory
 
-**Last Updated**: 2025-11-01
+**Last Updated**: 2025-11-03
 **Purpose**: Complete inventory of all application components with test coverage and status
 
 ---
@@ -26,12 +26,13 @@
 
 | Component | Purpose | Tests | Status |
 |-----------|---------|-------|--------|
-| `lib/analytics/game-analytics.ts` | Analytics calculation functions (shots, breakouts, periods) | 21 | ✅ DONE |
-| `components/analytics/shot-chart.tsx` | Shot location visualization on ice surface | - | ✅ DONE |
+| `lib/analytics/game-analytics.ts` | Analytics calculation functions (shots, breakouts, periods, player stats) | 21 | ✅ DONE |
+| `components/analytics/shot-chart.tsx` | Shot location visualization on ice surface with player names | - | ✅ DONE |
 | `components/analytics/shot-quality-chart.tsx` | Shot quality breakdown with bar charts | - | ✅ DONE |
 | `components/analytics/breakout-analysis.tsx` | Breakout performance with pie/bar charts | - | ✅ DONE |
 | `components/analytics/period-trends.tsx` | Period-by-period trends with line/bar charts | - | ✅ DONE |
-| `app/demo/analytics/page.tsx` | Analytics dashboard with filters & game selector | - | ✅ DONE |
+| `components/analytics/player-stats-table.tsx` | Sortable player statistics (shots, goals, turnovers, etc.) | - | ✅ DONE + 📱 MOBILE |
+| `app/demo/analytics/page.tsx` | Analytics dashboard with filters, game selector, & team switching | - | ✅ DONE |
 
 ---
 
@@ -89,7 +90,7 @@
 | `components/teams/team-selector.tsx` | TeamSelector dropdown with touch-friendly UI | 17 | ✅ DONE (2 skipped) |
 | `app/demo/layout.tsx` | Demo layout with navigation bar and team selector | - | ✅ DONE |
 
-**Team Management Features** (Milestones 1-4 Complete):
+**Team Management Features** (Milestones 1-5 Complete):
 - Auto-create organization for new users (slug generation with conflict resolution)
 - Team creation form with age group selector (USA vs Canada format switching)
 - Skill level selection (House, Travel, A, AA, AAA)
@@ -114,14 +115,21 @@
   - Navigation links: Teams, Track Game, Analytics, Practices
   - Active link highlighting
   - Multi-team support with proper context switching
+- **Roster integration** (Milestone 5):
+  - Game tracking loads real roster data (not demo players)
+  - Empty roster prevention with helpful error messages
+  - Player display format standardized to "F. Last (#10)"
+  - Player statistics table in analytics dashboard
+  - Shot chart shows player names on hover
+  - Team switching properly reloads roster and game data
 - Mobile-first responsive design throughout
-- **116 tests passing (107 passing, 9 skipped)**
+- **129 tests passing (120 passing, 9 skipped)**
 
 ---
 
 ## Test Coverage Summary
 
-**Current Test Count: 381 tests passing (15 skipped) = 396 total**
+**Current Test Count: 384 tests passing (25 skipped) = 409 total**
 
 ### Unit Tests: 285 tests (2 skipped)
 - Practice history: 19 tests
@@ -142,13 +150,14 @@
 ### Component Tests: 17 tests (2 skipped)
 - Team selector: 17 tests (2 skipped)
 
-### Integration Tests: 81 tests (5 skipped)
+### Integration Tests: 94 tests (5 skipped)
 - Game events: 23 tests (2 skipped due to JWT limitation)
 - Game event persistence: 11 tests
 - Practice planning: 21 tests
 - Organization CRUD: 7 tests (3 skipped due to auth user requirement)
 - Team CRUD: 16 tests
 - Player CRUD: 17 tests
+- Roster integration: 13 tests
 
 ### E2E Tests: 0 tests
 - Game tracking: TODO

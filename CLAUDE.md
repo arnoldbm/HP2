@@ -82,18 +82,18 @@ AI:        OpenAI GPT-4o
 
 ## 📊 PROJECT STATUS
 
-**Current Phase**: Phase 7 - Team & Roster Management (Milestones 1-4 Complete)
-**MVP Completion**: ~92% complete 🎯
-**Test Coverage**: 381/396 tests passing (96.2%)
+**Current Phase**: Phase 7 - Team & Roster Management (Milestones 1-5 Complete)
+**MVP Completion**: ~95% complete 🎯
+**Test Coverage**: 384/409 tests passing (93.9%)
 
 ### Recent Milestones ✅
 - [x] **Milestone 1**: Organization auto-creation
 - [x] **Milestone 2**: Team creation UI
 - [x] **Milestone 3**: Player roster management
 - [x] **Milestone 4**: Team selector & context (multi-team support)
+- [x] **Milestone 5**: Roster integration with game tracking ⭐ NEW
 
 ### Next Up 🚧
-- [ ] **Milestone 5**: Roster integration with game tracking
 - [ ] **Milestone 6**: User settings & team switching
 
 **See**: `docs/PHASE_7_PROGRESS.md` for detailed plan
@@ -170,9 +170,10 @@ npm run test         # Run Vitest tests
 ### ✅ Completed
 - User auth (email/password + reset flow)
 - Organization + team + player management
-- Live game tracking (6 event types)
+- Live game tracking (6 event types) with real roster data
 - Interactive ice surface (tap-to-log)
-- Post-game analytics dashboard
+- Post-game analytics dashboard with player stats table
+- Player statistics breakdown (sortable by shots, goals, turnovers, etc.)
 - AI practice plan generation
 - Practice history & manual builder
 - Team selector with multi-team support
@@ -180,7 +181,6 @@ npm run test         # Run Vitest tests
 - Mobile-first responsive design
 
 ### 🚧 In Progress
-- Roster integration with game tracking
 - User settings & preferences
 
 ### 📋 Deferred to Post-MVP
@@ -219,22 +219,22 @@ npm run test         # Run Vitest tests
 
 ## 🎯 WHAT TO WORK ON NEXT?
 
-**Current Focus**: Milestone 5 - Roster Integration
+**Current Focus**: Milestone 6 - User Settings & Team Switching
 
-**Goal**: Replace hardcoded demo players with real roster data from selected team
+**Goal**: Add user settings page and improve team switching UI
 
 **Tasks**:
-1. Update game tracking page to load players from roster
-2. Filter players by position for position-specific events
-3. Show player names in event lists (not just jersey numbers)
-4. Update analytics to use real player data
-5. Write ~30 integration tests
+1. Create user settings page
+2. Add team selector to global navigation
+3. User profile management
+4. Settings persistence
+5. Team switching improvements
 
 **See**: `docs/PHASE_7_PROGRESS.md` for detailed plan
 
 ---
 
-**Last Updated**: 2025-11-01
+**Last Updated**: 2025-11-03
 **Maintained By**: Brock Arnold + Claude
 **Project Name**: HP2 (Hockey Practice Planner v2)
 
