@@ -10,11 +10,13 @@ import {
   analyzeBreakouts,
   getPeriodStats,
   getShootingPercentageBySituation,
+  calculatePlayerStats,
 } from '@/lib/analytics/game-analytics'
 import { ShotChart } from '@/components/analytics/shot-chart'
 import { ShotQualityChart } from '@/components/analytics/shot-quality-chart'
 import { BreakoutAnalysis } from '@/components/analytics/breakout-analysis'
 import { PeriodTrends } from '@/components/analytics/period-trends'
+import { PlayerStatsTable } from '@/components/analytics/player-stats-table'
 import type { GameEvent } from '@/lib/stores/game-tracking-store'
 
 // Types for AI-generated practice plan
@@ -51,7 +53,7 @@ interface Game {
 }
 
 export default function AnalyticsDemoPage() {
-  const { events, gameState, loadEvents, setGameState } = useGameTrackingStore()
+  const { events, players, gameState, loadEvents, setGameState } = useGameTrackingStore()
   const { selectedTeamId, selectTeam } = useTeam()
   const [selectedPeriod, setSelectedPeriod] = useState<number | 'all'>('all')
   const [selectedSituation, setSelectedSituation] = useState<string | 'all'>('all')
@@ -70,15 +72,18 @@ export default function AnalyticsDemoPage() {
   const [saveError, setSaveError] = useState<string | null>(null)
   const [saveSuccess, setSaveSuccess] = useState(false)
 
-  // Load available games on mount
+  // Load available games on mount and when team changes
   useEffect(() => {
     async function loadAvailableGames() {
       try {
+        setLoading(true) // Reset loading state when team changes
+
         const {
           data: { user },
         } = await supabase.auth.getUser()
         if (!user) {
           console.log('❌ No user authenticated')
+          setLoading(false)
           return
         }
 
@@ -106,6 +111,29 @@ export default function AnalyticsDemoPage() {
           selectTeam(teamId)
         }
 
+        // Load players from roster for this team
+        const { data: dbPlayers } = await supabase
+          .from('players')
+          .select('id, jersey_number, first_name, last_name, position')
+          .eq('team_id', teamId)
+          .order('jersey_number')
+
+        if (dbPlayers && dbPlayers.length > 0) {
+          const mappedPlayers = dbPlayers.map((p) => ({
+            id: p.id,
+            jerseyNumber: p.jersey_number,
+            firstName: p.first_name,
+            lastName: p.last_name,
+            position: p.position as any,
+          }))
+          useGameTrackingStore.getState().setPlayers(mappedPlayers)
+          console.log('✅ Loaded', mappedPlayers.length, 'players from roster for team', teamId)
+        } else {
+          // Clear players if team has no roster
+          useGameTrackingStore.getState().setPlayers([])
+          console.log('⚠️ No players found for team', teamId)
+        }
+
         // Get all games for this team
         const { data: games } = await supabase
           .from('games')
@@ -114,24 +142,22 @@ export default function AnalyticsDemoPage() {
           .order('game_date', { ascending: false })
 
         if (games && games.length > 0) {
-          console.log('✅ Found', games.length, 'games')
+          console.log('✅ Found', games.length, 'games for team', teamId)
           setAvailableGames(games)
 
-          // If no game selected yet, select the most recent
-          let gameIdToLoad = gameState.gameId || games[0].id
+          // Always select the most recent game for the newly selected team
+          const gameIdToLoad = games[0].id
           setSelectedGameId(gameIdToLoad)
-
-          // Update store with gameId if not set
-          if (!gameState.gameId) {
-            setGameState({ gameId: gameIdToLoad })
-          }
+          setGameState({ gameId: gameIdToLoad })
 
           // Load events for the selected game
           console.log('📊 Loading events for game:', gameIdToLoad)
           await loadEvents(gameIdToLoad)
-          console.log('✅ Loaded', events.length, 'events')
+          console.log('✅ Loaded events for game')
         } else {
-          console.log('❌ No games found. Please create a game first.')
+          console.log('❌ No games found for team', teamId)
+          setAvailableGames([])
+          setSelectedGameId(null)
         }
       } catch (error) {
         console.error('❌ Error loading games:', error)
@@ -171,6 +197,7 @@ export default function AnalyticsDemoPage() {
   const breakoutAnalytics = analyzeBreakouts(filteredEvents)
   const periodStats = getPeriodStats(filteredEvents, 3)
   const situationStats = getShootingPercentageBySituation(filteredEvents)
+  const playerStats = calculatePlayerStats(filteredEvents, players)
 
   // Count turnovers
   const turnoverCount = filteredEvents.filter((e) => e.eventType === 'turnover').length
@@ -562,7 +589,7 @@ export default function AnalyticsDemoPage() {
 
             {/* Shot Chart */}
             <div>
-              <ShotChart shots={shotData} width={800} height={400} />
+              <ShotChart shots={shotData} players={players} width={800} height={400} />
             </div>
 
             {/* Shot Quality Breakdown */}
@@ -585,6 +612,13 @@ export default function AnalyticsDemoPage() {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-900">Period-by-Period Trends</h2>
             <PeriodTrends periodStats={periodStats} />
+          </div>
+        )}
+
+        {/* Player Statistics Section */}
+        {playerStats.length > 0 && (
+          <div className="space-y-6">
+            <PlayerStatsTable stats={playerStats} />
           </div>
         )}
 

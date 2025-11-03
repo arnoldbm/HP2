@@ -13,7 +13,7 @@ export function RecentEventsList() {
   const getPlayerName = (playerId: string | undefined) => {
     if (!playerId) return 'Unknown'
     const player = players.find((p) => p.id === playerId)
-    return player ? `#${player.jerseyNumber} ${player.lastName}` : 'Unknown'
+    return player ? `${player.firstName[0]}. ${player.lastName} (#${player.jerseyNumber})` : 'Unknown'
   }
 
   const getEventColor = (type: string) => {

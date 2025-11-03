@@ -1,4 +1,22 @@
-import type { GameEvent, ShotResult } from '@/lib/stores/game-tracking-store'
+import type { GameEvent, ShotResult, Player } from '@/lib/stores/game-tracking-store'
+
+export interface PlayerStats {
+  playerId: string
+  playerName: string
+  jerseyNumber: number
+  position: string
+  shots: number
+  goals: number
+  shootingPct: number
+  turnovers: number
+  breakouts: number
+  breakoutSuccessPct: number
+  zoneEntries: number
+  faceoffs: number
+  faceoffWins: number
+  faceoffWinPct: number
+  totalEvents: number
+}
 
 export interface ShotData {
   x: number
@@ -7,6 +25,7 @@ export interface ShotData {
   shotQuality?: 'high' | 'medium' | 'low'
   period: number
   situation: string
+  playerId?: string
 }
 
 export interface ShotQualityStats {
@@ -53,6 +72,7 @@ export function extractShotData(events: GameEvent[]): ShotData[] {
       shotQuality: event.details.shot_quality as 'high' | 'medium' | 'low' | undefined,
       period: event.period,
       situation: event.situation,
+      playerId: event.playerId,
     }))
 }
 
@@ -208,4 +228,54 @@ export function getShootingPercentageBySituation(events: GameEvent[]) {
       percentage: shots.length > 0 ? (goals / shots.length) * 100 : 0,
     }
   })
+}
+
+/**
+ * Calculate per-player statistics from game events
+ */
+export function calculatePlayerStats(events: GameEvent[], players: Player[]): PlayerStats[] {
+  return players.map((player) => {
+    // Filter events for this player
+    const playerEvents = events.filter((e) => e.playerId === player.id)
+
+    // Shots and goals
+    const shots = playerEvents.filter((e) => e.eventType === 'shot')
+    const goals = shots.filter((s) => s.details.result === 'goal')
+    const shootingPct = shots.length > 0 ? (goals.length / shots.length) * 100 : 0
+
+    // Turnovers
+    const turnovers = playerEvents.filter((e) => e.eventType === 'turnover')
+
+    // Breakouts
+    const breakouts = playerEvents.filter((e) => e.eventType === 'breakout')
+    const successfulBreakouts = breakouts.filter((b) => b.details.success === true)
+    const breakoutSuccessPct = breakouts.length > 0 ? (successfulBreakouts.length / breakouts.length) * 100 : 0
+
+    // Zone entries
+    const zoneEntries = playerEvents.filter((e) => e.eventType === 'zone_entry')
+
+    // Faceoffs
+    const faceoffs = playerEvents.filter((e) => e.eventType === 'faceoff')
+    const faceoffWins = faceoffs.filter((f) => f.details.won === true)
+    const faceoffWinPct = faceoffs.length > 0 ? (faceoffWins.length / faceoffs.length) * 100 : 0
+
+    return {
+      playerId: player.id,
+      playerName: `${player.firstName[0]}. ${player.lastName}`,
+      jerseyNumber: player.jerseyNumber,
+      position: player.position,
+      shots: shots.length,
+      goals: goals.length,
+      shootingPct,
+      turnovers: turnovers.length,
+      breakouts: breakouts.length,
+      breakoutSuccessPct,
+      zoneEntries: zoneEntries.length,
+      faceoffs: faceoffs.length,
+      faceoffWins: faceoffWins.length,
+      faceoffWinPct,
+      totalEvents: playerEvents.length,
+    }
+  }).filter(stats => stats.totalEvents > 0) // Only show players with events
+   .sort((a, b) => b.totalEvents - a.totalEvents) // Sort by most active players
 }

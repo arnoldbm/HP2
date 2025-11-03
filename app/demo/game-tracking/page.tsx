@@ -6,9 +6,9 @@ import { EventLogger } from '@/components/game-tracking/event-logger'
 import { RecentEventsList } from '@/components/game-tracking/recent-events-list'
 import { QuickEventButtons } from '@/components/game-tracking/quick-event-buttons'
 import { AuthModal } from '@/components/auth/auth-modal'
-import { setupDemoGameData } from '@/app/actions/demo-setup'
 import { supabase } from '@/lib/db/supabase'
 import { useTeam } from '@/lib/contexts/team-context'
+import type { Player } from '@/lib/stores/game-tracking-store'
 
 interface GameInfo {
   opponent_name: string
@@ -158,9 +158,6 @@ export default function GameTrackingDemoPage() {
           throw new Error('User not found')
         }
 
-        // Set up demo data (creates org, team, players if they don't exist)
-        const { players } = await setupDemoGameData(user.id)
-
         // Determine which team to use
         let teamId: string
 
@@ -181,13 +178,39 @@ export default function GameTrackingDemoPage() {
           }
 
           if (!teamMembers || teamMembers.length === 0) {
-            throw new Error('No team found for user')
+            throw new Error('No team found for user. Please create a team first.')
           }
 
           teamId = teamMembers[0].team_id
           // Auto-select this team in context
           selectTeam(teamId)
         }
+
+        // Load players from roster for this team
+        const { data: dbPlayers, error: playersError } = await supabase
+          .from('players')
+          .select('id, jersey_number, first_name, last_name, position')
+          .eq('team_id', teamId)
+          .order('jersey_number')
+
+        if (playersError) {
+          console.error('Error loading roster:', playersError)
+          throw new Error(`Failed to load roster: ${playersError.message}`)
+        }
+
+        // Check if roster is empty
+        if (!dbPlayers || dbPlayers.length === 0) {
+          throw new Error('no_players')
+        }
+
+        // Map database players to store format
+        const players: Player[] = dbPlayers.map((p) => ({
+          id: p.id,
+          jerseyNumber: p.jersey_number,
+          firstName: p.first_name,
+          lastName: p.last_name,
+          position: p.position as any,
+        }))
 
         let gameId: string | null = null
 
@@ -278,8 +301,14 @@ export default function GameTrackingDemoPage() {
 
         setLoading(false)
       } catch (err) {
-        console.error('Failed to initialize demo:', err)
-        setError('Failed to load demo. Please refresh the page.')
+        console.error('Failed to initialize game tracking:', err)
+
+        // Handle empty roster error specially
+        if (err instanceof Error && err.message === 'no_players') {
+          setError('empty_roster')
+        } else {
+          setError(err instanceof Error ? err.message : 'Failed to load game tracking. Please refresh the page.')
+        }
         setLoading(false)
       }
     }
@@ -356,6 +385,38 @@ export default function GameTrackingDemoPage() {
   }
 
   if (error) {
+    // Special handling for empty roster
+    if (error === 'empty_roster') {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 max-w-md">
+            <h2 className="text-yellow-900 font-bold text-lg mb-2">⚠️ No Players in Roster</h2>
+            <p className="text-yellow-700 mb-4">
+              You need to add players to your roster before you can track a game.
+            </p>
+            <p className="text-yellow-700 mb-4">
+              Game tracking requires players to log events like shots, goals, and turnovers.
+            </p>
+            <div className="flex gap-3">
+              <a
+                href={selectedTeamId ? `/demo/teams/${selectedTeamId}/roster` : '/demo/teams'}
+                className="px-4 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700 transition-colors"
+              >
+                {selectedTeamId ? 'Add Players to Roster' : 'Go to Teams'}
+              </a>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
+    // Regular error display
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
@@ -455,21 +516,30 @@ export default function GameTrackingDemoPage() {
         return
       }
 
-      const { data: teamMember } = await supabase
-        .from('team_members')
-        .select('team_id')
-        .eq('user_id', user.id)
-        .single()
+      // Use the selected team from context
+      let teamId = selectedTeamId
 
-      if (!teamMember) {
-        alert('No team found for user')
-        return
+      // If no team selected, get user's first team
+      if (!teamId) {
+        const { data: teamMembers } = await supabase
+          .from('team_members')
+          .select('team_id')
+          .eq('user_id', user.id)
+          .limit(1)
+
+        if (!teamMembers || teamMembers.length === 0) {
+          alert('No team found. Please create a team first.')
+          return
+        }
+
+        teamId = teamMembers[0].team_id
+        selectTeam(teamId) // Auto-select this team
       }
 
       const { data: newGame, error } = await supabase
         .from('games')
         .insert({
-          team_id: teamMember.team_id,
+          team_id: teamId,
           opponent_name: newGameOpponent.trim(),
           game_date: new Date().toISOString(),
           location: newGameLocation.trim() !== '' ? newGameLocation.trim() : null,
@@ -482,7 +552,7 @@ export default function GameTrackingDemoPage() {
 
       console.log('✅ New game created:', newGame.id, 'vs', newGameOpponent)
 
-      const storageKey = `current_game_${user.id}`
+      const storageKey = `current_game_${teamId}`
       localStorage.setItem(storageKey, newGame.id)
 
       setGameState({

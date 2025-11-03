@@ -3,9 +3,11 @@
 import React from 'react'
 import { IceSurface } from '@/components/game-tracking/ice-surface'
 import type { ShotData } from '@/lib/analytics/game-analytics'
+import type { Player } from '@/lib/stores/game-tracking-store'
 
 export interface ShotChartProps {
   shots: ShotData[]
+  players?: Player[]
   width?: number
   height?: number
   showZones?: boolean
@@ -30,11 +32,19 @@ const QUALITY_SIZES = {
 
 export function ShotChart({
   shots,
+  players = [],
   width = 600,
   height = 300,
   showZones = true,
   showSlot = true,
 }: ShotChartProps) {
+  // Helper to get player name
+  const getPlayerName = (playerId: string | undefined) => {
+    if (!playerId) return 'Unknown'
+    const player = players.find((p) => p.id === playerId)
+    return player ? `${player.firstName[0]}. ${player.lastName}` : 'Unknown'
+  }
+
   // Group shots by result for legend
   const shotsByResult = shots.reduce((acc, shot) => {
     const result = shot.result || 'miss_high'
@@ -81,6 +91,7 @@ export function ShotChart({
                 className="transition-all hover:fill-opacity-100 cursor-pointer"
               >
                 <title>
+                  {shot.playerId && `${getPlayerName(shot.playerId)} - `}
                   {shot.result.replace('_', ' ')} - Period {shot.period}
                   {shot.shotQuality && ` - ${shot.shotQuality} danger`}
                 </title>

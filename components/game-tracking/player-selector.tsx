@@ -82,9 +82,9 @@ export function PlayerSelector({
               {player.jerseyNumber}
             </span>
 
-            {/* Player Name */}
+            {/* Player Name - Format: F. Last */}
             <span className="text-xs md:text-sm text-gray-600 mt-1 text-center truncate w-full px-1">
-              {player.lastName}
+              {player.firstName[0]}. {player.lastName}
             </span>
 
             {/* Position Badge */}
