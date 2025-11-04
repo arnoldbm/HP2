@@ -133,6 +133,16 @@ function DemoLayoutContent({ children }: { children: React.ReactNode }) {
                   </button>
                 </>
               )}
+              <button
+                onClick={() => router.push('/demo/settings')}
+                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  pathname === '/demo/settings'
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Settings
+              </button>
             </div>
           </div>
         </div>

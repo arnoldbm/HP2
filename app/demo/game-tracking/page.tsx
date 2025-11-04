@@ -303,6 +303,13 @@ export default function GameTrackingDemoPage() {
       } catch (err) {
         console.error('Failed to initialize game tracking:', err)
 
+        // Handle no team error - redirect to teams page for onboarding
+        if (err instanceof Error && err.message.includes('No team found')) {
+          // Redirect new users to create their first team
+          window.location.href = '/demo/teams'
+          return
+        }
+
         // Handle empty roster error specially
         if (err instanceof Error && err.message === 'no_players') {
           setError('empty_roster')
