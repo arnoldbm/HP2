@@ -14,15 +14,20 @@ export async function getUserProfile(userId?: string): Promise<{ data: UserProfi
       return { data: null, error: 'User ID required' }
     }
 
-    // Get user profile
+    // Get user profile (use maybeSingle to handle missing profiles gracefully)
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('*')
       .eq('id', userId)
-      .single()
+      .maybeSingle()
 
     if (profileError) {
       return { data: null, error: profileError.message }
+    }
+
+    // If profile doesn't exist, return null without error
+    if (!profile) {
+      return { data: null, error: 'Profile not found' }
     }
 
     return { data: profile, error: null }

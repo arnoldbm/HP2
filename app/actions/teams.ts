@@ -4,6 +4,49 @@ import { supabaseAdmin } from '@/lib/db/supabase-admin'
 import { teamCreateSchema, teamUpdateSchema, type TeamCreateInput } from '@/lib/validation/team-schemas'
 
 /**
+ * Get Team Statistics
+ * Returns player count and game count for a team
+ */
+export async function getTeamStats(teamId: string): Promise<{
+  playerCount: number
+  gameCount: number
+  error: string | null
+}> {
+  try {
+    // Get player count
+    const { count: playerCount, error: playersError } = await supabaseAdmin
+      .from('players')
+      .select('*', { count: 'exact', head: true })
+      .eq('team_id', teamId)
+
+    if (playersError) {
+      console.error('Error counting players:', playersError)
+      return { playerCount: 0, gameCount: 0, error: playersError.message }
+    }
+
+    // Get game count
+    const { count: gameCount, error: gamesError } = await supabaseAdmin
+      .from('games')
+      .select('*', { count: 'exact', head: true })
+      .eq('team_id', teamId)
+
+    if (gamesError) {
+      console.error('Error counting games:', gamesError)
+      return { playerCount: playerCount || 0, gameCount: 0, error: gamesError.message }
+    }
+
+    return {
+      playerCount: playerCount || 0,
+      gameCount: gameCount || 0,
+      error: null,
+    }
+  } catch (error) {
+    console.error('Error getting team stats:', error)
+    return { playerCount: 0, gameCount: 0, error: 'Failed to get team stats' }
+  }
+}
+
+/**
  * Create Team
  *
  * Create a new team and add the user as head coach

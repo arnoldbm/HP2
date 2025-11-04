@@ -31,7 +31,7 @@ export default function SettingsPage() {
         let { data: profileData, error: profileError } = await getUserProfile(user.id)
 
         // If profile doesn't exist, create it (fallback for existing users)
-        if (profileError && (profileError.includes('0 rows') || profileError.includes('single JSON object'))) {
+        if (profileError && !profileData) {
           // Create profile
           const { error: insertError } = await supabase
             .from('user_profiles')

@@ -3,11 +3,25 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/db/supabase'
-import { getUserTeams } from '@/app/actions/teams'
+import { getUserTeams, getTeamStats } from '@/app/actions/teams'
+import { useTeam } from '@/lib/contexts/team-context'
+
+interface TeamWithStats {
+  id: string
+  name: string
+  age_group_display: string
+  level: string
+  season: string
+  region: string
+  role: string
+  playerCount?: number
+  gameCount?: number
+}
 
 export default function TeamsPage() {
   const router = useRouter()
-  const [teams, setTeams] = useState<any[]>([])
+  const { selectTeam } = useTeam()
+  const [teams, setTeams] = useState<TeamWithStats[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -31,7 +45,18 @@ export default function TeamsPage() {
         const result = await getUserTeams(user.id)
 
         if (result.success && result.teams) {
-          setTeams(result.teams)
+          // Load stats for each team
+          const teamsWithStats = await Promise.all(
+            result.teams.map(async (team) => {
+              const stats = await getTeamStats(team.id)
+              return {
+                ...team,
+                playerCount: stats.playerCount,
+                gameCount: stats.gameCount,
+              }
+            })
+          )
+          setTeams(teamsWithStats)
         } else {
           // Empty teams list is OK, don't show error
           if (result.teams && result.teams.length === 0) {
@@ -154,15 +179,54 @@ export default function TeamsPage() {
                   </div>
                 </div>
 
-                <div className="mt-4 pt-4 border-t border-gray-200">
+                {/* Team Stats */}
+                <div className="mt-4 flex gap-3">
+                  <div className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span className="font-medium">{team.playerCount || 0}</span>
+                    <span className="ml-1">players</span>
+                  </div>
+                  <div className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span className="font-medium">{team.gameCount || 0}</span>
+                    <span className="ml-1">games</span>
+                  </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="mt-4 pt-4 border-t border-gray-200 flex gap-2">
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
                       router.push(`/demo/teams/${team.id}/roster`)
                     }}
-                    className="text-blue-600 hover:text-blue-800 font-medium text-sm"
+                    className="flex-1 text-center text-blue-600 hover:bg-blue-50 py-2 rounded-md font-medium text-sm transition-colors"
                   >
-                    View Roster →
+                    👥 Roster
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      selectTeam(team.id)
+                      router.push('/demo/game-tracking')
+                    }}
+                    className="flex-1 text-center text-green-600 hover:bg-green-50 py-2 rounded-md font-medium text-sm transition-colors"
+                  >
+                    🏒 Track Game
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      router.push(`/demo/teams/${team.id}/settings`)
+                    }}
+                    className="text-gray-600 hover:bg-gray-50 px-3 py-2 rounded-md transition-colors"
+                    title="Team Settings"
+                  >
+                    ⚙️
                   </button>
                 </div>
               </div>
