@@ -379,3 +379,268 @@ export async function deleteTeam(teamId: string): Promise<{
     }
   }
 }
+
+/**
+ * Get Team Members
+ *
+ * Fetch all members of a team with their user profile info
+ */
+export async function getTeamMembers(teamId: string): Promise<{
+  success: boolean
+  members?: Array<{
+    id: string
+    user_id: string
+    role: string
+    created_at: string
+    email: string
+    full_name: string | null
+  }>
+  error?: string
+}> {
+  try {
+    const { data: members, error } = await supabaseAdmin
+      .from('team_members')
+      .select(`
+        id,
+        user_id,
+        role,
+        created_at,
+        user_profiles:user_id (
+          email,
+          full_name
+        )
+      `)
+      .eq('team_id', teamId)
+      .order('created_at', { ascending: true })
+
+    if (error) {
+      console.error('Failed to fetch team members:', error)
+      return {
+        success: false,
+        error: 'Failed to fetch team members',
+      }
+    }
+
+    // Transform the data to flatten user_profiles
+    const formattedMembers = members?.map((member: any) => ({
+      id: member.id,
+      user_id: member.user_id,
+      role: member.role,
+      created_at: member.created_at,
+      email: member.user_profiles?.email || '',
+      full_name: member.user_profiles?.full_name || null,
+    })) || []
+
+    return {
+      success: true,
+      members: formattedMembers,
+    }
+  } catch (error) {
+    console.error('Unexpected error in getTeamMembers:', error)
+    return {
+      success: false,
+      error: 'An unexpected error occurred',
+    }
+  }
+}
+
+/**
+ * Add Team Member
+ *
+ * Add a user to a team by email
+ */
+export async function addTeamMember(
+  teamId: string,
+  email: string,
+  role: 'head_coach' | 'assistant_coach' | 'manager' | 'stat_tracker'
+): Promise<{
+  success: boolean
+  member?: any
+  error?: string
+}> {
+  try {
+    // 1. Find user by email
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('id, email')
+      .eq('email', email)
+      .maybeSingle()
+
+    if (profileError) {
+      console.error('Error finding user:', profileError)
+      return {
+        success: false,
+        error: 'Error finding user',
+      }
+    }
+
+    if (!profile) {
+      return {
+        success: false,
+        error: 'No user found with this email address',
+      }
+    }
+
+    // 2. Check if already a member
+    const { data: existingMember } = await supabaseAdmin
+      .from('team_members')
+      .select('id')
+      .eq('team_id', teamId)
+      .eq('user_id', profile.id)
+      .maybeSingle()
+
+    if (existingMember) {
+      return {
+        success: false,
+        error: 'User is already a member of this team',
+      }
+    }
+
+    // 3. Add as team member
+    const { data: member, error: memberError } = await supabaseAdmin
+      .from('team_members')
+      .insert({
+        team_id: teamId,
+        user_id: profile.id,
+        role: role,
+      })
+      .select()
+      .single()
+
+    if (memberError) {
+      console.error('Failed to add team member:', memberError)
+      return {
+        success: false,
+        error: 'Failed to add team member',
+      }
+    }
+
+    return {
+      success: true,
+      member,
+    }
+  } catch (error) {
+    console.error('Unexpected error in addTeamMember:', error)
+    return {
+      success: false,
+      error: 'An unexpected error occurred',
+    }
+  }
+}
+
+/**
+ * Remove Team Member
+ *
+ * Remove a user from a team
+ */
+export async function removeTeamMember(
+  teamId: string,
+  userId: string
+): Promise<{
+  success: boolean
+  error?: string
+}> {
+  try {
+    // Check if this is the last head_coach
+    const { data: headCoaches } = await supabaseAdmin
+      .from('team_members')
+      .select('id, user_id')
+      .eq('team_id', teamId)
+      .eq('role', 'head_coach')
+
+    if (headCoaches && headCoaches.length === 1 && headCoaches[0].user_id === userId) {
+      return {
+        success: false,
+        error: 'Cannot remove the last head coach. Assign another head coach first.',
+      }
+    }
+
+    const { error } = await supabaseAdmin
+      .from('team_members')
+      .delete()
+      .eq('team_id', teamId)
+      .eq('user_id', userId)
+
+    if (error) {
+      console.error('Failed to remove team member:', error)
+      return {
+        success: false,
+        error: 'Failed to remove team member',
+      }
+    }
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    console.error('Unexpected error in removeTeamMember:', error)
+    return {
+      success: false,
+      error: 'An unexpected error occurred',
+    }
+  }
+}
+
+/**
+ * Update Team Member Role
+ *
+ * Change a team member's role
+ */
+export async function updateTeamMemberRole(
+  teamId: string,
+  userId: string,
+  newRole: 'head_coach' | 'assistant_coach' | 'manager' | 'stat_tracker'
+): Promise<{
+  success: boolean
+  error?: string
+}> {
+  try {
+    // If changing FROM head_coach, check if there's another head_coach
+    const { data: currentMember } = await supabaseAdmin
+      .from('team_members')
+      .select('role')
+      .eq('team_id', teamId)
+      .eq('user_id', userId)
+      .single()
+
+    if (currentMember?.role === 'head_coach' && newRole !== 'head_coach') {
+      // Check if there are other head coaches
+      const { data: headCoaches } = await supabaseAdmin
+        .from('team_members')
+        .select('id')
+        .eq('team_id', teamId)
+        .eq('role', 'head_coach')
+
+      if (headCoaches && headCoaches.length === 1) {
+        return {
+          success: false,
+          error: 'Cannot change role. Team must have at least one head coach.',
+        }
+      }
+    }
+
+    const { error } = await supabaseAdmin
+      .from('team_members')
+      .update({ role: newRole })
+      .eq('team_id', teamId)
+      .eq('user_id', userId)
+
+    if (error) {
+      console.error('Failed to update team member role:', error)
+      return {
+        success: false,
+        error: 'Failed to update role',
+      }
+    }
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    console.error('Unexpected error in updateTeamMemberRole:', error)
+    return {
+      success: false,
+      error: 'An unexpected error occurred',
+    }
+  }
+}
