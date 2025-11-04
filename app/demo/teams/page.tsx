@@ -115,30 +115,113 @@ export default function TeamsPage() {
 
         {/* Teams Grid */}
         {teams.length === 0 ? (
-          <div className="bg-white rounded-lg shadow p-12 text-center">
-            <svg
-              className="mx-auto h-12 w-12 text-gray-400 mb-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No teams yet</h3>
-            <p className="text-gray-500 mb-6">
-              Get started by creating your first team
-            </p>
-            <button
-              onClick={() => router.push('/demo/teams/new')}
-              className="bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors inline-block"
-            >
-              Create Your First Team
-            </button>
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            {/* Hero Section */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-8 text-center text-white">
+              <svg
+                className="mx-auto h-16 w-16 mb-4 opacity-90"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+                />
+              </svg>
+              <h3 className="text-2xl font-bold mb-2">Welcome to Team Management!</h3>
+              <p className="text-blue-100 max-w-2xl mx-auto">
+                Teams are the foundation of your coaching experience. Create a team to start tracking games, managing rosters, and generating AI-powered practice plans.
+              </p>
+            </div>
+
+            {/* Onboarding Steps */}
+            <div className="p-8">
+              <h4 className="text-lg font-semibold text-gray-900 mb-6 text-center">
+                Getting Started is Easy
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                {/* Step 1 */}
+                <div className="text-center">
+                  <div className="bg-blue-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-blue-600 font-bold text-lg">1</span>
+                  </div>
+                  <h5 className="font-semibold text-gray-900 mb-2">Create Your Team</h5>
+                  <p className="text-sm text-gray-600">
+                    Set up your team with name, age group, level, and region
+                  </p>
+                </div>
+
+                {/* Step 2 */}
+                <div className="text-center">
+                  <div className="bg-green-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-green-600 font-bold text-lg">2</span>
+                  </div>
+                  <h5 className="font-semibold text-gray-900 mb-2">Add Your Roster</h5>
+                  <p className="text-sm text-gray-600">
+                    Add players with positions and jersey numbers
+                  </p>
+                </div>
+
+                {/* Step 3 */}
+                <div className="text-center">
+                  <div className="bg-purple-100 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <span className="text-purple-600 font-bold text-lg">3</span>
+                  </div>
+                  <h5 className="font-semibold text-gray-900 mb-2">Start Tracking</h5>
+                  <p className="text-sm text-gray-600">
+                    Track games and get AI-powered practice plans
+                  </p>
+                </div>
+              </div>
+
+              {/* Features */}
+              <div className="bg-gray-50 rounded-lg p-6 mb-6">
+                <h5 className="font-semibold text-gray-900 mb-4">What you can do with teams:</h5>
+                <ul className="space-y-2 text-sm text-gray-600">
+                  <li className="flex items-start">
+                    <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span><strong>Track live games</strong> with detailed event logging</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span><strong>Manage player rosters</strong> with positions and numbers</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span><strong>Generate AI practice plans</strong> based on game performance</span>
+                  </li>
+                  <li className="flex items-start">
+                    <svg className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span><strong>View analytics</strong> and track team progress over time</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* CTA */}
+              <div className="text-center">
+                <button
+                  onClick={() => router.push('/demo/teams/new')}
+                  className="bg-blue-600 text-white px-8 py-4 rounded-md font-medium hover:bg-blue-700 transition-colors inline-flex items-center gap-2 text-lg"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                  Create Your First Team
+                </button>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
