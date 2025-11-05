@@ -26,7 +26,16 @@ export async function createTeamInvitation(
   requiresVerification?: boolean
 }> {
   try {
-    // 0. Check if inviting user's email is verified (using our custom field)
+    // 0. Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return {
+        success: false,
+        error: 'Invalid email address format. Please provide a valid email (e.g., user@example.com)',
+      }
+    }
+
+    // 1. Check if inviting user's email is verified (using our custom field)
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('email_verified')
@@ -48,7 +57,7 @@ export async function createTeamInvitation(
       }
     }
 
-    // 1. Check if user is already a member
+    // 2. Check if user is already a member
     const { data: existingProfile } = await supabaseAdmin
       .from('user_profiles')
       .select('id')
@@ -71,7 +80,7 @@ export async function createTeamInvitation(
       }
     }
 
-    // 2. Check for pending invitation
+    // 3. Check for pending invitation
     const { data: pendingInvite } = await supabaseAdmin
       .from('team_invitations')
       .select('id')
@@ -87,10 +96,10 @@ export async function createTeamInvitation(
       }
     }
 
-    // 3. Generate secure token
+    // 4. Generate secure token
     const token = crypto.randomBytes(32).toString('hex')
 
-    // 4. Create invitation
+    // 5. Create invitation
     const { data: invitation, error: inviteError } = await supabaseAdmin
       .from('team_invitations')
       .insert({
@@ -111,11 +120,11 @@ export async function createTeamInvitation(
       }
     }
 
-    // 5. Generate invite link
+    // 6. Generate invite link
     const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
     const inviteLink = `${baseUrl}/invite/${invitation.token}`
 
-    // 6. Send email if requested
+    // 7. Send email if requested
     if (sendEmail) {
       // Get team and inviter info
       const { data: team } = await supabaseAdmin

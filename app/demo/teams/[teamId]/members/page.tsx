@@ -115,8 +115,20 @@ export default function TeamMembersPage() {
     }
   }
 
+  function validateEmail(email: string): boolean {
+    // Basic email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
   async function handleSendInvite() {
     if (!currentUserId) return
+
+    // Validate email before submitting
+    if (!validateEmail(inviteEmail)) {
+      setError('Please enter a valid email address (e.g., user@example.com)')
+      return
+    }
 
     setIsSubmitting(true)
     setError(null)
@@ -150,6 +162,12 @@ export default function TeamMembersPage() {
 
   async function handleCopyLink() {
     if (!currentUserId) return
+
+    // Validate email before submitting
+    if (!validateEmail(inviteEmail)) {
+      setError('Please enter a valid email address (e.g., user@example.com)')
+      return
+    }
 
     setIsSubmitting(true)
     setError(null)
@@ -506,7 +524,7 @@ export default function TeamMembersPage() {
                         </div>
                         <div>
                           <p className="font-medium text-gray-900">
-                            {member.full_name || 'No name'}
+                            {member.full_name || member.email.split('@')[0]}
                             {member.user_id === currentUserId && (
                               <span className="ml-2 text-sm text-gray-500">(You)</span>
                             )}

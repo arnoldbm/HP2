@@ -7,6 +7,7 @@ import { getUserTeams } from '@/app/actions/teams'
 import { TeamProvider, useTeam } from '@/lib/contexts/team-context'
 import { TeamSelector } from '@/components/teams/team-selector'
 import { EmailVerificationBanner } from '@/components/auth/email-verification-banner'
+import { UserMenu } from '@/components/navigation/user-menu'
 
 interface Team {
   id: string
@@ -80,9 +81,6 @@ function DemoLayoutContent({ children }: { children: React.ReactNode }) {
     selectTeam(teamId)
   }
 
-  // Don't show team selector on teams list page or team creation page
-  const showTeamSelector = pathname !== '/demo/teams' && pathname !== '/demo/teams/new'
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Navigation Bar */}
@@ -99,8 +97,8 @@ function DemoLayoutContent({ children }: { children: React.ReactNode }) {
               </button>
             </div>
 
-            {/* Team Selector (only show on non-team pages) */}
-            {showTeamSelector && !isLoading && teams.length > 0 && (
+            {/* Team Selector - Always visible */}
+            {!isLoading && (
               <div className="flex-1 max-w-md mx-8">
                 <TeamSelector
                   teams={teams}
@@ -112,16 +110,6 @@ function DemoLayoutContent({ children }: { children: React.ReactNode }) {
 
             {/* Navigation Links */}
             <div className="flex items-center gap-4">
-              <button
-                onClick={() => router.push('/demo/teams')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname === '/demo/teams'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                Teams
-              </button>
               {selectedTeamId && (
                 <>
                   <button
@@ -156,25 +144,13 @@ function DemoLayoutContent({ children }: { children: React.ReactNode }) {
                   </button>
                 </>
               )}
-              <button
-                onClick={() => router.push('/demo/settings')}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  pathname === '/demo/settings'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                Settings
-              </button>
-              <button
-                onClick={async () => {
-                  await supabase.auth.signOut()
-                  router.push('/auth/signin')
-                }}
-                className="px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
-              >
-                Sign Out
-              </button>
+
+              {/* User Menu Dropdown */}
+              <UserMenu
+                userEmail={userEmail}
+                emailVerified={emailVerified}
+                currentPath={pathname}
+              />
             </div>
           </div>
         </div>

@@ -18,7 +18,7 @@ interface Player {
   birthdate?: string | null
 }
 
-export default function TeamRosterPage({ params }: { params: { teamId: string } }) {
+export default function TeamRosterPage({ params }: { params: Promise<{ teamId: string }> }) {
   const router = useRouter()
   const [players, setPlayers] = useState<Player[]>([])
   const [team, setTeam] = useState<any>(null)
@@ -26,10 +26,22 @@ export default function TeamRosterPage({ params }: { params: { teamId: string } 
   const [error, setError] = useState<string | null>(null)
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingPlayer, setEditingPlayer] = useState<Player | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
+  const [teamId, setTeamId] = useState<string | null>(null)
 
   useEffect(() => {
-    loadTeamAndRoster()
-  }, [params.teamId])
+    const loadParams = async () => {
+      const resolvedParams = await params
+      setTeamId(resolvedParams.teamId)
+    }
+    loadParams()
+  }, [params])
+
+  useEffect(() => {
+    if (teamId) {
+      loadTeamAndRoster()
+    }
+  }, [teamId])
 
   async function loadTeamAndRoster() {
     try {
@@ -50,11 +62,13 @@ export default function TeamRosterPage({ params }: { params: { teamId: string } 
         return
       }
 
+      setUserId(user.id)
+
       // Fetch team details
       const { data: teamData, error: teamError } = await supabase
         .from('teams_with_age_display')
         .select()
-        .eq('id', params.teamId)
+        .eq('id', teamId)
         .single()
 
       if (teamError) {
@@ -67,7 +81,7 @@ export default function TeamRosterPage({ params }: { params: { teamId: string } 
       setTeam(teamData)
 
       // Fetch roster
-      const result = await getTeamRoster(params.teamId)
+      const result = await getTeamRoster(teamId!)
 
       if (result.success && result.players) {
         setPlayers(result.players as Player[])
@@ -85,7 +99,12 @@ export default function TeamRosterPage({ params }: { params: { teamId: string } 
   const handleAddPlayer = async (data: PlayerCreateInput) => {
     setError(null)
 
-    const result = await createPlayer(data)
+    if (!userId) {
+      setError('Not authenticated')
+      return
+    }
+
+    const result = await createPlayer(data, userId)
 
     if (result.success && result.player) {
       setPlayers([...players, result.player as Player])
@@ -100,13 +119,18 @@ export default function TeamRosterPage({ params }: { params: { teamId: string } 
 
     setError(null)
 
+    if (!userId) {
+      setError('Not authenticated')
+      return
+    }
+
     const result = await updatePlayer(editingPlayer.id, {
       jersey_number: data.jersey_number,
       first_name: data.first_name,
       last_name: data.last_name,
       position: data.position,
       birthdate: data.birthdate,
-    })
+    }, userId)
 
     if (result.success && result.player) {
       setPlayers(players.map((p) => (p.id === editingPlayer.id ? (result.player as Player) : p)))
@@ -119,7 +143,12 @@ export default function TeamRosterPage({ params }: { params: { teamId: string } 
   const handleDeletePlayer = async (playerId: string) => {
     setError(null)
 
-    const result = await deletePlayer(playerId)
+    if (!userId) {
+      setError('Not authenticated')
+      return
+    }
+
+    const result = await deletePlayer(playerId, userId)
 
     if (result.success) {
       setPlayers(players.filter((p) => p.id !== playerId))
@@ -182,27 +211,29 @@ export default function TeamRosterPage({ params }: { params: { teamId: string } 
         />
 
         {/* Add Player Bottom Sheet (Mobile) / Modal (Desktop) */}
-        <BottomSheet
-          isOpen={showAddForm}
-          onClose={() => setShowAddForm(false)}
-          title="Add Player"
-        >
-          <PlayerForm
-            teamId={params.teamId}
-            onSuccess={handleAddPlayer}
-            onCancel={() => setShowAddForm(false)}
-          />
-        </BottomSheet>
+        {teamId && (
+          <BottomSheet
+            isOpen={showAddForm}
+            onClose={() => setShowAddForm(false)}
+            title="Add Player"
+          >
+            <PlayerForm
+              teamId={teamId}
+              onSuccess={handleAddPlayer}
+              onCancel={() => setShowAddForm(false)}
+            />
+          </BottomSheet>
+        )}
 
         {/* Edit Player Bottom Sheet (Mobile) / Modal (Desktop) */}
-        {editingPlayer && (
+        {editingPlayer && teamId && (
           <BottomSheet
             isOpen={!!editingPlayer}
             onClose={() => setEditingPlayer(null)}
             title="Edit Player"
           >
             <PlayerForm
-              teamId={params.teamId}
+              teamId={teamId}
               initialData={editingPlayer}
               onSuccess={handleUpdatePlayer}
               onCancel={() => setEditingPlayer(null)}
