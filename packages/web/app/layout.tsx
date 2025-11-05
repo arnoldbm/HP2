@@ -13,14 +13,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HP2 - Hockey Practice Planner",
+  title: "HockeyPilot - Hockey Practice Planner",
   description: "Track hockey games in real-time and generate AI-powered practice plans",
   manifest: "/manifest.json",
   themeColor: "#1e40af",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "HP2 Tracker",
+    title: "HockeyPilot",
   },
   icons: {
     icon: "/icon.svg",

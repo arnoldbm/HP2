@@ -262,7 +262,7 @@ npm run test         # Run Vitest tests
 
 **Last Updated**: 2025-11-05
 **Maintained By**: Brock Arnold + Claude
-**Project Name**: HP2 (Hockey Practice Planner v2)
+**Project Name**: HockeyPilot (formerly HP2)
 
 ---
 

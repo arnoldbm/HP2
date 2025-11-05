@@ -1,14 +1,14 @@
-# HP2 - Hockey Practice Planner v2
+# HockeyPilot
 
 > AI-powered practice planning with live game tracking for youth hockey coaches
 
-[![Status](https://img.shields.io/badge/status-in%20development-green.svg)](https://github.com/yourusername/HP2)
-[![Tests](https://img.shields.io/badge/tests-234%20passing-brightgreen.svg)](https://github.com/yourusername/HP2)
+[![Status](https://img.shields.io/badge/status-in%20development-green.svg)](https://github.com/arnoldbm/HP2)
+[![Tests](https://img.shields.io/badge/tests-384%20passing-brightgreen.svg)](https://github.com/arnoldbm/HP2)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-## 🏒 What is HP2?
+## 🏒 What is HockeyPilot?
 
-HP2 is a modern web application that transforms how youth hockey coaches plan practices. By combining **real-time game event tracking** with **AI-powered practice plan generation**, coaches get data-driven recommendations that address their team's specific weaknesses.
+HockeyPilot is a cross-platform application (web + iOS + Android) that transforms how youth hockey coaches plan practices. By combining **real-time game event tracking** with **AI-powered practice plan generation**, coaches get data-driven recommendations that address their team's specific weaknesses.
 
 ### The Problem
 Coaches rely on memory and subjective impressions after games. "We need to work on breakouts" is vague. Which side of the ice? What specific situation? How often did it happen?

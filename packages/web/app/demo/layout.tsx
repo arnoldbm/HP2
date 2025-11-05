@@ -93,7 +93,7 @@ function DemoLayoutContent({ children }: { children: React.ReactNode }) {
                 onClick={() => router.push('/demo/teams')}
                 className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors"
               >
-                HP2
+                HockeyPilot
               </button>
             </div>
 

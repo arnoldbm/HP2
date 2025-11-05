@@ -1,6 +1,6 @@
 {
-  "name": "Hockey Practice Planner - Game Tracker",
-  "short_name": "HP2 Tracker",
+  "name": "HockeyPilot - Game Tracker",
+  "short_name": "HockeyPilot",
   "description": "Track hockey games in real-time and generate AI-powered practice plans",
   "start_url": "/demo/game-tracking",
   "display": "standalone",
