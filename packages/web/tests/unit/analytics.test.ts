@@ -7,7 +7,7 @@ import {
   extractTurnoverData,
   getShootingPercentageBySituation,
 } from '@/lib/analytics/game-analytics'
-import type { GameEvent } from '@/lib/stores/game-tracking-store'
+import type { GameEvent } from '@/lib/stores/game-tracking-store-configured'
 
 describe('Game Analytics', () => {
   // Helper to create test events

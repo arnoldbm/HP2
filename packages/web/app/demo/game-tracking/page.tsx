@@ -1,14 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useGameTrackingStore } from '@/lib/stores/game-tracking-store'
+import { useGameTrackingStore } from '@/lib/stores/game-tracking-store-configured'
 import { EventLogger } from '@/components/game-tracking/event-logger'
 import { RecentEventsList } from '@/components/game-tracking/recent-events-list'
 import { QuickEventButtons } from '@/components/game-tracking/quick-event-buttons'
 import { AuthModal } from '@/components/auth/auth-modal'
 import { supabase } from '@/lib/db/supabase'
 import { useTeam } from '@/lib/contexts/team-context'
-import type { Player } from '@/lib/stores/game-tracking-store'
+import type { Player } from '@/lib/stores/game-tracking-store-configured'
 
 interface GameInfo {
   opponent_name: string

@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { QuickEventButtons } from '@/components/game-tracking/quick-event-buttons'
-import type { EventType } from '@/lib/stores/game-tracking-store'
+import type { EventType } from '@/lib/stores/game-tracking-store-configured'
 
 describe('QuickEventButtons', () => {
   describe('Rendering', () => {

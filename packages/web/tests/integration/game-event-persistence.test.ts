@@ -7,7 +7,7 @@ import {
   getGameEvents,
   mapRowToGameEvent,
 } from '@/lib/db/game-events'
-import type { GameEvent } from '@/lib/stores/game-tracking-store'
+import type { GameEvent } from '@/lib/stores/game-tracking-store-configured'
 
 describe('Game Event Persistence', () => {
   let testOrgId: string

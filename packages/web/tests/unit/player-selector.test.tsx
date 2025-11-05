@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { PlayerSelector } from '@/components/game-tracking/player-selector'
-import type { Player } from '@/lib/stores/game-tracking-store'
+import type { Player } from '@/lib/stores/game-tracking-store-configured'
 
 const mockPlayers: Player[] = [
   { id: '1', jerseyNumber: 7, firstName: 'John', lastName: 'Doe', position: 'forward' },

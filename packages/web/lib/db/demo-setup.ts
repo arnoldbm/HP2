@@ -1,5 +1,5 @@
 import { supabaseAdmin } from './supabase'
-import type { Player } from '@/lib/stores/game-tracking-store'
+import type { Player } from '@/lib/stores/game-tracking-store-configured'
 
 /**
  * Set up demo data for the game tracking demo

@@ -1,7 +1,7 @@
 'use server'
 
 import { supabaseAdmin } from '@/lib/db/supabase-admin'
-import type { Player } from '@/lib/stores/game-tracking-store'
+import type { Player } from '@/lib/stores/game-tracking-store-configured'
 
 /**
  * Server action to set up demo data for the game tracking demo

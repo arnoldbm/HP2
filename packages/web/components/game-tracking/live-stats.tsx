@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { useGameTrackingStore } from '@/lib/stores/game-tracking-store'
+import { useGameTrackingStore } from '@/lib/stores/game-tracking-store-configured'
 import { supabase } from '@/lib/db/supabase'
 
 export function LiveStats() {

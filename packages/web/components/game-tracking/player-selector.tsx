@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import type { Player } from '@/lib/stores/game-tracking-store'
+import type { Player } from '@/lib/stores/game-tracking-store-configured'
 
 export interface PlayerSelectorProps {
   players: Player[]

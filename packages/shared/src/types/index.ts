@@ -53,18 +53,24 @@ export type ShotType = 'wrist' | 'slap' | 'snap' | 'backhand' | 'deflection' | '
 
 export type GameSituation = 'even_strength' | 'power_play' | 'penalty_kill' | 'empty_net'
 
-// Database schema (snake_case)
+// Database schema (snake_case) - matches actual Supabase schema
 export interface GameEventRow {
   id: string
   game_id: string
   event_type: EventType
-  player_id: string
-  x: number
-  y: number
+  x_coord: number | null
+  y_coord: number | null
   period: number
-  game_time: string
-  metadata: Record<string, any>
-  created_at: string
+  game_time_seconds: number | null
+  player_id: string | null
+  situation: GameSituation | null
+  details: Record<string, any>
+  event_timestamp: string | null
+  tracked_by: string | null
+  created_at: string | null
+  updated_at: string | null
+  notes: string | null
+  zone: string | null
 }
 
 // Client-side format (camelCase)

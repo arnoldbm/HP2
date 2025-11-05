@@ -1,6 +1,6 @@
 import { supabase } from './supabase'
 import type { Database } from '@/lib/types/database'
-import type { GameEvent } from '@/lib/stores/game-tracking-store'
+import type { GameEvent } from '@/lib/stores/game-tracking-store-configured'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 type GameEventRow = Database['public']['Tables']['game_events']['Row']

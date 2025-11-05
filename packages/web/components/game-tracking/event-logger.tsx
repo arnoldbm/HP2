@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useGameTrackingStore } from '@/lib/stores/game-tracking-store'
+import { useGameTrackingStore } from '@/lib/stores/game-tracking-store-configured'
 import { IceSurface } from './ice-surface'
 import { PlayerSelector } from './player-selector'
 import { QuickEventButtons } from './quick-event-buttons'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import type { Coordinates } from '@/lib/utils/ice-surface-coordinates'
-import type { ShotResult } from '@/lib/stores/game-tracking-store'
+import type { ShotResult } from '@/lib/stores/game-tracking-store-configured'
 
 export interface EventLoggerProps {
   showZones?: boolean

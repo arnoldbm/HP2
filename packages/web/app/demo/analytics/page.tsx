@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useGameTrackingStore } from '@/lib/stores/game-tracking-store'
+import { useGameTrackingStore } from '@/lib/stores/game-tracking-store-configured'
 import { supabase } from '@/lib/db/supabase'
 import { useTeam } from '@/lib/contexts/team-context'
 import {
@@ -17,7 +17,7 @@ import { ShotQualityChart } from '@/components/analytics/shot-quality-chart'
 import { BreakoutAnalysis } from '@/components/analytics/breakout-analysis'
 import { PeriodTrends } from '@/components/analytics/period-trends'
 import { PlayerStatsTable } from '@/components/analytics/player-stats-table'
-import type { GameEvent } from '@/lib/stores/game-tracking-store'
+import type { GameEvent } from '@/lib/stores/game-tracking-store-configured'
 
 // Types for AI-generated practice plan
 interface PracticePlanDrill {

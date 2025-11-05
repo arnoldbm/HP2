@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import type { EventType } from '@/lib/stores/game-tracking-store'
+import type { EventType } from '@/lib/stores/game-tracking-store-configured'
 
 export interface QuickEventButtonsProps {
   onEventSelect: (eventType: EventType, prefilledDetails?: Record<string, unknown>) => void

@@ -1,7 +1,7 @@
 'use client'
 
 import React from 'react'
-import { useGameTrackingStore } from '@/lib/stores/game-tracking-store'
+import { useGameTrackingStore } from '@/lib/stores/game-tracking-store-configured'
 import { SwipeableItem } from '@/components/ui/swipeable-item'
 
 export function RecentEventsList() {

@@ -3,7 +3,7 @@
 import React from 'react'
 import { IceSurface } from '@/components/game-tracking/ice-surface'
 import type { ShotData } from '@/lib/analytics/game-analytics'
-import type { Player } from '@/lib/stores/game-tracking-store'
+import type { Player } from '@/lib/stores/game-tracking-store-configured'
 
 export interface ShotChartProps {
   shots: ShotData[]

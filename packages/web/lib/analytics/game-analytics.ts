@@ -1,4 +1,4 @@
-import type { GameEvent, ShotResult, Player } from '@/lib/stores/game-tracking-store'
+import type { GameEvent, ShotResult, Player } from '@/lib/stores/game-tracking-store-configured'
 
 export interface PlayerStats {
   playerId: string
