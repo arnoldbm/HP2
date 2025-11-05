@@ -18,7 +18,7 @@ describe('IceSurface Component', () => {
     })
 
     it('should apply custom width and height', () => {
-      render(<IceSurface width={800} height={400} />)
+      render(<IceSurface width={800} height={400} responsive={false} />)
       const svg = document.querySelector('svg')
       expect(svg?.getAttribute('width')).toBe('800')
       expect(svg?.getAttribute('height')).toBe('400')
@@ -86,18 +86,17 @@ describe('IceSurface Component', () => {
       expect(zones.length).toBe(0)
     })
 
-    it('should render all three zones (defensive, neutral, offensive)', () => {
+    it('should render defensive and offensive zones (neutral zone is unshaded)', () => {
       const { container } = render(
         <IceSurface width={400} height={200} showZones={true} />
       )
 
       const defensiveZone = container.querySelector('[data-zone="defensive"]')
-      const neutralZone = container.querySelector('[data-zone="neutral"]')
       const offensiveZone = container.querySelector('[data-zone="offensive"]')
 
       expect(defensiveZone).toBeTruthy()
-      expect(neutralZone).toBeTruthy()
       expect(offensiveZone).toBeTruthy()
+      // Neutral zone is intentionally not shaded to keep the ice surface clean
     })
   })
 

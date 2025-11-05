@@ -36,20 +36,20 @@ describe('Ice Surface Coordinate Helpers', () => {
   })
 
   describe('getZone', () => {
-    it('should return defensive for x < 67', () => {
+    it('should return defensive for x < 64', () => {
       expect(getZone({ x: 0, y: 50 })).toBe('defensive')
       expect(getZone({ x: 33, y: 50 })).toBe('defensive')
-      expect(getZone({ x: 66, y: 50 })).toBe('defensive')
+      expect(getZone({ x: 63, y: 50 })).toBe('defensive')
     })
 
-    it('should return neutral for x 67-133', () => {
-      expect(getZone({ x: 67, y: 50 })).toBe('neutral')
+    it('should return neutral for x 64-136', () => {
+      expect(getZone({ x: 64, y: 50 })).toBe('neutral')
       expect(getZone({ x: 100, y: 50 })).toBe('neutral')
-      expect(getZone({ x: 133, y: 50 })).toBe('neutral')
+      expect(getZone({ x: 136, y: 50 })).toBe('neutral')
     })
 
-    it('should return offensive for x > 133', () => {
-      expect(getZone({ x: 134, y: 50 })).toBe('offensive')
+    it('should return offensive for x > 136', () => {
+      expect(getZone({ x: 137, y: 50 })).toBe('offensive')
       expect(getZone({ x: 167, y: 50 })).toBe('offensive')
       expect(getZone({ x: 200, y: 50 })).toBe('offensive')
     })
@@ -63,21 +63,21 @@ describe('Ice Surface Coordinate Helpers', () => {
 
   describe('isInSlot', () => {
     it('should return true for coordinates in slot area', () => {
-      expect(isInSlot({ x: 90, y: 50 })).toBe(true)
-      expect(isInSlot({ x: 95, y: 45 })).toBe(true)
-      expect(isInSlot({ x: 100, y: 55 })).toBe(true)
+      expect(isInSlot({ x: 150, y: 50 })).toBe(true)
+      expect(isInSlot({ x: 160, y: 45 })).toBe(true)
+      expect(isInSlot({ x: 170, y: 55 })).toBe(true)
     })
 
     it('should return true at slot boundaries', () => {
-      expect(isInSlot({ x: 80, y: 35 })).toBe(true)
-      expect(isInSlot({ x: 110, y: 65 })).toBe(true)
+      expect(isInSlot({ x: 145, y: 35 })).toBe(true)
+      expect(isInSlot({ x: 175, y: 65 })).toBe(true)
     })
 
     it('should return false for coordinates outside slot', () => {
-      expect(isInSlot({ x: 79, y: 50 })).toBe(false)
-      expect(isInSlot({ x: 111, y: 50 })).toBe(false)
-      expect(isInSlot({ x: 95, y: 34 })).toBe(false)
-      expect(isInSlot({ x: 95, y: 66 })).toBe(false)
+      expect(isInSlot({ x: 144, y: 50 })).toBe(false)
+      expect(isInSlot({ x: 176, y: 50 })).toBe(false)
+      expect(isInSlot({ x: 160, y: 34 })).toBe(false)
+      expect(isInSlot({ x: 160, y: 66 })).toBe(false)
     })
 
     it('should return false for extreme coordinates', () => {
@@ -88,21 +88,22 @@ describe('Ice Surface Coordinate Helpers', () => {
 
   describe('isInHighDangerArea', () => {
     it('should return true for slot area', () => {
-      expect(isInHighDangerArea({ x: 95, y: 50 })).toBe(true)
+      expect(isInHighDangerArea({ x: 160, y: 50 })).toBe(true)
+      expect(isInHighDangerArea({ x: 150, y: 45 })).toBe(true)
     })
 
     it('should return true for very close to net', () => {
-      expect(isInHighDangerArea({ x: 70, y: 50 })).toBe(true)
-      expect(isInHighDangerArea({ x: 65, y: 45 })).toBe(true)
+      expect(isInHighDangerArea({ x: 180, y: 50 })).toBe(true)
+      expect(isInHighDangerArea({ x: 185, y: 45 })).toBe(true)
     })
 
     it('should return false for medium danger areas', () => {
-      expect(isInHighDangerArea({ x: 120, y: 50 })).toBe(false)
-      expect(isInHighDangerArea({ x: 115, y: 40 })).toBe(false)
+      expect(isInHighDangerArea({ x: 140, y: 50 })).toBe(false)
+      expect(isInHighDangerArea({ x: 120, y: 40 })).toBe(false)
     })
 
     it('should return false for low danger areas', () => {
-      expect(isInHighDangerArea({ x: 160, y: 50 })).toBe(false)
+      expect(isInHighDangerArea({ x: 100, y: 50 })).toBe(false)
       expect(isInHighDangerArea({ x: 10, y: 50 })).toBe(false)
     })
   })
@@ -194,8 +195,8 @@ describe('Ice Surface Coordinate Helpers', () => {
     })
 
     it('should handle boundary values correctly', () => {
-      expect(getQuadrant({ x: 67, y: 50 })).toBe('neutral_left')
-      expect(getQuadrant({ x: 133, y: 51 })).toBe('neutral_right')
+      expect(getQuadrant({ x: 64, y: 50 })).toBe('neutral_left')
+      expect(getQuadrant({ x: 136, y: 51 })).toBe('neutral_right')
     })
 
     it('should handle center ice correctly', () => {
@@ -272,9 +273,9 @@ describe('Ice Surface Coordinate Helpers', () => {
     })
 
     it('should handle slot coordinates correctly', () => {
-      // Center of slot at ice (95, 50)
-      const result = iceToScreen({ x: 95, y: 50 }, 400, 200)
-      expect(result.x).toBe(190)
+      // Center of slot at ice (160, 50)
+      const result = iceToScreen({ x: 160, y: 50 }, 400, 200)
+      expect(result.x).toBe(320)
       expect(result.y).toBe(100)
     })
   })

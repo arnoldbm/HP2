@@ -1,0 +1,80 @@
+{
+  "node": {
+    "40fe3ebce1844a9e7c8ef610443e73434ff6a5555b": {
+      "workers": {
+        "app/demo/teams/[teamId]/settings/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/teams/[teamId]/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getUserTeams",
+          "filename": "code/hp2/packages/web/app/actions/teams.ts"
+        }
+      },
+      "layer": {
+        "app/demo/teams/[teamId]/settings/page": "action-browser"
+      },
+      "exportedName": "getUserTeams",
+      "filename": "code/hp2/packages/web/app/actions/teams.ts"
+    },
+    "40c52ff0a08abb5ca278b4e1ffa60a8e290de064ef": {
+      "workers": {
+        "app/demo/teams/[teamId]/settings/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/teams/[teamId]/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "resendVerificationEmail",
+          "filename": "code/hp2/packages/web/app/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/demo/teams/[teamId]/settings/page": "action-browser"
+      },
+      "exportedName": "resendVerificationEmail",
+      "filename": "code/hp2/packages/web/app/actions/auth.ts"
+    },
+    "607dbe2769166efb05495079da32a7519fce996813": {
+      "workers": {
+        "app/demo/teams/[teamId]/settings/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/teams/[teamId]/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getTeamById",
+          "filename": "code/hp2/packages/web/app/actions/teams.ts"
+        }
+      },
+      "layer": {
+        "app/demo/teams/[teamId]/settings/page": "action-browser"
+      },
+      "exportedName": "getTeamById",
+      "filename": "code/hp2/packages/web/app/actions/teams.ts"
+    },
+    "601efbf980325c3a956d1ee5f8b6f36d119dbb2b5f": {
+      "workers": {
+        "app/demo/teams/[teamId]/settings/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/teams/[teamId]/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "updateTeam",
+          "filename": "code/hp2/packages/web/app/actions/teams.ts"
+        }
+      },
+      "layer": {
+        "app/demo/teams/[teamId]/settings/page": "action-browser"
+      },
+      "exportedName": "updateTeam",
+      "filename": "code/hp2/packages/web/app/actions/teams.ts"
+    },
+    "4003eda13ef42f5897b694e47f1359be71c71c53c0": {
+      "workers": {
+        "app/demo/teams/[teamId]/settings/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/teams/[teamId]/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "deleteTeam",
+          "filename": "code/hp2/packages/web/app/actions/teams.ts"
+        }
+      },
+      "layer": {
+        "app/demo/teams/[teamId]/settings/page": "action-browser"
+      },
+      "exportedName": "deleteTeam",
+      "filename": "code/hp2/packages/web/app/actions/teams.ts"
+    }
+  },
+  "edge": {}
+}

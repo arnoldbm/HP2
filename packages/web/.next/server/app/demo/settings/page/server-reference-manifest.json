@@ -1,0 +1,65 @@
+{
+  "node": {
+    "40fe3ebce1844a9e7c8ef610443e73434ff6a5555b": {
+      "workers": {
+        "app/demo/settings/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/code/hp2/packages/web/app/actions/users.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getUserTeams",
+          "filename": "code/hp2/packages/web/app/actions/teams.ts"
+        }
+      },
+      "layer": {
+        "app/demo/settings/page": "action-browser"
+      },
+      "exportedName": "getUserTeams",
+      "filename": "code/hp2/packages/web/app/actions/teams.ts"
+    },
+    "40c52ff0a08abb5ca278b4e1ffa60a8e290de064ef": {
+      "workers": {
+        "app/demo/settings/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/code/hp2/packages/web/app/actions/users.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "resendVerificationEmail",
+          "filename": "code/hp2/packages/web/app/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/demo/settings/page": "action-browser"
+      },
+      "exportedName": "resendVerificationEmail",
+      "filename": "code/hp2/packages/web/app/actions/auth.ts"
+    },
+    "402edf6c6579e731a049621664b9ed33244356857a": {
+      "workers": {
+        "app/demo/settings/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/code/hp2/packages/web/app/actions/users.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getUserProfile",
+          "filename": "code/hp2/packages/web/app/actions/users.ts"
+        }
+      },
+      "layer": {
+        "app/demo/settings/page": "action-browser"
+      },
+      "exportedName": "getUserProfile",
+      "filename": "code/hp2/packages/web/app/actions/users.ts"
+    },
+    "6062d951aade22ae95ebf068478ba9f5575339c0a0": {
+      "workers": {
+        "app/demo/settings/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/settings/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/code/hp2/packages/web/app/actions/users.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "updateUserProfile",
+          "filename": "code/hp2/packages/web/app/actions/users.ts"
+        }
+      },
+      "layer": {
+        "app/demo/settings/page": "action-browser"
+      },
+      "exportedName": "updateUserProfile",
+      "filename": "code/hp2/packages/web/app/actions/users.ts"
+    }
+  },
+  "edge": {}
+}

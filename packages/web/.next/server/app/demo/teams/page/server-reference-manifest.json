@@ -1,0 +1,95 @@
+{
+  "node": {
+    "40fe3ebce1844a9e7c8ef610443e73434ff6a5555b": {
+      "workers": {
+        "app/demo/teams/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/teams/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/code/hp2/packages/web/app/actions/invitations.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getUserTeams",
+          "filename": "code/hp2/packages/web/app/actions/teams.ts"
+        }
+      },
+      "layer": {
+        "app/demo/teams/page": "action-browser"
+      },
+      "exportedName": "getUserTeams",
+      "filename": "code/hp2/packages/web/app/actions/teams.ts"
+    },
+    "40c52ff0a08abb5ca278b4e1ffa60a8e290de064ef": {
+      "workers": {
+        "app/demo/teams/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/teams/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/code/hp2/packages/web/app/actions/invitations.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "resendVerificationEmail",
+          "filename": "code/hp2/packages/web/app/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/demo/teams/page": "action-browser"
+      },
+      "exportedName": "resendVerificationEmail",
+      "filename": "code/hp2/packages/web/app/actions/auth.ts"
+    },
+    "405c45025e9a13f66027d9ac2cda37fb543cc9d0bb": {
+      "workers": {
+        "app/demo/teams/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/teams/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/code/hp2/packages/web/app/actions/invitations.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getTeamStats",
+          "filename": "code/hp2/packages/web/app/actions/teams.ts"
+        }
+      },
+      "layer": {
+        "app/demo/teams/page": "action-browser"
+      },
+      "exportedName": "getTeamStats",
+      "filename": "code/hp2/packages/web/app/actions/teams.ts"
+    },
+    "40360a602e9cbeb768c4e21134ec04e7bd6d25610f": {
+      "workers": {
+        "app/demo/teams/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/teams/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/code/hp2/packages/web/app/actions/invitations.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getMyInvitations",
+          "filename": "code/hp2/packages/web/app/actions/invitations.ts"
+        }
+      },
+      "layer": {
+        "app/demo/teams/page": "action-browser"
+      },
+      "exportedName": "getMyInvitations",
+      "filename": "code/hp2/packages/web/app/actions/invitations.ts"
+    },
+    "60fa6cffb379eaa7639a0e853e945b9628a52824e1": {
+      "workers": {
+        "app/demo/teams/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/teams/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/code/hp2/packages/web/app/actions/invitations.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "acceptTeamInvitation",
+          "filename": "code/hp2/packages/web/app/actions/invitations.ts"
+        }
+      },
+      "layer": {
+        "app/demo/teams/page": "action-browser"
+      },
+      "exportedName": "acceptTeamInvitation",
+      "filename": "code/hp2/packages/web/app/actions/invitations.ts"
+    },
+    "40a01c657fbfb8ef04c331c180929a648ab48b6208": {
+      "workers": {
+        "app/demo/teams/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/teams/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE2 => \"[project]/code/hp2/packages/web/app/actions/invitations.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "revokeTeamInvitation",
+          "filename": "code/hp2/packages/web/app/actions/invitations.ts"
+        }
+      },
+      "layer": {
+        "app/demo/teams/page": "action-browser"
+      },
+      "exportedName": "revokeTeamInvitation",
+      "filename": "code/hp2/packages/web/app/actions/invitations.ts"
+    }
+  },
+  "edge": {}
+}
