@@ -22,3 +22,22 @@ export * from './validation/user-schemas'
 export * from './utils/age-groups'
 export * from './utils/ice-surface-coordinates'
 export * from './utils/organization-setup'
+
+// Export analytics
+export * from './analytics/shot-quality'
+export * from './analytics/breakout-analytics'
+export {
+  type PlayerStats,
+  type ShotData,
+  type ShotQualityStats,
+  type BreakoutAnalytics,
+  type PeriodStats,
+  type TurnoverData,
+  extractShotData,
+  calculateShotQualityStats,
+  analyzeBreakouts,
+  getPeriodStats,
+  extractTurnoverData,
+  getShootingPercentageBySituation,
+  calculatePlayerStats,
+} from './analytics/game-analytics'

@@ -45,9 +45,16 @@ export interface Game {
 }
 
 // Event types
-export type EventType = 'shot' | 'turnover' | 'breakout' | 'zone_entry' | 'faceoff' | 'blocked_shot'
+export type EventType = 'shot' | 'turnover' | 'breakout' | 'zone_entry' | 'faceoff' | 'blocked_shot' | 'penalty'
 
-export interface GameEvent {
+export type ShotResult = 'goal' | 'save' | 'miss_high' | 'miss_wide' | 'blocked' | 'post'
+
+export type ShotType = 'wrist' | 'slap' | 'snap' | 'backhand' | 'deflection' | 'one_timer'
+
+export type GameSituation = 'even_strength' | 'power_play' | 'penalty_kill' | 'empty_net'
+
+// Database schema (snake_case)
+export interface GameEventRow {
   id: string
   game_id: string
   event_type: EventType
@@ -58,6 +65,21 @@ export interface GameEvent {
   game_time: string
   metadata: Record<string, any>
   created_at: string
+}
+
+// Client-side format (camelCase)
+export interface GameEvent {
+  id: string
+  gameId: string
+  eventType: EventType
+  coordinates?: { x: number; y: number }
+  playerId?: string
+  period: number
+  gameTimeSeconds: number
+  situation: GameSituation
+  details: Record<string, unknown>
+  timestamp: string
+  trackedBy?: string
 }
 
 // Subscription types
