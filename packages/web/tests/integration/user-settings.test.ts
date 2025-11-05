@@ -28,12 +28,15 @@ describe('User Settings - Integration Tests', () => {
     if (authError) throw authError
     testUserId = authData.user.id
 
-    // Create user profile
-    const { error: profileError } = await supabaseAdmin.from('user_profiles').insert({
-      id: testUserId,
-      email: testUserEmail,
-      full_name: 'Test User',
-    })
+    // Note: User profile is now auto-created by database trigger
+    // Wait a moment for trigger to complete
+    await new Promise((resolve) => setTimeout(resolve, 100))
+
+    // Update the auto-created profile with our test data
+    const { error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .update({ full_name: 'Test User' })
+      .eq('id', testUserId)
 
     if (profileError) throw profileError
   })
@@ -262,15 +265,21 @@ describe('User Settings - Integration Tests', () => {
         email: otherEmail,
         password: 'test-password-123',
         email_confirm: true,
+        user_metadata: {
+          full_name: 'Other User',
+        },
       })
 
       const otherUserId = otherAuthData.user.id
 
-      await supabaseAdmin.from('user_profiles').insert({
-        id: otherUserId,
-        email: otherEmail,
-        full_name: 'Other User',
-      })
+      // Wait for auto-created profile
+      await new Promise((resolve) => setTimeout(resolve, 100))
+
+      // Update the auto-created profile
+      await supabaseAdmin
+        .from('user_profiles')
+        .update({ full_name: 'Other User' })
+        .eq('id', otherUserId)
 
       // Sign in as first test user
       const { data: sessionData } = await supabaseAdmin.auth.admin.generateLink({

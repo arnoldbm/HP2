@@ -146,9 +146,9 @@ describe('PlayerSelector', () => {
       const buttons = container.querySelectorAll('button')
       expect(buttons.length).toBeGreaterThan(0)
 
-      // Should have min-h-[80px] for quick tapping
+      // Should have min-h-[88px] for quick tapping (larger than default 80px)
       buttons.forEach((btn) => {
-        expect(btn.className).toContain('min-h-[80px]')
+        expect(btn.className).toContain('min-h-[88px]')
       })
     })
 
