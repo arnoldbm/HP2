@@ -10,6 +10,11 @@ import {
   removeTeamMember,
   updateTeamMemberRole
 } from '@/app/actions/teams'
+import {
+  createTeamInvitation,
+  getTeamInvitations,
+  revokeTeamInvitation
+} from '@/app/actions/invitations'
 
 interface TeamMember {
   id: string
@@ -27,6 +32,16 @@ interface TeamData {
   role: string
 }
 
+interface TeamInvitation {
+  id: string
+  email: string
+  role: string
+  status: string
+  created_at: string
+  expires_at: string
+  invited_by_name: string | null
+}
+
 export default function TeamMembersPage() {
   const router = useRouter()
   const params = useParams()
@@ -34,15 +49,18 @@ export default function TeamMembersPage() {
 
   const [team, setTeam] = useState<TeamData | null>(null)
   const [members, setMembers] = useState<TeamMember[]>([])
+  const [invitations, setInvitations] = useState<TeamInvitation[]>([])
   const [currentUserId, setCurrentUserId] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [showAddForm, setShowAddForm] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [showInviteForm, setShowInviteForm] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Add member form state
-  const [newMemberEmail, setNewMemberEmail] = useState('')
-  const [newMemberRole, setNewMemberRole] = useState<'head_coach' | 'assistant_coach' | 'manager' | 'stat_tracker'>('assistant_coach')
+  // Invite form state
+  const [inviteEmail, setInviteEmail] = useState('')
+  const [inviteRole, setInviteRole] = useState<'head_coach' | 'assistant_coach' | 'manager' | 'stat_tracker'>('assistant_coach')
+  const [copiedLink, setCopiedLink] = useState(false)
 
   useEffect(() => {
     loadTeamAndMembers()
@@ -82,6 +100,13 @@ export default function TeamMembersPage() {
       } else {
         setError(membersResult.error || 'Failed to load members')
       }
+
+      // Get pending invitations
+      const invitationsResult = await getTeamInvitations(teamId)
+
+      if (invitationsResult.success && invitationsResult.invitations) {
+        setInvitations(invitationsResult.invitations.filter(inv => inv.status === 'pending'))
+      }
     } catch (err) {
       console.error('Error loading team and members:', err)
       setError('An unexpected error occurred')
@@ -90,26 +115,68 @@ export default function TeamMembersPage() {
     }
   }
 
-  async function handleAddMember(e: React.FormEvent) {
-    e.preventDefault()
+  async function handleSendInvite() {
+    if (!currentUserId) return
+
     setIsSubmitting(true)
     setError(null)
+    setSuccessMessage(null)
 
     try {
-      const result = await addTeamMember(teamId, newMemberEmail, newMemberRole)
+      const result = await createTeamInvitation(
+        teamId,
+        inviteEmail,
+        inviteRole,
+        currentUserId,
+        true // Send email
+      )
 
       if (result.success) {
-        // Reset form
-        setNewMemberEmail('')
-        setNewMemberRole('assistant_coach')
-        setShowAddForm(false)
-        // Reload members
+        setSuccessMessage(`Invitation sent to ${inviteEmail}`)
+        setInviteEmail('')
+        setInviteRole('assistant_coach')
+        setShowInviteForm(false)
         await loadTeamAndMembers()
       } else {
-        setError(result.error || 'Failed to add member')
+        setError(result.error || 'Failed to send invitation')
       }
     } catch (err) {
-      console.error('Error adding member:', err)
+      console.error('Error sending invitation:', err)
+      setError('An unexpected error occurred')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  async function handleCopyLink() {
+    if (!currentUserId) return
+
+    setIsSubmitting(true)
+    setError(null)
+    setSuccessMessage(null)
+
+    try {
+      const result = await createTeamInvitation(
+        teamId,
+        inviteEmail,
+        inviteRole,
+        currentUserId,
+        false // Don't send email
+      )
+
+      if (result.success && result.invitation) {
+        await navigator.clipboard.writeText(result.invitation.inviteLink)
+        setCopiedLink(true)
+        setSuccessMessage(`Invitation link copied to clipboard for ${inviteEmail}`)
+        setTimeout(() => setCopiedLink(false), 2000)
+        setInviteEmail('')
+        setInviteRole('assistant_coach')
+        await loadTeamAndMembers()
+      } else {
+        setError(result.error || 'Failed to create invitation')
+      }
+    } catch (err) {
+      console.error('Error creating invitation:', err)
       setError('An unexpected error occurred')
     } finally {
       setIsSubmitting(false)
@@ -143,6 +210,7 @@ export default function TeamMembersPage() {
   async function handleRoleChange(userId: string, newRole: string) {
     setIsSubmitting(true)
     setError(null)
+    setSuccessMessage(null)
 
     try {
       const result = await updateTeamMemberRole(
@@ -158,6 +226,32 @@ export default function TeamMembersPage() {
       }
     } catch (err) {
       console.error('Error updating role:', err)
+      setError('An unexpected error occurred')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  async function handleRevokeInvitation(invitationId: string, email: string) {
+    if (!confirm(`Revoke invitation for ${email}?`)) {
+      return
+    }
+
+    setIsSubmitting(true)
+    setError(null)
+    setSuccessMessage(null)
+
+    try {
+      const result = await revokeTeamInvitation(invitationId)
+
+      if (result.success) {
+        setSuccessMessage('Invitation revoked')
+        await loadTeamAndMembers()
+      } else {
+        setError(result.error || 'Failed to revoke invitation')
+      }
+    } catch (err) {
+      console.error('Error revoking invitation:', err)
       setError('An unexpected error occurred')
     } finally {
       setIsSubmitting(false)
@@ -233,15 +327,26 @@ export default function TeamMembersPage() {
             </div>
             {canManageMembers && (
               <button
-                onClick={() => setShowAddForm(!showAddForm)}
+                onClick={() => {
+                  setShowInviteForm(!showInviteForm)
+                  setError(null)
+                  setSuccessMessage(null)
+                }}
                 disabled={isSubmitting}
                 className="bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
               >
-                {showAddForm ? 'Cancel' : '+ Add Member'}
+                {showInviteForm ? 'Cancel' : '+ Invite Member'}
               </button>
             )}
           </div>
         </div>
+
+        {/* Success Alert */}
+        {successMessage && (
+          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+            <p className="text-green-700">{successMessage}</p>
+          </div>
+        )}
 
         {/* Error Alert */}
         {error && (
@@ -250,11 +355,11 @@ export default function TeamMembersPage() {
           </div>
         )}
 
-        {/* Add Member Form */}
-        {showAddForm && canManageMembers && (
+        {/* Invite Member Form */}
+        {showInviteForm && canManageMembers && (
           <div className="bg-white rounded-lg shadow p-6 mb-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Add Team Member</h2>
-            <form onSubmit={handleAddMember} className="space-y-4">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Invite Team Member</h2>
+            <div className="space-y-4">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                   Email Address
@@ -262,14 +367,14 @@ export default function TeamMembersPage() {
                 <input
                   id="email"
                   type="email"
-                  value={newMemberEmail}
-                  onChange={(e) => setNewMemberEmail(e.target.value)}
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="user@example.com"
                   required
                 />
                 <p className="mt-1 text-sm text-gray-500">
-                  The user must already have an account
+                  They will receive an invitation to join the team
                 </p>
               </div>
 
@@ -279,8 +384,8 @@ export default function TeamMembersPage() {
                 </label>
                 <select
                   id="role"
-                  value={newMemberRole}
-                  onChange={(e) => setNewMemberRole(e.target.value as any)}
+                  value={inviteRole}
+                  onChange={(e) => setInviteRole(e.target.value as any)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="assistant_coach">Assistant Coach</option>
@@ -292,26 +397,86 @@ export default function TeamMembersPage() {
 
               <div className="flex gap-3">
                 <button
-                  type="submit"
-                  disabled={isSubmitting || !newMemberEmail}
+                  type="button"
+                  onClick={handleSendInvite}
+                  disabled={isSubmitting || !inviteEmail}
                   className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-md font-medium hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
-                  {isSubmitting ? 'Adding...' : 'Add Member'}
+                  {isSubmitting ? 'Sending...' : '📧 Send Email Invitation'}
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowAddForm(false)
-                    setNewMemberEmail('')
-                    setNewMemberRole('assistant_coach')
-                  }}
-                  disabled={isSubmitting}
-                  className="px-6 py-3 border border-gray-300 rounded-md font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
+                  onClick={handleCopyLink}
+                  disabled={isSubmitting || !inviteEmail}
+                  className="flex-1 bg-green-600 text-white px-6 py-3 rounded-md font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                 >
-                  Cancel
+                  {copiedLink ? '✓ Link Copied!' : '🔗 Copy Invite Link'}
                 </button>
               </div>
-            </form>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setShowInviteForm(false)
+                  setInviteEmail('')
+                  setInviteRole('assistant_coach')
+                  setError(null)
+                  setSuccessMessage(null)
+                }}
+                disabled={isSubmitting}
+                className="w-full px-6 py-3 border border-gray-300 rounded-md font-medium text-gray-700 hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Pending Invitations */}
+        {canManageMembers && invitations.length > 0 && (
+          <div className="bg-white rounded-lg shadow overflow-hidden mb-6">
+            <div className="px-6 py-4 border-b border-gray-200 bg-amber-50">
+              <h2 className="text-lg font-semibold text-gray-900">
+                Pending Invitations ({invitations.length})
+              </h2>
+            </div>
+            <ul className="divide-y divide-gray-200">
+              {invitations.map((invitation) => (
+                <li key={invitation.id} className="px-6 py-4 hover:bg-gray-50">
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                          <span className="text-amber-600 font-semibold">
+                            {invitation.email[0].toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-900">{invitation.email}</p>
+                          <p className="text-sm text-gray-600">
+                            Invited {new Date(invitation.created_at).toLocaleDateString()} •
+                            Expires {new Date(invitation.expires_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getRoleBadgeColor(invitation.role)}`}>
+                        {formatRole(invitation.role)}
+                      </span>
+                      <button
+                        onClick={() => handleRevokeInvitation(invitation.id, invitation.email)}
+                        disabled={isSubmitting}
+                        className="text-red-600 hover:text-red-800 font-medium text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+                      >
+                        Revoke
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
 

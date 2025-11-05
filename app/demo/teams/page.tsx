@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/db/supabase'
 import { getUserTeams, getTeamStats } from '@/app/actions/teams'
+import { getMyInvitations, acceptTeamInvitation, revokeTeamInvitation } from '@/app/actions/invitations'
 import { useTeam } from '@/lib/contexts/team-context'
 
 interface TeamWithStats {
@@ -18,12 +19,28 @@ interface TeamWithStats {
   gameCount?: number
 }
 
+interface PendingInvitation {
+  id: string
+  team_id: string
+  team_name: string
+  token: string
+  email: string
+  role: string
+  status: string
+  created_at: string
+  expires_at: string
+  invited_by_name: string | null
+}
+
 export default function TeamsPage() {
   const router = useRouter()
   const { selectTeam } = useTeam()
   const [teams, setTeams] = useState<TeamWithStats[]>([])
+  const [pendingInvitations, setPendingInvitations] = useState<PendingInvitation[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [isProcessingInvite, setIsProcessingInvite] = useState(false)
 
   useEffect(() => {
     const loadTeams = async () => {
@@ -37,10 +54,17 @@ export default function TeamsPage() {
         if (userError || !user) {
           console.log('Auth error, clearing session:', userError)
           await supabase.auth.signOut()
-          setError('Please sign in to view teams')
-          setIsLoading(false)
+          // Redirect to sign-in page
+          router.push('/auth/signin?returnUrl=/demo/teams')
           return
         }
+
+        // Get user profile for email
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('email')
+          .eq('id', user.id)
+          .single()
 
         const result = await getUserTeams(user.id)
 
@@ -65,6 +89,14 @@ export default function TeamsPage() {
             setError(result.error || 'Failed to load teams')
           }
         }
+
+        // Get pending invitations
+        if (profile?.email) {
+          const invitationsResult = await getMyInvitations(profile.email)
+          if (invitationsResult.success && invitationsResult.invitations) {
+            setPendingInvitations(invitationsResult.invitations)
+          }
+        }
       } catch (err) {
         console.error('Error loading teams:', err)
         setError('An unexpected error occurred')
@@ -75,6 +107,67 @@ export default function TeamsPage() {
 
     loadTeams()
   }, [])
+
+  async function handleAcceptInvitation(invitationId: string, token: string) {
+    setIsProcessingInvite(true)
+    setError(null)
+    setSuccessMessage(null)
+
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setError('You must be signed in to accept invitations')
+        setIsProcessingInvite(false)
+        return
+      }
+
+      const result = await acceptTeamInvitation(token, user.id)
+
+      if (result.success) {
+        setSuccessMessage('Invitation accepted! Reloading teams...')
+        // Reload teams and invitations
+        window.location.reload()
+      } else {
+        setError(result.error || 'Failed to accept invitation')
+      }
+    } catch (err) {
+      console.error('Error accepting invitation:', err)
+      setError('An unexpected error occurred')
+    } finally {
+      setIsProcessingInvite(false)
+    }
+  }
+
+  async function handleDeclineInvitation(invitationId: string, teamName: string) {
+    if (!confirm(`Decline invitation to join ${teamName}?`)) {
+      return
+    }
+
+    setIsProcessingInvite(true)
+    setError(null)
+    setSuccessMessage(null)
+
+    try {
+      const result = await revokeTeamInvitation(invitationId)
+
+      if (result.success) {
+        setSuccessMessage('Invitation declined')
+        // Remove from list
+        setPendingInvitations(pendingInvitations.filter(inv => inv.id !== invitationId))
+      } else {
+        setError(result.error || 'Failed to decline invitation')
+      }
+    } catch (err) {
+      console.error('Error declining invitation:', err)
+      setError('An unexpected error occurred')
+    } finally {
+      setIsProcessingInvite(false)
+    }
+  }
+
+  function formatRole(role: string) {
+    return role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+  }
 
   if (isLoading) {
     return (
@@ -106,10 +199,79 @@ export default function TeamsPage() {
           </button>
         </div>
 
+        {/* Success Alert */}
+        {successMessage && (
+          <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
+            <p className="text-green-700">{successMessage}</p>
+          </div>
+        )}
+
         {/* Error Alert */}
         {error && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
             <p className="text-red-700">{error}</p>
+          </div>
+        )}
+
+        {/* Pending Invitations Section */}
+        {pendingInvitations.length > 0 && (
+          <div className="mb-8">
+            <div className="bg-white rounded-lg shadow overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-200 bg-amber-50">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Pending Invitations ({pendingInvitations.length})
+                  </h2>
+                  <span className="text-sm text-gray-600">You've been invited to join these teams</span>
+                </div>
+              </div>
+              <div className="divide-y divide-gray-200">
+                {pendingInvitations.map((invitation) => (
+                  <div key={invitation.id} className="px-6 py-4 hover:bg-gray-50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center">
+                            <svg className="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="font-semibold text-gray-900">{invitation.team_name}</h3>
+                              <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                                {formatRole(invitation.role)}
+                              </span>
+                            </div>
+                            <p className="text-sm text-gray-600">
+                              Invited by {invitation.invited_by_name || 'Unknown'} •
+                              Expires {new Date(invitation.expires_at).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 ml-4">
+                        <button
+                          onClick={() => handleAcceptInvitation(invitation.id, invitation.token)}
+                          disabled={isProcessingInvite}
+                          className="bg-green-600 text-white px-4 py-2 rounded-md font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors text-sm"
+                        >
+                          Accept
+                        </button>
+                        <button
+                          onClick={() => handleDeclineInvitation(invitation.id, invitation.team_name)}
+                          disabled={isProcessingInvite}
+                          className="bg-white text-gray-700 px-4 py-2 rounded-md font-medium border border-gray-300 hover:bg-gray-50 disabled:bg-gray-100 disabled:cursor-not-allowed transition-colors text-sm"
+                        >
+                          Decline
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         )}
 

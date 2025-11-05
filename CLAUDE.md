@@ -45,6 +45,7 @@
 | `docs/GAME_TRACKING_UX_IMPROVEMENTS.md` | Ice-first flow, PWA setup |
 | `docs/PWA_INSTALLATION_GUIDE.md` | End-user PWA install guide |
 | `docs/ROSTER_MANAGEMENT.md` | Player roster management |
+| `docs/INVITATION_SYSTEM.md` | **NEW** Team invitation system (email + shareable links) |
 | `docs/PHASE_7_PROGRESS.md` | Team management progress tracker |
 
 ---
@@ -82,8 +83,8 @@ AI:        OpenAI GPT-4o
 
 ## 📊 PROJECT STATUS
 
-**Current Phase**: Phase 7 - Team & Roster Management (Milestones 1-5 Complete)
-**MVP Completion**: ~95% complete 🎯
+**Current Phase**: Phase 7 - Team & Roster Management (Milestones 1-6 Complete)
+**MVP Completion**: ~97% complete 🎯
 **Test Coverage**: 384/409 tests passing (93.9%)
 
 ### Recent Milestones ✅
@@ -91,10 +92,11 @@ AI:        OpenAI GPT-4o
 - [x] **Milestone 2**: Team creation UI
 - [x] **Milestone 3**: Player roster management
 - [x] **Milestone 4**: Team selector & context (multi-team support)
-- [x] **Milestone 5**: Roster integration with game tracking ⭐ NEW
+- [x] **Milestone 5**: Roster integration with game tracking
+- [x] **Milestone 6**: Team invitation system (email + shareable links) ⭐ NEW
 
 ### Next Up 🚧
-- [ ] **Milestone 6**: User settings & team switching
+- [ ] **Milestone 7**: User settings & team switching
 
 **See**: `docs/PHASE_7_PROGRESS.md` for detailed plan
 
@@ -112,6 +114,7 @@ npm run test         # Run Vitest tests
 ### Demo Pages
 - 🏆 `/demo/teams` - Teams list
 - 👥 `/demo/teams/[teamId]/roster` - Roster management
+- 🤝 `/demo/teams/[teamId]/members` - Team members & invitations
 - 🏒 `/demo/game-tracking` - Live game tracking
 - 📊 `/demo/analytics` - Post-game analytics
 - 📚 `/demo/drills` - Drill library
@@ -170,6 +173,7 @@ npm run test         # Run Vitest tests
 ### ✅ Completed
 - User auth (email/password + reset flow)
 - Organization + team + player management
+- Team invitation system (email + shareable links)
 - Live game tracking (6 event types) with real roster data
 - Interactive ice surface (tap-to-log)
 - Post-game analytics dashboard with player stats table
@@ -181,7 +185,7 @@ npm run test         # Run Vitest tests
 - Mobile-first responsive design
 
 ### 🚧 In Progress
-- User settings & preferences
+- User settings & preferences (Milestone 7)
 
 ### 📋 Deferred to Post-MVP
 - Offline support (IndexedDB + sync)
@@ -219,7 +223,7 @@ npm run test         # Run Vitest tests
 
 ## 🎯 WHAT TO WORK ON NEXT?
 
-**Current Focus**: Milestone 6 - User Settings & Team Switching
+**Current Focus**: Milestone 7 - User Settings & Team Switching
 
 **Goal**: Add user settings page and improve team switching UI
 
@@ -232,9 +236,11 @@ npm run test         # Run Vitest tests
 
 **See**: `docs/PHASE_7_PROGRESS.md` for detailed plan
 
+**Recently Completed**: Team invitation system with email delivery (Resend) and shareable links - see `docs/INVITATION_SYSTEM.md`
+
 ---
 
-**Last Updated**: 2025-11-03
+**Last Updated**: 2025-11-04
 **Maintained By**: Brock Arnold + Claude
 **Project Name**: HP2 (Hockey Practice Planner v2)
 

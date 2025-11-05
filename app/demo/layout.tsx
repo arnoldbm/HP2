@@ -6,6 +6,7 @@ import { supabase } from '@/lib/db/supabase'
 import { getUserTeams } from '@/app/actions/teams'
 import { TeamProvider, useTeam } from '@/lib/contexts/team-context'
 import { TeamSelector } from '@/components/teams/team-selector'
+import { EmailVerificationBanner } from '@/components/auth/email-verification-banner'
 
 interface Team {
   id: string
@@ -20,6 +21,8 @@ function DemoLayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const [teams, setTeams] = useState<Team[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [userEmail, setUserEmail] = useState<string | null>(null)
+  const [emailVerified, setEmailVerified] = useState<boolean>(true)
   const { selectedTeamId, selectTeam } = useTeam()
 
   useEffect(() => {
@@ -37,6 +40,26 @@ function DemoLayoutContent({ children }: { children: React.ReactNode }) {
           setIsLoading(false)
           return
         }
+
+        // Get user profile to check custom email_verified field
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('email, email_verified')
+          .eq('id', user.id)
+          .single()
+
+        const email = profile?.email || user.email || null
+        const verified = profile?.email_verified ?? false
+        setUserEmail(email)
+        setEmailVerified(verified)
+
+        console.log('🔍 LAYOUT DEBUG:', {
+          email,
+          verified,
+          profileEmailVerified: profile?.email_verified,
+          supabaseEmailConfirmedAt: user.email_confirmed_at,
+          willShowBanner: !verified && !!email,
+        })
 
         const result = await getUserTeams(user.id)
 
@@ -143,10 +166,31 @@ function DemoLayoutContent({ children }: { children: React.ReactNode }) {
               >
                 Settings
               </button>
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut()
+                  router.push('/auth/signin')
+                }}
+                className="px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
+              >
+                Sign Out
+              </button>
             </div>
           </div>
         </div>
       </nav>
+
+      {/* Email Verification Banner */}
+      {(() => {
+        const shouldShow = !isLoading && userEmail && !emailVerified
+        console.log('🎨 BANNER RENDER CHECK:', {
+          isLoading,
+          userEmail,
+          emailVerified,
+          shouldShow,
+        })
+        return shouldShow ? <EmailVerificationBanner email={userEmail} /> : null
+      })()}
 
       {/* Main Content */}
       <main>{children}</main>

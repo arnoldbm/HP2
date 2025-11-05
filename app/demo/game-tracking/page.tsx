@@ -23,6 +23,7 @@ export default function GameTrackingDemoPage() {
   const [error, setError] = useState<string | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [checkingAuth, setCheckingAuth] = useState(true)
+  const [emailVerified, setEmailVerified] = useState(true)
   const [gameInfo, setGameInfo] = useState<GameInfo | null>(null)
   const [isEditingGameInfo, setIsEditingGameInfo] = useState(false)
   const [editOpponentName, setEditOpponentName] = useState('')
@@ -156,6 +157,20 @@ export default function GameTrackingDemoPage() {
 
         if (!user) {
           throw new Error('User not found')
+        }
+
+        // Check if email is verified (using our custom field)
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('email_verified')
+          .eq('id', user.id)
+          .single()
+
+        if (!profile?.email_verified) {
+          setEmailVerified(false)
+          setError('email_not_verified')
+          setLoading(false)
+          return
         }
 
         // Determine which team to use
@@ -392,6 +407,37 @@ export default function GameTrackingDemoPage() {
   }
 
   if (error) {
+    // Special handling for email not verified
+    if (error === 'email_not_verified') {
+      return (
+        <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-6 max-w-md">
+            <h2 className="text-amber-900 font-bold text-lg mb-2">📧 Email Verification Required</h2>
+            <p className="text-amber-700 mb-4">
+              You need to verify your email address before you can track games.
+            </p>
+            <p className="text-amber-700 mb-4">
+              Check your inbox for a verification link. Once verified, you'll have full access to game tracking.
+            </p>
+            <div className="flex gap-3">
+              <a
+                href="/demo/teams"
+                className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition-colors"
+              >
+                Go to Teams
+              </a>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded transition-colors"
+              >
+                I've Verified
+              </button>
+            </div>
+          </div>
+        </div>
+      )
+    }
+
     // Special handling for empty roster
     if (error === 'empty_roster') {
       return (

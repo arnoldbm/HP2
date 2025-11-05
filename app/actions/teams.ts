@@ -70,8 +70,31 @@ export async function createTeam(input: TeamCreateInput, userId: string): Promis
     role: string
   }
   error?: string
+  requiresVerification?: boolean
 }> {
   try {
+    // Check if user's email is verified (using our custom field)
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('email_verified')
+      .eq('id', userId)
+      .single()
+
+    if (profileError || !profile) {
+      return {
+        success: false,
+        error: 'User profile not found',
+      }
+    }
+
+    if (!profile.email_verified) {
+      return {
+        success: false,
+        error: 'Please verify your email address before creating a team',
+        requiresVerification: true,
+      }
+    }
+
     // Validate input
     const validatedData = teamCreateSchema.parse(input)
 
@@ -398,18 +421,10 @@ export async function getTeamMembers(teamId: string): Promise<{
   error?: string
 }> {
   try {
+    // Get team members
     const { data: members, error } = await supabaseAdmin
       .from('team_members')
-      .select(`
-        id,
-        user_id,
-        role,
-        created_at,
-        user_profiles:user_id (
-          email,
-          full_name
-        )
-      `)
+      .select('id, user_id, role, created_at')
       .eq('team_id', teamId)
       .order('created_at', { ascending: true })
 
@@ -421,15 +436,37 @@ export async function getTeamMembers(teamId: string): Promise<{
       }
     }
 
-    // Transform the data to flatten user_profiles
-    const formattedMembers = members?.map((member: any) => ({
-      id: member.id,
-      user_id: member.user_id,
-      role: member.role,
-      created_at: member.created_at,
-      email: member.user_profiles?.email || '',
-      full_name: member.user_profiles?.full_name || null,
-    })) || []
+    if (!members || members.length === 0) {
+      return {
+        success: true,
+        members: [],
+      }
+    }
+
+    // Get user profiles for all members
+    const userIds = members.map((m) => m.user_id)
+    const { data: profiles, error: profilesError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('id, email, full_name')
+      .in('id', userIds)
+
+    if (profilesError) {
+      console.error('Failed to fetch user profiles:', profilesError)
+      // Continue with members data but without profile info
+    }
+
+    // Merge member data with profile data
+    const formattedMembers = members.map((member) => {
+      const profile = profiles?.find((p) => p.id === member.user_id)
+      return {
+        id: member.id,
+        user_id: member.user_id,
+        role: member.role,
+        created_at: member.created_at,
+        email: profile?.email || '',
+        full_name: profile?.full_name || null,
+      }
+    })
 
     return {
       success: true,

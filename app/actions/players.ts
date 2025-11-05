@@ -9,9 +9,10 @@ import { playerCreateSchema, playerUpdateSchema, type PlayerCreateInput } from '
  * Add a new player to a team roster
  *
  * @param input - Player creation data
+ * @param userId - User ID performing the action
  * @returns Created player
  */
-export async function createPlayer(input: PlayerCreateInput): Promise<{
+export async function createPlayer(input: PlayerCreateInput, userId: string): Promise<{
   success: boolean
   player?: {
     id: string
@@ -23,8 +24,31 @@ export async function createPlayer(input: PlayerCreateInput): Promise<{
     birthdate: string | null
   }
   error?: string
+  requiresVerification?: boolean
 }> {
   try {
+    // Check if user's email is verified (using our custom field)
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('email_verified')
+      .eq('id', userId)
+      .single()
+
+    if (profileError || !profile) {
+      return {
+        success: false,
+        error: 'User profile not found',
+      }
+    }
+
+    if (!profile.email_verified) {
+      return {
+        success: false,
+        error: 'Please verify your email address before adding players',
+        requiresVerification: true,
+      }
+    }
+
     // Validate input
     const validatedData = playerCreateSchema.parse(input)
 
@@ -135,17 +159,42 @@ export async function getTeamRoster(teamId: string): Promise<{
  *
  * @param playerId - Player ID
  * @param input - Player update data
+ * @param userId - User ID performing the action
  * @returns Updated player
  */
 export async function updatePlayer(
   playerId: string,
-  input: { jersey_number?: number; first_name?: string; last_name?: string; position?: string; birthdate?: string }
+  input: { jersey_number?: number; first_name?: string; last_name?: string; position?: string; birthdate?: string },
+  userId: string
 ): Promise<{
   success: boolean
   player?: any
   error?: string
+  requiresVerification?: boolean
 }> {
   try {
+    // Check if user's email is verified (using our custom field)
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('email_verified')
+      .eq('id', userId)
+      .single()
+
+    if (profileError || !profile) {
+      return {
+        success: false,
+        error: 'User profile not found',
+      }
+    }
+
+    if (!profile.email_verified) {
+      return {
+        success: false,
+        error: 'Please verify your email address before editing players',
+        requiresVerification: true,
+      }
+    }
+
     // Validate input
     const validatedData = playerUpdateSchema.parse(input)
 
@@ -210,13 +259,37 @@ export async function updatePlayer(
  * Remove a player from the roster
  *
  * @param playerId - Player ID
+ * @param userId - User ID performing the action
  * @returns Success status
  */
-export async function deletePlayer(playerId: string): Promise<{
+export async function deletePlayer(playerId: string, userId: string): Promise<{
   success: boolean
   error?: string
+  requiresVerification?: boolean
 }> {
   try {
+    // Check if user's email is verified (using our custom field)
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('email_verified')
+      .eq('id', userId)
+      .single()
+
+    if (profileError || !profile) {
+      return {
+        success: false,
+        error: 'User profile not found',
+      }
+    }
+
+    if (!profile.email_verified) {
+      return {
+        success: false,
+        error: 'Please verify your email address before deleting players',
+        requiresVerification: true,
+      }
+    }
+
     const { error } = await supabaseAdmin.from('players').delete().eq('id', playerId)
 
     if (error) {
