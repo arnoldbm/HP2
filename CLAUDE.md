@@ -45,13 +45,21 @@
 | `docs/GAME_TRACKING_UX_IMPROVEMENTS.md` | Ice-first flow, PWA setup |
 | `docs/PWA_INSTALLATION_GUIDE.md` | End-user PWA install guide |
 | `docs/ROSTER_MANAGEMENT.md` | Player roster management |
-| `docs/INVITATION_SYSTEM.md` | **NEW** Team invitation system (email + shareable links) |
+| `docs/INVITATION_SYSTEM.md` | Team invitation system (email + shareable links) |
 | `docs/PHASE_7_PROGRESS.md` | Team management progress tracker |
+
+### Native Mobile App (React Native + Expo)
+| Document | Purpose |
+|----------|---------|
+| `docs/NATIVE_APP_LAUNCH_PLAN.md` | **⭐ START HERE** 10-week launch plan (Phases 1-8) |
+| `docs/MOBILE_APP_SETUP.md` | **NEW** Phase 1 & 3 complete - Setup & testing infrastructure |
+| `docs/MOBILE_APP_DEVELOPMENT.md` | **NEW** Phase 4-5 plan - Core screens (Weeks 4-6) |
 
 ---
 
 ## 🏗️ TECH STACK
 
+### Web App (packages/web)
 ```
 Frontend:  Next.js 14+ (App Router, TypeScript)
 Backend:   Supabase (PostgreSQL + Auth + RLS)
@@ -60,6 +68,26 @@ State:     Zustand
 Forms:     React Hook Form + Zod
 UI:        TailwindCSS + shadcn/ui
 AI:        OpenAI GPT-4o
+```
+
+### Mobile App (packages/mobile) - NEW! 📱
+```
+Framework: React Native + Expo (iOS + Android)
+Routing:   Expo Router (file-based)
+Testing:   Jest + React Native Testing Library
+State:     Zustand (via @hockeypilot/shared)
+Backend:   Supabase (shared with web)
+UI:        React Native components
+Payments:  RevenueCat (cross-platform subscriptions)
+```
+
+### Shared Package (packages/shared)
+```
+Stores:    Zustand stores (game tracking, etc.)
+Types:     TypeScript types & interfaces
+Validation: Zod schemas
+Utils:     Helper functions (ice coordinates, age groups)
+Analytics: Game statistics calculations
 ```
 
 ---
@@ -76,6 +104,10 @@ AI:        OpenAI GPT-4o
 | **Team context with localStorage** | Multi-team support, persists selection |
 | **Ice-click-first event logging** | Ice surface is primary interaction |
 | **PWA with fullscreen support** | Works offline, fullscreen on iOS via home screen |
+| **Monorepo with shared package** | Single source of truth for business logic |
+| **Expo Router for mobile navigation** | File-based routing (like Next.js), simpler mental model |
+| **AsyncStorage for auth tokens** | Supabase handles encryption, sufficient for tokens |
+| **React Native + Expo (not Capacitor)** | Better native performance, larger ecosystem |
 
 **Full list**: See `docs/TROUBLESHOOTING.md` for detailed explanations
 
@@ -83,36 +115,61 @@ AI:        OpenAI GPT-4o
 
 ## 📊 PROJECT STATUS
 
-**Current Phase**: Phase 7 - Team & Roster Management (ALL MILESTONES COMPLETE) 🎉
-**MVP Completion**: 100% complete 🎯
+### Web App (MVP)
+**Phase 7**: ✅ Complete - All milestones done! 🎉
 **Test Coverage**: 384/409 tests passing (93.9%)
 
-### Recent Milestones ✅
-- [x] **Milestone 1**: Organization auto-creation
-- [x] **Milestone 2**: Team creation UI
-- [x] **Milestone 3**: Player roster management
-- [x] **Milestone 4**: Team selector & context (multi-team support)
-- [x] **Milestone 5**: Roster integration with game tracking
-- [x] **Milestone 6**: Team invitation system (email + shareable links)
-- [x] **Milestone 7**: User settings & team switching 🎉 NEW
+**Recent Milestones** ✅:
+- [x] Organization auto-creation
+- [x] Team creation & management
+- [x] Player roster management
+- [x] Team selector & context (multi-team support)
+- [x] Roster integration with game tracking
+- [x] Team invitation system (email + shareable links)
+- [x] User settings & team switching
 
-### Next Up 🚧
-- [ ] **Post-MVP Features**: See below for options
+### Mobile App (Native iOS + Android) - NEW! 📱
+**Phase 3**: ✅ Complete - Setup & testing infrastructure
+**Phase 4-5**: 🚧 In Progress - Core screens (Weeks 4-6)
 
-**See**: `docs/PHASE_7_PROGRESS.md` for detailed implementation
+**Completed** ✅:
+- [x] Expo app with tabs template
+- [x] Jest + React Native Testing Library setup
+- [x] Supabase client configured (AsyncStorage)
+- [x] Test helpers and mock factories
+- [x] Linked to @hockeypilot/shared package
+- [x] Bundle IDs configured (com.hockeypilot.app)
+
+**Next Up** 🚧:
+- [ ] Auth context provider
+- [ ] UI component library (Button, Input, Text)
+- [ ] Auth screens (login, signup, forgot password)
+- [ ] Teams & roster screens
+- [ ] Game tracking with IceSurface component
+
+**See**: `docs/MOBILE_APP_DEVELOPMENT.md` for detailed Phase 4-5 plan
 
 ---
 
 ## 🛠️ LOCAL DEVELOPMENT
 
-### Quick Start
+### Quick Start - Web App
 ```bash
 npm run dev          # Start Next.js (http://localhost:3000)
 npx supabase start   # Start local Supabase
 npm run test         # Run Vitest tests
 ```
 
-### Demo Pages
+### Quick Start - Mobile App 📱
+```bash
+cd packages/mobile
+npm start            # Start Expo dev server
+npm test             # Run Jest tests
+npm run ios          # Run on iOS simulator
+npm run android      # Run on Android emulator
+```
+
+### Demo Pages (Web)
 - 🏆 `/demo/teams` - Teams list
 - 👥 `/demo/teams/[teamId]/roster` - Roster management
 - 🤝 `/demo/teams/[teamId]/members` - Team members & invitations
@@ -229,34 +286,48 @@ npm run test         # Run Vitest tests
 
 ## 🎯 WHAT TO WORK ON NEXT?
 
-**Phase 7 Complete!** 🎉 All MVP features are now implemented.
+**Current Focus**: 📱 **Native Mobile App Development** (Phase 4-5)
 
-**Recently Completed**:
-- Milestone 6: Team invitation system with email delivery and shareable links
-- Milestone 7: User settings, team settings, and team switching improvements
+### Mobile App - Week 4: Auth & Foundation 🚧 IN PROGRESS
 
-**Next Options**:
+**Recently Completed** ✅:
+- Phase 3: Expo setup with testing infrastructure
+- Supabase client configured for React Native
+- Test helpers and mock factories
 
-### Option A: Polish & Testing 🧪
-- Write integration tests for Milestone 6 & 7 features
+**Next Tasks** (in order):
+1. **Auth Context Provider**
+   - Create auth context with session management
+   - Write tests for auth state changes
+   - Handle login/logout flows
+
+2. **UI Component Library**
+   - Button, Input, Text components (TDD)
+   - Consistent design system
+   - 80%+ test coverage
+
+3. **Auth Screens**
+   - Login screen (TDD)
+   - Signup screen (TDD)
+   - Forgot password screen (TDD)
+
+**See**: `docs/MOBILE_APP_DEVELOPMENT.md` for detailed Week 4-6 plan
+
+---
+
+### Alternative Options (if pausing mobile work):
+
+#### Option A: Web App Polish & Testing 🧪
+- Write integration tests for team invitation system
 - Add E2E tests for critical user flows
 - Performance testing with 50+ events per game
-- Mobile UX refinements and polish
 
-### Option B: Post-MVP Features 🚀
-- **Offline Support**: IndexedDB + background sync for offline game tracking
-- **Stripe Integration**: Payment processing for premium features
-- **Multi-Tracker Collaboration**: Real-time multi-coach game tracking
-- **Season Analytics**: Long-term trend analysis across multiple games
-- **Comparative Analytics**: Team vs league average comparisons
+#### Option B: Web App Post-MVP Features 🚀
+- **Offline Support**: IndexedDB + background sync
+- **Stripe Integration**: Payment processing
+- **Season Analytics**: Long-term trend analysis
 
-### Option C: Pre-Launch 🎯
-- Design onboarding flow for new coaches
-- Beta test with 3-5 real teams for a full season
-- Performance optimization and load testing
-- Documentation for end users
-
-**See**: `docs/PHASE_7_PROGRESS.md` for Phase 7 details
+**See**: `docs/PHASE_7_PROGRESS.md` for web app details
 
 ---
 
@@ -269,14 +340,22 @@ npm run test         # Run Vitest tests
 ## 💬 ASSISTANT INSTRUCTIONS
 
 When the user asks what to work on:
-1. Check `docs/PHASE_7_PROGRESS.md` for current milestone
-2. Offer to continue with the next task in the plan
-3. Or ask what specific feature/issue they want to address
+1. **Mobile App**: Check `docs/MOBILE_APP_DEVELOPMENT.md` for current tasks (Phase 4-5)
+2. **Web App**: Check `docs/PHASE_7_PROGRESS.md` (complete, see post-MVP options)
+3. Offer to continue with the next task in the plan
+4. Or ask what specific feature/issue they want to address
+
+When working on mobile app:
+1. Follow TDD approach (write tests first!)
+2. Reuse code from `@hockeypilot/shared` when possible
+3. Check `docs/MOBILE_APP_SETUP.md` for setup verification
+4. Run `npm test` in packages/mobile frequently
 
 When encountering an error:
 1. Check `docs/TROUBLESHOOTING.md` for known issues
 2. Check `docs/DATABASE_REFERENCE.md` for schema/RLS issues
 3. Check `docs/COMPONENTS_INVENTORY.md` for component locations
+4. Check `docs/MOBILE_APP_SETUP.md` for mobile-specific issues
 
 When adding documentation:
 1. Add to appropriate specialized doc (not this file!)
