@@ -44,6 +44,22 @@ interface GameAnalytics {
       successRate: number
     }>
   }
+  zoneExitAnalytics?: {
+    total: number
+    controlled: number
+    uncontrolled: number
+    successRate: number
+  }
+  defensiveAnalytics?: {
+    blockedShots: number
+    takeaways: number
+    goalsAgainst: number
+  }
+  penaltyAnalytics?: {
+    total: number
+    taken: number
+    drawn: number
+  }
   turnoverCount: number
   periodStats: Array<{
     period: number
@@ -68,7 +84,16 @@ interface GeneratePracticePlanRequest {
 
 // AI prompt template for practice plan generation
 function buildPracticePlanPrompt(analytics: GameAnalytics, drills: any[], teamAge?: number): string {
-  const { shotQualityStats, breakoutAnalytics, turnoverCount, periodStats, situationStats } = analytics
+  const {
+    shotQualityStats,
+    breakoutAnalytics,
+    zoneExitAnalytics,
+    defensiveAnalytics,
+    penaltyAnalytics,
+    turnoverCount,
+    periodStats,
+    situationStats
+  } = analytics
 
   // Provide defaults for missing stats
   const totalShots = shotQualityStats?.totalShots || 0
@@ -100,9 +125,31 @@ ${(breakoutAnalytics?.successRate || 0) < 60 ? '⚠️ POOR BREAKOUT EXECUTION -
 Breakout Types:
 ${Array.isArray(breakoutAnalytics?.byType) ? breakoutAnalytics.byType.map(bt => `- ${bt.type}: ${bt.successRate.toFixed(1)}% success (${bt.successful}/${bt.total})`).join('\n') : 'No breakout data available'}
 
+${zoneExitAnalytics ? `### Zone Exit Performance
+- Success Rate: ${zoneExitAnalytics.successRate.toFixed(1)}% (${zoneExitAnalytics.controlled}/${zoneExitAnalytics.total} controlled)
+- Controlled Exits: ${zoneExitAnalytics.controlled}
+- Uncontrolled Exits: ${zoneExitAnalytics.uncontrolled}
+${zoneExitAnalytics.successRate < 50 ? '⚠️ LOW ZONE EXIT SUCCESS RATE - Need defensive zone puck movement drills' : ''}
+` : ''}
+
 ### Turnovers
 - Total Turnovers: ${turnoverCount}
 ${turnoverCount > 15 ? '⚠️ HIGH TURNOVER COUNT - Need puck protection drills' : ''}
+
+${defensiveAnalytics ? `### Defensive Performance
+- Blocked Shots: ${defensiveAnalytics.blockedShots}
+- Takeaways: ${defensiveAnalytics.takeaways}
+- Goals Against: ${defensiveAnalytics.goalsAgainst}
+${defensiveAnalytics.blockedShots < 5 ? '⚠️ LOW BLOCKED SHOTS - Need more defensive commitment' : ''}
+${defensiveAnalytics.takeaways < 3 ? '⚠️ LOW TAKEAWAYS - Need active stick and gap control work' : ''}
+${defensiveAnalytics.goalsAgainst > 5 ? '⚠️ HIGH GOALS AGAINST - Defensive structure needs work' : ''}
+` : ''}
+
+${penaltyAnalytics && penaltyAnalytics.total > 0 ? `### Penalties
+- Total Penalties: ${penaltyAnalytics.total} (${penaltyAnalytics.taken} taken, ${penaltyAnalytics.drawn} drawn)
+${penaltyAnalytics.taken > 5 ? '⚠️ HIGH PENALTY COUNT - Need discipline and positioning work' : ''}
+${penaltyAnalytics.drawn > penaltyAnalytics.taken ? '✅ GOOD - Drawing more penalties than taking' : ''}
+` : ''}
 
 ### Period-by-Period Trends
 ${periodStats.map(ps => `Period ${ps.period}: ${ps.shots} shots, ${ps.goals} goals, ${ps.events} total events`).join('\n')}

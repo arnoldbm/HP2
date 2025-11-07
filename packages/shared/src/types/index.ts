@@ -2,6 +2,9 @@
  * Shared TypeScript types for HockeyPilot
  */
 
+// Import types needed in this file
+import type { EventType } from './game-events'
+
 // Re-export common types
 export type Platform = 'web' | 'ios' | 'android'
 
@@ -44,12 +47,8 @@ export interface Game {
   created_at: string
 }
 
-// Event types
-export type EventType = 'shot' | 'turnover' | 'breakout' | 'zone_entry' | 'faceoff' | 'blocked_shot' | 'penalty'
-
-export type ShotResult = 'goal' | 'save' | 'miss_high' | 'miss_wide' | 'blocked' | 'post'
-
-export type ShotType = 'wrist' | 'slap' | 'snap' | 'backhand' | 'deflection' | 'one_timer'
+// Re-export game event types from dedicated module
+export * from './game-events'
 
 export type GameSituation = 'even_strength' | 'power_play' | 'penalty_kill' | 'empty_net'
 

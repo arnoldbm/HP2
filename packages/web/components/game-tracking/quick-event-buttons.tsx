@@ -60,11 +60,46 @@ const defaultEventButtons: EventButton[] = [
     icon: '➡️',
   },
   {
+    type: 'zone_exit',
+    label: 'Zone Exit',
+    color: 'bg-cyan-500 hover:bg-cyan-600 text-white',
+    bgHover: 'hover:bg-cyan-50',
+    icon: '🧊',
+  },
+  {
+    type: 'blocked_shot',
+    label: 'Blocked Shot',
+    color: 'bg-indigo-500 hover:bg-indigo-600 text-white',
+    bgHover: 'hover:bg-indigo-50',
+    icon: '🧍‍♂️',
+  },
+  {
+    type: 'takeaway',
+    label: 'Takeaway',
+    color: 'bg-emerald-500 hover:bg-emerald-600 text-white',
+    bgHover: 'hover:bg-emerald-50',
+    icon: '⚔️',
+  },
+  {
     type: 'faceoff',
     label: 'Faceoff',
     color: 'bg-purple-500 hover:bg-purple-600 text-white',
     bgHover: 'hover:bg-purple-50',
     icon: '⚫',
+  },
+  {
+    type: 'penalty',
+    label: 'Penalty',
+    color: 'bg-orange-500 hover:bg-orange-600 text-white',
+    bgHover: 'hover:bg-orange-50',
+    icon: '🚨',
+  },
+  {
+    type: 'goal_against',
+    label: 'Goal Against',
+    color: 'bg-rose-600 hover:bg-rose-700 text-white',
+    bgHover: 'hover:bg-rose-50',
+    icon: '🧱',
   },
 ]
 

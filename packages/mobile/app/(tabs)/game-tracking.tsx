@@ -12,9 +12,12 @@ import {
 } from 'react-native'
 import { IceSurface } from '@/components/game-tracking/IceSurface'
 import { PlayerSelector, type Player } from '@/components/game-tracking/PlayerSelector'
+import { EventContextMenu } from '@/components/game-tracking/EventContextMenu'
 import { AppText, Button } from '@/components/ui'
 import { supabase } from '@/lib/supabase'
 import type { Coordinates } from '@/lib/utils/ice-surface-coordinates'
+import type { EventType, EventDetails, getEventLabel } from '@hockeypilot/shared'
+import { getEventLabel as getLabel } from '@hockeypilot/shared'
 
 interface Team {
   id: string
@@ -35,11 +38,12 @@ interface GameEvent {
   id: string
   game_id: string
   player_id: string
-  event_type: 'shot' | 'goal' | 'turnover' | 'breakout' | 'zone_entry'
+  event_type: EventType
   x_coord: number
   y_coord: number
   period: number
   event_timestamp: string
+  details?: EventDetails
 }
 
 export function GameTrackingScreen() {
@@ -57,8 +61,10 @@ export function GameTrackingScreen() {
   // Event logging state
   const [pendingLocation, setPendingLocation] = useState<Coordinates | null>(null)
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null)
+  const [selectedEventType, setSelectedEventType] = useState<EventType | null>(null)
   const [showPlayerSelector, setShowPlayerSelector] = useState(false)
   const [showEventTypeSelector, setShowEventTypeSelector] = useState(false)
+  const [showContextMenu, setShowContextMenu] = useState(false)
 
   // Timer state
   const [isTimerRunning, setIsTimerRunning] = useState(false)
@@ -156,8 +162,15 @@ export function GameTrackingScreen() {
       if (error) throw error
       setEvents(data || [])
 
-      // Calculate score from events
-      const goals = data?.filter((e) => e.event_type === 'goal').length || 0
+      // Calculate score from shot events with result='goal'
+      const goals =
+        data?.filter(
+          (e) =>
+            e.event_type === 'shot' &&
+            e.details &&
+            'result' in e.details &&
+            e.details.result === 'goal'
+        ).length || 0
       setScore(goals)
     } catch (error) {
       console.error('Error loading events:', error)
@@ -227,8 +240,14 @@ export function GameTrackingScreen() {
     setShowEventTypeSelector(true)
   }
 
-  const handleEventTypeSelect = async (eventType: GameEvent['event_type']) => {
-    if (!game || !pendingLocation || !selectedPlayerId) return
+  const handleEventTypeSelect = (eventType: EventType) => {
+    setSelectedEventType(eventType)
+    setShowEventTypeSelector(false)
+    setShowContextMenu(true)
+  }
+
+  const handleContextComplete = async (details: EventDetails) => {
+    if (!game || !pendingLocation || !selectedPlayerId || !selectedEventType) return
 
     try {
       const { data, error } = await supabase
@@ -236,11 +255,12 @@ export function GameTrackingScreen() {
         .insert({
           game_id: game.id,
           player_id: selectedPlayerId,
-          event_type: eventType,
+          event_type: selectedEventType,
           x_coord: pendingLocation.x,
           y_coord: pendingLocation.y,
           period: currentPeriod,
           event_timestamp: new Date().toISOString(),
+          details,
         })
         .select()
         .single()
@@ -249,15 +269,16 @@ export function GameTrackingScreen() {
 
       setEvents((prev) => [...prev, data])
 
-      // Update score if it's a goal
-      if (eventType === 'goal') {
+      // Update score if it's a shot with result=goal
+      if (selectedEventType === 'shot' && 'result' in details && details.result === 'goal') {
         setScore((prev) => prev + 1)
       }
 
       // Reset state
       setPendingLocation(null)
       setSelectedPlayerId(null)
-      setShowEventTypeSelector(false)
+      setSelectedEventType(null)
+      setShowContextMenu(false)
     } catch (error) {
       console.error('Error logging event:', error)
       Alert.alert('Error', 'Failed to log event')
@@ -274,6 +295,11 @@ export function GameTrackingScreen() {
     setShowEventTypeSelector(false)
   }
 
+  const handleCancelContextMenu = () => {
+    setSelectedEventType(null)
+    setShowContextMenu(false)
+  }
+
   const handleDeleteEvent = async (eventId: string, index: number) => {
     try {
       const { error } = await supabase
@@ -286,8 +312,13 @@ export function GameTrackingScreen() {
       const deletedEvent = events[index]
       setEvents((prev) => prev.filter((e) => e.id !== eventId))
 
-      // Update score if it was a goal
-      if (deletedEvent.event_type === 'goal') {
+      // Update score if it was a shot with result=goal
+      if (
+        deletedEvent.event_type === 'shot' &&
+        deletedEvent.details &&
+        'result' in deletedEvent.details &&
+        deletedEvent.details.result === 'goal'
+      ) {
         setScore((prev) => Math.max(0, prev - 1))
       }
     } catch (error) {
@@ -607,52 +638,102 @@ export function GameTrackingScreen() {
               What happened?
             </AppText>
 
-            <View style={styles.eventTypeButtonGrid}>
-              <TouchableOpacity
-                style={styles.eventTypeButton}
-                onPress={() => handleEventTypeSelect('shot')}
-              >
-                <AppText variant="body" weight="semibold">
-                  Shot
-                </AppText>
-              </TouchableOpacity>
+            <ScrollView style={styles.eventTypeScrollView}>
+              <View style={styles.eventTypeButtonGrid}>
+                {/* Offensive Events */}
+                <TouchableOpacity
+                  style={styles.eventTypeButton}
+                  onPress={() => handleEventTypeSelect('shot')}
+                >
+                  <AppText variant="body" weight="semibold">
+                    {getLabel('shot')}
+                  </AppText>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.eventTypeButton}
-                onPress={() => handleEventTypeSelect('goal')}
-              >
-                <AppText variant="body" weight="semibold">
-                  Goal
-                </AppText>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.eventTypeButton}
+                  onPress={() => handleEventTypeSelect('zone_entry')}
+                >
+                  <AppText variant="body" weight="semibold">
+                    {getLabel('zone_entry')}
+                  </AppText>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.eventTypeButton}
-                onPress={() => handleEventTypeSelect('turnover')}
-              >
-                <AppText variant="body" weight="semibold">
-                  Turnover
-                </AppText>
-              </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.eventTypeButton}
+                  onPress={() => handleEventTypeSelect('breakout')}
+                >
+                  <AppText variant="body" weight="semibold">
+                    {getLabel('breakout')}
+                  </AppText>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.eventTypeButton}
-                onPress={() => handleEventTypeSelect('breakout')}
-              >
-                <AppText variant="body" weight="semibold">
-                  Breakout
-                </AppText>
-              </TouchableOpacity>
+                {/* Defensive Events */}
+                <TouchableOpacity
+                  style={styles.eventTypeButton}
+                  onPress={() => handleEventTypeSelect('zone_exit')}
+                >
+                  <AppText variant="body" weight="semibold">
+                    {getLabel('zone_exit')}
+                  </AppText>
+                </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.eventTypeButton}
-                onPress={() => handleEventTypeSelect('zone_entry')}
-              >
-                <AppText variant="body" weight="semibold">
-                  Zone Entry
-                </AppText>
-              </TouchableOpacity>
-            </View>
+                <TouchableOpacity
+                  style={styles.eventTypeButton}
+                  onPress={() => handleEventTypeSelect('blocked_shot')}
+                >
+                  <AppText variant="body" weight="semibold">
+                    {getLabel('blocked_shot')}
+                  </AppText>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.eventTypeButton}
+                  onPress={() => handleEventTypeSelect('takeaway')}
+                >
+                  <AppText variant="body" weight="semibold">
+                    {getLabel('takeaway')}
+                  </AppText>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.eventTypeButton}
+                  onPress={() => handleEventTypeSelect('turnover')}
+                >
+                  <AppText variant="body" weight="semibold">
+                    {getLabel('turnover')}
+                  </AppText>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.eventTypeButton}
+                  onPress={() => handleEventTypeSelect('goal_against')}
+                >
+                  <AppText variant="body" weight="semibold">
+                    {getLabel('goal_against')}
+                  </AppText>
+                </TouchableOpacity>
+
+                {/* Special Events */}
+                <TouchableOpacity
+                  style={styles.eventTypeButton}
+                  onPress={() => handleEventTypeSelect('faceoff')}
+                >
+                  <AppText variant="body" weight="semibold">
+                    {getLabel('faceoff')}
+                  </AppText>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.eventTypeButton}
+                  onPress={() => handleEventTypeSelect('penalty')}
+                >
+                  <AppText variant="body" weight="semibold">
+                    {getLabel('penalty')}
+                  </AppText>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
 
             <TouchableOpacity
               style={styles.cancelButton}
@@ -665,6 +746,16 @@ export function GameTrackingScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Event Context Menu */}
+      {selectedEventType && (
+        <EventContextMenu
+          visible={showContextMenu}
+          eventType={selectedEventType}
+          onComplete={handleContextComplete}
+          onCancel={handleCancelContextMenu}
+        />
+      )}
     </View>
   )
 }
@@ -812,30 +903,36 @@ const styles = StyleSheet.create({
   eventTypeModalCentered: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    padding: 24,
-    width: '90%',
-    maxWidth: 500,
+    padding: 20,
+    width: '95%',
+    maxWidth: 700,
+    maxHeight: '85%',
   },
   modalTitle: {
-    marginBottom: 20,
+    marginBottom: 16,
     textAlign: 'center',
+  },
+  eventTypeScrollView: {
+    flexGrow: 0,
+    flexShrink: 1,
   },
   eventTypeButtonGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
-    marginBottom: 16,
+    gap: 10,
+    paddingBottom: 12,
   },
   eventTypeButton: {
     backgroundColor: '#FFFFFF',
     borderWidth: 2,
     borderColor: '#3B82F6',
     borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
     alignItems: 'center',
-    flex: 1,
-    minWidth: 120,
+    justifyContent: 'center',
+    width: '23%',
+    minHeight: 52,
   },
   cancelButton: {
     backgroundColor: '#F3F4F6',

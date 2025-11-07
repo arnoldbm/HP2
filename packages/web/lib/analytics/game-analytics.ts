@@ -12,9 +12,15 @@ export interface PlayerStats {
   breakouts: number
   breakoutSuccessPct: number
   zoneEntries: number
+  zoneExits: number
+  zoneExitSuccessPct: number
+  blockedShots: number
+  takeaways: number
   faceoffs: number
   faceoffWins: number
   faceoffWinPct: number
+  penalties: number
+  goalsAgainst: number
   totalEvents: number
 }
 
@@ -50,6 +56,12 @@ export interface PeriodStats {
   turnovers: number
   breakouts: number
   zoneEntries: number
+  zoneExits: number
+  blockedShots: number
+  takeaways: number
+  faceoffs: number
+  penalties: number
+  goalsAgainst: number
 }
 
 export interface TurnoverData {
@@ -172,6 +184,78 @@ export function analyzeBreakouts(events: GameEvent[]): BreakoutAnalytics {
 }
 
 /**
+ * Analyze zone exit performance
+ */
+export function analyzeZoneExits(events: GameEvent[]) {
+  const zoneExits = events.filter((e) => e.eventType === 'zone_exit')
+
+  const analytics = {
+    total: zoneExits.length,
+    controlled: 0,
+    uncontrolled: 0,
+    successRate: 0,
+  }
+
+  zoneExits.forEach((exit) => {
+    if (exit.details.controlled === true) {
+      analytics.controlled++
+    } else {
+      analytics.uncontrolled++
+    }
+  })
+
+  if (analytics.total > 0) {
+    analytics.successRate = (analytics.controlled / analytics.total) * 100
+  }
+
+  return analytics
+}
+
+/**
+ * Analyze defensive performance
+ */
+export function analyzeDefensivePlay(events: GameEvent[]) {
+  return {
+    blockedShots: events.filter((e) => e.eventType === 'blocked_shot').length,
+    takeaways: events.filter((e) => e.eventType === 'takeaway').length,
+    goalsAgainst: events.filter((e) => e.eventType === 'goal_against').length,
+  }
+}
+
+/**
+ * Analyze penalties
+ */
+export function analyzePenalties(events: GameEvent[]) {
+  const penalties = events.filter((e) => e.eventType === 'penalty')
+
+  const analytics = {
+    total: penalties.length,
+    taken: 0,
+    drawn: 0,
+    bySeverity: {
+      minor: 0,
+      major: 0,
+      misconduct: 0,
+    } as Record<string, number>,
+  }
+
+  penalties.forEach((penalty) => {
+    if (penalty.details.type === 'taken') {
+      analytics.taken++
+    } else if (penalty.details.type === 'drawn') {
+      analytics.drawn++
+    }
+
+    const severity = penalty.details.severity as string
+    if (severity && analytics.bySeverity[severity] !== undefined) {
+      analytics.bySeverity[severity]++
+    }
+  })
+
+  return analytics
+}
+
+/**
  * Get period-by-period statistics
  */
 export function getPeriodStats(events: GameEvent[], maxPeriod = 3): PeriodStats[] {
@@ -189,6 +273,12 @@ export function getPeriodStats(events: GameEvent[], maxPeriod = 3): PeriodStats[
       turnovers: periodEvents.filter((e) => e.eventType === 'turnover').length,
       breakouts: periodEvents.filter((e) => e.eventType === 'breakout').length,
       zoneEntries: periodEvents.filter((e) => e.eventType === 'zone_entry').length,
+      zoneExits: periodEvents.filter((e) => e.eventType === 'zone_exit').length,
+      blockedShots: periodEvents.filter((e) => e.eventType === 'blocked_shot').length,
+      takeaways: periodEvents.filter((e) => e.eventType === 'takeaway').length,
+      faceoffs: periodEvents.filter((e) => e.eventType === 'faceoff').length,
+      penalties: periodEvents.filter((e) => e.eventType === 'penalty').length,
+      goalsAgainst: periodEvents.filter((e) => e.eventType === 'goal_against').length,
     })
   }
 
@@ -254,10 +344,27 @@ export function calculatePlayerStats(events: GameEvent[], players: Player[]): Pl
     // Zone entries
     const zoneEntries = playerEvents.filter((e) => e.eventType === 'zone_entry')
 
+    // Zone exits
+    const zoneExits = playerEvents.filter((e) => e.eventType === 'zone_exit')
+    const successfulZoneExits = zoneExits.filter((z) => z.details.controlled === true)
+    const zoneExitSuccessPct = zoneExits.length > 0 ? (successfulZoneExits.length / zoneExits.length) * 100 : 0
+
+    // Blocked shots (defensive)
+    const blockedShots = playerEvents.filter((e) => e.eventType === 'blocked_shot')
+
+    // Takeaways (defensive)
+    const takeaways = playerEvents.filter((e) => e.eventType === 'takeaway')
+
     // Faceoffs
     const faceoffs = playerEvents.filter((e) => e.eventType === 'faceoff')
     const faceoffWins = faceoffs.filter((f) => f.details.won === true)
     const faceoffWinPct = faceoffs.length > 0 ? (faceoffWins.length / faceoffs.length) * 100 : 0
+
+    // Penalties
+    const penalties = playerEvents.filter((e) => e.eventType === 'penalty')
+
+    // Goals against (defensive accountability)
+    const goalsAgainst = playerEvents.filter((e) => e.eventType === 'goal_against')
 
     return {
       playerId: player.id,
@@ -271,9 +378,15 @@ export function calculatePlayerStats(events: GameEvent[], players: Player[]): Pl
       breakouts: breakouts.length,
       breakoutSuccessPct,
       zoneEntries: zoneEntries.length,
+      zoneExits: zoneExits.length,
+      zoneExitSuccessPct,
+      blockedShots: blockedShots.length,
+      takeaways: takeaways.length,
       faceoffs: faceoffs.length,
       faceoffWins: faceoffWins.length,
       faceoffWinPct,
+      penalties: penalties.length,
+      goalsAgainst: goalsAgainst.length,
       totalEvents: playerEvents.length,
     }
   }).filter(stats => stats.totalEvents > 0) // Only show players with events

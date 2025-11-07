@@ -173,7 +173,8 @@ export function createGameTrackingStore(api: IGameEventsAPI) {
         loggingFlow: {
           ...prev.loggingFlow,
           playerId,
-          step: prev.loggingFlow.eventType === 'shot' ? 'select_details' : 'complete',
+          // All event types now require context details selection
+          step: 'select_details',
         },
       })),
 

@@ -5,9 +5,11 @@ import { useGameTrackingStore } from '@/lib/stores/game-tracking-store-configure
 import { IceSurface } from './ice-surface'
 import { PlayerSelector } from './player-selector'
 import { QuickEventButtons } from './quick-event-buttons'
+import { EventContextDialog } from './event-context-dialog'
 import { BottomSheet } from '@/components/ui/bottom-sheet'
 import type { Coordinates } from '@/lib/utils/ice-surface-coordinates'
-import type { ShotResult } from '@/lib/stores/game-tracking-store-configured'
+import type { ShotResult, EventType } from '@/lib/stores/game-tracking-store-configured'
+import type { EventDetails } from '@hockeypilot/shared'
 
 export interface EventLoggerProps {
   showZones?: boolean
@@ -111,11 +113,23 @@ export function EventLogger({
     cancelEventLogging()
   }
 
-  // Handle shot result selection
-  const handleShotResultSelect = (result: ShotResult) => {
-    setEventDetails({ result })
+  // Handle context details completion
+  const handleContextComplete = (details: EventDetails) => {
+    setEventDetails(details)
     completeEvent()
   }
+
+  // State for controlling context dialog
+  const [showContextDialog, setShowContextDialog] = useState(false)
+
+  // Show context dialog when step changes to select_details
+  useEffect(() => {
+    if (loggingFlow.step === 'select_details') {
+      setShowContextDialog(true)
+    } else {
+      setShowContextDialog(false)
+    }
+  }, [loggingFlow.step])
 
   // Check if game is completed
   const isGameCompleted = gameState.status === 'completed'
@@ -300,66 +314,44 @@ export function EventLogger({
         )
 
       case 'select_details':
-        // Shot result selection
-        if (loggingFlow.eventType === 'shot' || loggingFlow.eventType === 'goal') {
-          return (
-            <div className="space-y-2 md:space-y-3 landscape:h-full landscape:flex landscape:flex-col landscape:justify-center">
-              {/* Prompt - Hidden in landscape, shown in portrait */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 md:p-3 landscape:hidden">
-                <p className="text-blue-900 font-medium text-xs md:text-sm">Select shot result</p>
-              </div>
+        // Context details selection (handled by EventContextDialog)
+        // Show ice surface in background
+        return (
+          <div className="space-y-2 md:space-y-3 landscape:h-full landscape:flex landscape:flex-col">
+            {/* Prompt - Hidden in landscape, shown in portrait */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 md:p-3 landscape:hidden">
+              <p className="text-blue-900 font-medium text-xs md:text-sm">
+                Collecting event details...
+              </p>
+              {loggingFlow.coordinates && (
+                <p className="text-xs text-blue-700 mt-1">
+                  Location: ({loggingFlow.coordinates.x.toFixed(0)}, {loggingFlow.coordinates.y.toFixed(0)})
+                </p>
+              )}
+            </div>
 
-              <div className="bg-white rounded-lg shadow p-2 md:p-3 landscape:p-1.5">
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    onClick={() => handleShotResultSelect('goal')}
-                    className="py-4 md:py-5 px-3 md:px-4 bg-green-500 hover:bg-green-600 active:bg-green-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation text-sm md:text-base"
-                  >
-                    Goal
-                  </button>
-                  <button
-                    onClick={() => handleShotResultSelect('save')}
-                    className="py-4 md:py-5 px-3 md:px-4 bg-blue-500 hover:bg-blue-600 active:bg-blue-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation text-sm md:text-base"
-                  >
-                    Save
-                  </button>
-                  <button
-                    onClick={() => handleShotResultSelect('miss_wide')}
-                    className="py-4 md:py-5 px-3 md:px-4 bg-gray-500 hover:bg-gray-600 active:bg-gray-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation text-sm md:text-base"
-                  >
-                    Miss Wide
-                  </button>
-                  <button
-                    onClick={() => handleShotResultSelect('miss_high')}
-                    className="py-4 md:py-5 px-3 md:px-4 bg-gray-500 hover:bg-gray-600 active:bg-gray-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation text-sm md:text-base"
-                  >
-                    Miss High
-                  </button>
-                  <button
-                    onClick={() => handleShotResultSelect('blocked')}
-                    className="py-4 md:py-5 px-3 md:px-4 bg-red-500 hover:bg-red-600 active:bg-red-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation text-sm md:text-base"
-                  >
-                    Blocked
-                  </button>
-                  <button
-                    onClick={() => handleShotResultSelect('post')}
-                    className="py-4 md:py-5 px-3 md:px-4 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white font-semibold rounded-lg shadow transition-colors touch-manipulation text-sm md:text-base"
-                  >
-                    Post
-                  </button>
-                </div>
-
-                <button
-                  onClick={cancelEventLogging}
-                  className="w-full mt-2 py-2 text-xs md:text-sm text-gray-600 hover:text-gray-800 font-medium landscape:hidden"
-                >
-                  Cancel
-                </button>
+            {/* Show ice surface with events in background */}
+            <div className="bg-white rounded-lg shadow p-2 md:p-3 opacity-50 landscape:opacity-100 landscape:p-1.5 landscape:flex-1 landscape:min-h-0">
+              <div className="w-full landscape:h-full landscape:flex landscape:items-center landscape:justify-center">
+                <IceSurface
+                  showZones={showZones}
+                  showSlot={showSlot}
+                  responsive={true}
+                  endsSwapped={endsSwapped}
+                  events={currentPeriodEvents.map((e) => {
+                    const coords = e.coordinates ? transformCoords(e.coordinates) : { x: 0, y: 0 }
+                    return {
+                      id: e.id,
+                      x: coords.x,
+                      y: coords.y,
+                      type: e.eventType as any,
+                    }
+                  })}
+                />
               </div>
             </div>
-          )
-        }
-        return null
+          </div>
+        )
 
       default:
         return null
@@ -385,6 +377,16 @@ export function EventLogger({
           quickSelect={true}
         />
       </BottomSheet>
+
+      {/* Event Context Dialog */}
+      {loggingFlow.eventType && (
+        <EventContextDialog
+          open={showContextDialog}
+          eventType={loggingFlow.eventType as EventType}
+          onComplete={handleContextComplete}
+          onCancel={cancelEventLogging}
+        />
+      )}
     </>
   )
 }
