@@ -67,6 +67,20 @@ jest.mock('expo-router', () => ({
   Tabs: 'Tabs',
 }))
 
+// Mock React Navigation
+jest.mock('@react-navigation/native', () => ({
+  ...jest.requireActual('@react-navigation/native'),
+  useFocusEffect: jest.fn((callback) => {
+    // Execute the callback immediately in tests
+    callback()
+  }),
+  useNavigation: () => ({
+    navigate: jest.fn(),
+    goBack: jest.fn(),
+    setOptions: jest.fn(),
+  }),
+}))
+
 // Mock React Native Purchases (RevenueCat)
 jest.mock('react-native-purchases', () => ({
   configure: jest.fn(),
