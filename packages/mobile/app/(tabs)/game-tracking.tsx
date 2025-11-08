@@ -849,18 +849,18 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   completedGameContainer: {
-    padding: 24,
-    paddingBottom: 40,
+    padding: 20,
+    paddingBottom: 24,
   },
   title: {
     marginBottom: 8,
   },
   completedTitle: {
-    marginBottom: 8,
+    marginBottom: 6,
     textAlign: 'center',
   },
   completedSubtitle: {
-    marginBottom: 32,
+    marginBottom: 20,
     color: '#6B7280',
     textAlign: 'center',
   },
@@ -895,45 +895,45 @@ const styles = StyleSheet.create({
   summaryCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
-    padding: 24,
-    marginBottom: 32,
+    padding: 20,
+    marginBottom: 20,
     borderWidth: 1,
     borderColor: '#E5E7EB',
   },
   summaryLabel: {
     color: '#6B7280',
-    marginBottom: 12,
+    marginBottom: 8,
     textAlign: 'center',
   },
   scoreContainer: {
     alignItems: 'center',
-    paddingVertical: 16,
+    paddingVertical: 12,
   },
   scoreText: {
-    fontSize: 72,
+    fontSize: 56,
     fontWeight: 'bold',
     color: '#3B82F6',
   },
   statsSection: {
-    marginTop: 24,
-    paddingTop: 24,
+    marginTop: 16,
+    paddingTop: 16,
     borderTopWidth: 1,
     borderTopColor: '#E5E7EB',
   },
   statsSectionTitle: {
     color: '#6B7280',
-    marginBottom: 8,
+    marginBottom: 6,
     textAlign: 'center',
   },
   summaryValue: {
     color: '#111827',
     textAlign: 'center',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   statsBreakdown: {
     color: '#6B7280',
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 6,
   },
   header: {
     backgroundColor: '#FFFFFF',
