@@ -97,7 +97,7 @@ function parseSeason(season) {
 "[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"4003eda13ef42f5897b694e47f1359be71c71c53c0":"deleteTeam","40288fda725bdb5c12167bb174a10aad442824f4ce":"getTeamMembers","405c45025e9a13f66027d9ac2cda37fb543cc9d0bb":"getTeamStats","40fe3ebce1844a9e7c8ef610443e73434ff6a5555b":"getUserTeams","601da4d6b5d31fdb0843f5d4275195c384d8572524":"createTeam","601efbf980325c3a956d1ee5f8b6f36d119dbb2b5f":"updateTeam","6020c8c1d6aac2360b336816e6cc70e60eeafa0756":"removeTeamMember","607dbe2769166efb05495079da32a7519fce996813":"getTeamById","70b7fdece0e7f883f29ca818f09a82ab6f9aedec99":"addTeamMember","70d6763b16b7efa0e9396d793bdf5d05f1fe5a1ab5":"updateTeamMemberRole"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"4071fbd79cc3f64cf3e86a7265453a1156856a9d04":"deleteTeam","4090e44a5d34c440979190f878ba8cb296dc427a56":"getTeamStats","40c14c728de26a5c1aac4c7c0c9b36f2bcb955abbd":"getUserTeams","40f42ddf808e47498db3a2d326bd9029ee6ffacc04":"getTeamMembers","60233a1d51c24f5b1499376bc29d9cd18f350319e1":"updateTeam","607a28ffe57fd3cd4f585f096b696ad6ddc9bf13e1":"removeTeamMember","608e9804018b1b01e7e3108c5028a8136bb14f6739":"createTeam","60e56b0ce6869e9b0ec574ed7bdc7fe1c37d6d45d8":"getTeamById","70f3975fce83d66fa85f9ebd84b0be15109c2ee086":"addTeamMember","70f4b0a25828cca7cc8f8001f17ee74613e24a3869":"updateTeamMemberRole"},"",""] */ __turbopack_context__.s([
     "addTeamMember",
     ()=>addTeamMember,
     "createTeam",
@@ -550,16 +550,16 @@ async function updateTeamMemberRole(teamId, userId, newRole) {
     removeTeamMember,
     updateTeamMemberRole
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getTeamStats, "405c45025e9a13f66027d9ac2cda37fb543cc9d0bb", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createTeam, "601da4d6b5d31fdb0843f5d4275195c384d8572524", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUserTeams, "40fe3ebce1844a9e7c8ef610443e73434ff6a5555b", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getTeamById, "607dbe2769166efb05495079da32a7519fce996813", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateTeam, "601efbf980325c3a956d1ee5f8b6f36d119dbb2b5f", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteTeam, "4003eda13ef42f5897b694e47f1359be71c71c53c0", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getTeamMembers, "40288fda725bdb5c12167bb174a10aad442824f4ce", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(addTeamMember, "70b7fdece0e7f883f29ca818f09a82ab6f9aedec99", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(removeTeamMember, "6020c8c1d6aac2360b336816e6cc70e60eeafa0756", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateTeamMemberRole, "70d6763b16b7efa0e9396d793bdf5d05f1fe5a1ab5", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getTeamStats, "4090e44a5d34c440979190f878ba8cb296dc427a56", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createTeam, "608e9804018b1b01e7e3108c5028a8136bb14f6739", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getUserTeams, "40c14c728de26a5c1aac4c7c0c9b36f2bcb955abbd", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getTeamById, "60e56b0ce6869e9b0ec574ed7bdc7fe1c37d6d45d8", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateTeam, "60233a1d51c24f5b1499376bc29d9cd18f350319e1", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(deleteTeam, "4071fbd79cc3f64cf3e86a7265453a1156856a9d04", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(getTeamMembers, "40f42ddf808e47498db3a2d326bd9029ee6ffacc04", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(addTeamMember, "70f3975fce83d66fa85f9ebd84b0be15109c2ee086", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(removeTeamMember, "607a28ffe57fd3cd4f585f096b696ad6ddc9bf13e1", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(updateTeamMemberRole, "70f4b0a25828cca7cc8f8001f17ee74613e24a3869", null);
 }),
 "[externals]/node:crypto [external] (node:crypto, cjs)", ((__turbopack_context__, module, exports) => {
 
@@ -824,7 +824,7 @@ module.exports = mod;
 "[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
-/* __next_internal_action_entry_do_not_use__ [{"40bb72b659ca51e64bfacd5ce0d2512d5750b1cb37":"verifyEmailToken","40c52ff0a08abb5ca278b4e1ffa60a8e290de064ef":"resendVerificationEmail","60cc30a6a551da8e346b806a4cc1a1ecb83c8cc675":"sendInitialVerificationEmail","70d06c71c32b616a10f8e76cbf730c497780920197":"createUserProfileAndOrg"},"",""] */ __turbopack_context__.s([
+/* __next_internal_action_entry_do_not_use__ [{"40b4186522335168b5b97289467aaed208f2e5e207":"verifyEmailToken","40efef82390e69e95aca20a20a977be6884be2e7ff":"resendVerificationEmail","60942b1f9fcfb89200fa6680a3e3ec5abf15945118":"sendInitialVerificationEmail","70c257e96f0b77934374e3ed1394d6c8bef4b43e40":"createUserProfileAndOrg"},"",""] */ __turbopack_context__.s([
     "createUserProfileAndOrg",
     ()=>createUserProfileAndOrg,
     "resendVerificationEmail",
@@ -1042,10 +1042,10 @@ async function verifyEmailToken(token) {
     resendVerificationEmail,
     verifyEmailToken
 ]);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createUserProfileAndOrg, "70d06c71c32b616a10f8e76cbf730c497780920197", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(sendInitialVerificationEmail, "60cc30a6a551da8e346b806a4cc1a1ecb83c8cc675", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(resendVerificationEmail, "40c52ff0a08abb5ca278b4e1ffa60a8e290de064ef", null);
-(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(verifyEmailToken, "40bb72b659ca51e64bfacd5ce0d2512d5750b1cb37", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(createUserProfileAndOrg, "70c257e96f0b77934374e3ed1394d6c8bef4b43e40", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(sendInitialVerificationEmail, "60942b1f9fcfb89200fa6680a3e3ec5abf15945118", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(resendVerificationEmail, "40efef82390e69e95aca20a20a977be6884be2e7ff", null);
+(0, __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$node_modules$2f$next$2f$dist$2f$build$2f$webpack$2f$loaders$2f$next$2d$flight$2d$loader$2f$server$2d$reference$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["registerServerReference"])(verifyEmailToken, "40b4186522335168b5b97289467aaed208f2e5e207", null);
 }),
 "[project]/code/hp2/packages/web/.next-internal/server/app/demo/game-tracking/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript) <locals>", ((__turbopack_context__) => {
 "use strict";
@@ -1060,10 +1060,10 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$packages$2f$w
 "use strict";
 
 __turbopack_context__.s([
-    "40c52ff0a08abb5ca278b4e1ffa60a8e290de064ef",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$packages$2f$web$2f$app$2f$actions$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["resendVerificationEmail"],
-    "40fe3ebce1844a9e7c8ef610443e73434ff6a5555b",
-    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$packages$2f$web$2f$app$2f$actions$2f$teams$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getUserTeams"]
+    "40c14c728de26a5c1aac4c7c0c9b36f2bcb955abbd",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$packages$2f$web$2f$app$2f$actions$2f$teams$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getUserTeams"],
+    "40efef82390e69e95aca20a20a977be6884be2e7ff",
+    ()=>__TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$packages$2f$web$2f$app$2f$actions$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["resendVerificationEmail"]
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$packages$2f$web$2f2e$next$2d$internal$2f$server$2f$app$2f$demo$2f$game$2d$tracking$2f$page$2f$actions$2e$js__$7b$__ACTIONS_MODULE0__$3d3e$__$225b$project$5d2f$code$2f$hp2$2f$packages$2f$web$2f$app$2f$actions$2f$teams$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29222c$__ACTIONS_MODULE1__$3d3e$__$225b$project$5d2f$code$2f$hp2$2f$packages$2f$web$2f$app$2f$actions$2f$auth$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$2922$__$7d$__$5b$app$2d$rsc$5d$__$28$server__actions__loader$2c$__ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i('[project]/code/hp2/packages/web/.next-internal/server/app/demo/game-tracking/page/actions.js { ACTIONS_MODULE0 => "[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)", ACTIONS_MODULE1 => "[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)" } [app-rsc] (server actions loader, ecmascript) <locals>');
 var __TURBOPACK__imported__module__$5b$project$5d2f$code$2f$hp2$2f$packages$2f$web$2f$app$2f$actions$2f$teams$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)");

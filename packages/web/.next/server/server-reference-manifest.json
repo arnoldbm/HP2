@@ -1,5 +1,36 @@
 {
-  "node": {},
+  "node": {
+    "40c14c728de26a5c1aac4c7c0c9b36f2bcb955abbd": {
+      "workers": {
+        "app/demo/game-tracking/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/game-tracking/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "getUserTeams",
+          "filename": "code/hp2/packages/web/app/actions/teams.ts"
+        }
+      },
+      "layer": {
+        "app/demo/game-tracking/page": "action-browser"
+      },
+      "filename": "code/hp2/packages/web/app/actions/teams.ts",
+      "exportedName": "getUserTeams"
+    },
+    "40efef82390e69e95aca20a20a977be6884be2e7ff": {
+      "workers": {
+        "app/demo/game-tracking/page": {
+          "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/game-tracking/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
+          "async": false,
+          "exportedName": "resendVerificationEmail",
+          "filename": "code/hp2/packages/web/app/actions/auth.ts"
+        }
+      },
+      "layer": {
+        "app/demo/game-tracking/page": "action-browser"
+      },
+      "filename": "code/hp2/packages/web/app/actions/auth.ts",
+      "exportedName": "resendVerificationEmail"
+    }
+  },
   "edge": {},
-  "encryptionKey": "AO8XghkspYvFuMEVQn7yjo3U/oGg4o4GkSsAhvqB5WE="
+  "encryptionKey": "/O2gG4ylJq/1mqY+e1XHbqDiCTchpoxUbP36ob2eapU="
 }

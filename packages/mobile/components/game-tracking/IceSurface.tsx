@@ -93,6 +93,7 @@ export function IceSurface({
         viewBox={`0 0 ${ICE_SURFACE.WIDTH} ${ICE_SURFACE.HEIGHT}`}
         preserveAspectRatio="xMidYMid meet"
         onPress={handlePress}
+        testID="ice-surface-svg"
       >
         {/* Ice surface background - white ice */}
         <Rect

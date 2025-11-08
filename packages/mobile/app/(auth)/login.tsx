@@ -38,7 +38,7 @@ export default function LoginScreen() {
       return
     }
 
-    router.replace('/(tabs)')
+    router.replace('/(tabs)/teams')
   }
 
   return (

@@ -46,13 +46,21 @@ interface GameEvent {
   details?: EventDetails
 }
 
-export function GameTrackingScreen() {
+interface GameTrackingScreenProps {
+  team?: Team
+  players?: Player[]
+  game?: Game
+  events?: GameEvent[]
+  onCreateEvent?: (event: Partial<GameEvent>) => void
+}
+
+export function GameTrackingScreen(props: GameTrackingScreenProps = {}) {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions()
 
-  const [team, setTeam] = useState<Team | null>(null)
-  const [players, setPlayers] = useState<Player[]>([])
-  const [game, setGame] = useState<Game | null>(null)
-  const [events, setEvents] = useState<GameEvent[]>([])
+  const [team, setTeam] = useState<Team | null>(props.team ?? null)
+  const [players, setPlayers] = useState<Player[]>(props.players ?? [])
+  const [game, setGame] = useState<Game | null>(props.game ?? null)
+  const [events, setEvents] = useState<GameEvent[]>(props.events ?? [])
 
   // Game setup state
   const [opponent, setOpponent] = useState('')
@@ -75,19 +83,21 @@ export function GameTrackingScreen() {
   // Ice surface state
   const [endsSwapped, setEndsSwapped] = useState(false)
 
-  // Load team and players
+  // Load team and players (only if not provided via props)
   useEffect(() => {
-    loadTeam()
+    if (!props.team) {
+      loadTeam()
+    }
   }, [])
 
   useEffect(() => {
-    if (team) {
+    if (team && !props.players) {
       loadPlayers()
     }
   }, [team])
 
   useEffect(() => {
-    if (game) {
+    if (game && !props.events) {
       loadEvents()
     }
   }, [game])

@@ -1,6 +1,6 @@
 {
   "node": {
-    "40fe3ebce1844a9e7c8ef610443e73434ff6a5555b": {
+    "40c14c728de26a5c1aac4c7c0c9b36f2bcb955abbd": {
       "workers": {
         "app/demo/game-tracking/page": {
           "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/game-tracking/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",
@@ -15,7 +15,7 @@
       "exportedName": "getUserTeams",
       "filename": "code/hp2/packages/web/app/actions/teams.ts"
     },
-    "40c52ff0a08abb5ca278b4e1ffa60a8e290de064ef": {
+    "40efef82390e69e95aca20a20a977be6884be2e7ff": {
       "workers": {
         "app/demo/game-tracking/page": {
           "moduleId": "[project]/code/hp2/packages/web/.next-internal/server/app/demo/game-tracking/page/actions.js { ACTIONS_MODULE0 => \"[project]/code/hp2/packages/web/app/actions/teams.ts [app-rsc] (ecmascript)\", ACTIONS_MODULE1 => \"[project]/code/hp2/packages/web/app/actions/auth.ts [app-rsc] (ecmascript)\" } [app-rsc] (server actions loader, ecmascript)",

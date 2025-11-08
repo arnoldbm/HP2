@@ -52,10 +52,11 @@ describe('IceSurface', () => {
     it('calls onTap with ice coordinates when surface is tapped', () => {
       render(<IceSurface onTap={mockOnTap} />)
 
-      const svg = screen.getByTestId('ice-surface')
+      const container = screen.getByTestId('ice-surface')
+      const svg = screen.getByTestId('ice-surface-svg')
 
       // Simulate a tap event
-      fireEvent(svg, 'onLayout', {
+      fireEvent(container, 'onLayout', {
         nativeEvent: {
           layout: {
             width: 400,
@@ -64,7 +65,7 @@ describe('IceSurface', () => {
         },
       })
 
-      // Simulate touch
+      // Simulate touch on svg
       fireEvent.press(svg, {
         nativeEvent: {
           locationX: 200,
@@ -119,10 +120,11 @@ describe('IceSurface', () => {
 
       render(<IceSurface onTap={mockOnTap} />)
 
-      const svg = screen.getByTestId('ice-surface')
+      const container = screen.getByTestId('ice-surface')
+      const svg = screen.getByTestId('ice-surface-svg')
 
       // Set up a 800x400 surface
-      fireEvent(svg, 'onLayout', {
+      fireEvent(container, 'onLayout', {
         nativeEvent: {
           layout: {
             width: 800,
@@ -131,7 +133,7 @@ describe('IceSurface', () => {
         },
       })
 
-      // Tap at center
+      // Tap at center on svg
       fireEvent.press(svg, {
         nativeEvent: {
           locationX: 400,

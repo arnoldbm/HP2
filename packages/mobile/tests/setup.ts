@@ -12,12 +12,29 @@ jest.mock('@react-native-async-storage/async-storage', () =>
 jest.mock('@supabase/supabase-js', () => ({
   createClient: jest.fn(() => ({
     auth: {
-      getSession: jest.fn(),
-      getUser: jest.fn(),
-      signInWithPassword: jest.fn(),
-      signUp: jest.fn(),
-      signOut: jest.fn(),
-      resetPasswordForEmail: jest.fn(),
+      getSession: jest.fn().mockResolvedValue({
+        data: { session: null },
+        error: null,
+      }),
+      getUser: jest.fn().mockResolvedValue({
+        data: { user: { id: 'test-user-id', email: 'test@example.com' } },
+        error: null,
+      }),
+      signInWithPassword: jest.fn().mockResolvedValue({
+        data: { user: null, session: null },
+        error: null,
+      }),
+      signUp: jest.fn().mockResolvedValue({
+        data: { user: null, session: null },
+        error: null,
+      }),
+      signOut: jest.fn().mockResolvedValue({
+        error: null,
+      }),
+      resetPasswordForEmail: jest.fn().mockResolvedValue({
+        data: null,
+        error: null,
+      }),
       onAuthStateChange: jest.fn(() => ({
         data: { subscription: { unsubscribe: jest.fn() } },
       })),
@@ -28,7 +45,11 @@ jest.mock('@supabase/supabase-js', () => ({
       update: jest.fn().mockReturnThis(),
       delete: jest.fn().mockReturnThis(),
       eq: jest.fn().mockReturnThis(),
-      single: jest.fn(),
+      limit: jest.fn().mockReturnThis(),
+      single: jest.fn().mockResolvedValue({
+        data: null,
+        error: null,
+      }),
     })),
   })),
 }))

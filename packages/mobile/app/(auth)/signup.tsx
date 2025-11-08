@@ -56,7 +56,7 @@ export default function SignupScreen() {
       return
     }
 
-    router.replace('/(tabs)')
+    router.replace('/(tabs)/teams')
   }
 
   return (
