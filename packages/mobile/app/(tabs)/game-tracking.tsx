@@ -422,6 +422,8 @@ export function GameTrackingScreen(props: GameTrackingScreenProps = {}) {
 
               if (error) throw error
 
+              // Update local game state to reflect completion
+              setGame({ ...game, status: 'completed' })
               setIsTimerRunning(false)
               Alert.alert('Game Ended', 'Game has been ended successfully')
             } catch (error) {
@@ -497,6 +499,58 @@ export function GameTrackingScreen(props: GameTrackingScreenProps = {}) {
     )
   }
 
+  // Completed game summary
+  if (game?.status === 'completed') {
+    const goalEvents = events.filter(
+      (e) => e.event_type === 'shot' && e.details && 'result' in e.details && e.details.result === 'goal'
+    )
+
+    return (
+      <ScrollView style={styles.container} contentContainerStyle={styles.setupContainer}>
+        <AppText variant="title" weight="bold" style={styles.title}>
+          Game Complete
+        </AppText>
+
+        <AppText variant="body" style={styles.teamName}>
+          {team.name} vs {game.opponent_name}
+        </AppText>
+
+        <View style={styles.summaryCard}>
+          <AppText variant="body" weight="bold" style={styles.summaryLabel}>
+            Final Score
+          </AppText>
+          <AppText variant="title" weight="bold" style={styles.scoreText}>
+            {goalEvents.length}
+          </AppText>
+
+          <AppText variant="body" weight="semibold" style={[styles.summaryLabel, { marginTop: 16 }]}>
+            Total Events Logged
+          </AppText>
+          <AppText variant="body" style={styles.summaryValue}>
+            {events.length} events
+          </AppText>
+
+          <AppText variant="caption" style={[styles.summaryLabel, { marginTop: 8 }]}>
+            Shots: {events.filter((e) => e.event_type === 'shot').length} |
+            Turnovers: {events.filter((e) => e.event_type === 'turnover').length} |
+            Zone Entries: {events.filter((e) => e.event_type === 'zone_entry').length}
+          </AppText>
+        </View>
+
+        <Button onPress={() => {
+          setGame(null)
+          setEvents([])
+          setOpponent('')
+          setScore(0)
+          setCurrentPeriod(1)
+          setElapsedTime(0)
+        }}>
+          Start New Game
+        </Button>
+      </ScrollView>
+    )
+  }
+
   // Game setup form
   if (!game) {
     return (
@@ -505,7 +559,7 @@ export function GameTrackingScreen(props: GameTrackingScreenProps = {}) {
           Start New Game
         </AppText>
 
-        <AppText variant="subtitle" style={styles.teamName}>
+        <AppText variant="body" style={styles.teamName}>
           {team.name}
         </AppText>
 
@@ -817,6 +871,25 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginTop: 8,
     textAlign: 'center',
+  },
+  summaryCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 24,
+    marginVertical: 24,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  summaryLabel: {
+    color: '#6B7280',
+    marginBottom: 4,
+  },
+  summaryValue: {
+    color: '#111827',
+  },
+  scoreText: {
+    fontSize: 48,
+    color: '#3B82F6',
   },
   header: {
     backgroundColor: '#FFFFFF',
