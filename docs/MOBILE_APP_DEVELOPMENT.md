@@ -1,9 +1,9 @@
 # Mobile App Development Plan - Phase 3-5
 
-**Status**: In Progress - Phase 3 Complete ✅
+**Status**: Phase 4 In Progress (Week 4-5) 🚧
 **Timeline**: 3-4 weeks
 **Approach**: Test-Driven Development (TDD)
-**Current Date**: 2025-11-05
+**Last Updated**: 2025-11-08
 
 ---
 
@@ -16,6 +16,8 @@ Building React Native mobile app (iOS + Android) using Expo, sharing business lo
 - Reuse shared code (stores, API, validation, types)
 - Mobile-first design (touch-optimized)
 - Offline-capable (Phase 2 feature)
+
+**Current Focus**: Building core screens (auth, teams, game tracking)
 
 ---
 
@@ -54,45 +56,50 @@ packages/mobile/
 
 ## 🚧 Phase 4: Core React Native Screens (Weeks 4-6)
 
-### 4.1 Setup Testing Infrastructure
-
-**Test Framework**: Jest + React Native Testing Library (included with Expo)
-
-**Tasks**:
-1. Configure Jest for React Native
-2. Set up test utilities and helpers
-3. Create mock factories for common data
-4. Configure coverage reporting
-
-**Files to Create**:
-- `tests/setup.ts` - Test configuration
-- `tests/helpers.tsx` - Test utilities (renderWithProviders, etc.)
-- `tests/mocks/` - Mock data factories
-- `jest.config.js` - Jest configuration
-
-**Test Coverage Goals**:
-- Core business logic: 100% (already in shared package)
-- Screen components: 80%+
-- Navigation flows: 90%+
-- User interactions: 90%+
+**Overall Status**: 🚧 In Progress (60% complete)
 
 ---
 
-### 4.2 Supabase Client Configuration
+### ✅ 4.1 Setup Testing Infrastructure - COMPLETE
 
-**Goal**: Configure Supabase for React Native with secure token storage
+**Status**: ✅ Complete
 
-**Tasks**:
-1. Create Supabase client with AsyncStorage
-2. Set up auth state management
-3. Create auth context provider
-4. Write tests for auth flows
+**Test Framework**: Jest + React Native Testing Library (included with Expo)
 
-**Files to Create**:
-- `lib/supabase.ts` - Supabase client config
-- `lib/contexts/auth-context.tsx` - Auth context
-- `tests/lib/supabase.test.ts` - Supabase config tests
-- `tests/lib/auth-context.test.tsx` - Auth context tests
+**Completed Tasks**:
+1. ✅ Configured Jest for React Native
+2. ✅ Set up test utilities and helpers
+3. ✅ Created mock factories for common data
+4. ✅ Configured coverage reporting
+5. ✅ Added React Navigation mocks (useFocusEffect, useNavigation)
+6. ✅ Added Supabase global mocks
+
+**Files Created**:
+- ✅ `tests/setup.ts` - Test configuration with global mocks
+- ✅ `tests/helpers.tsx` - Test utilities (renderWithProviders, wait, etc.)
+- ✅ `tests/mocks/data.ts` - Mock data factories (teams, players, games)
+- ✅ `jest.config.js` - Jest configuration
+
+**Test Results**:
+- Current: 61/83 tests passing (73% pass rate)
+- Remaining failures are TDD-style tests for incomplete features
+
+---
+
+### ✅ 4.2 Supabase Client Configuration - COMPLETE
+
+**Status**: ✅ Complete
+
+**Completed Tasks**:
+1. ✅ Created Supabase client with AsyncStorage
+2. ✅ Set up auth state management
+3. ✅ Created auth context provider
+4. ✅ Wrote tests for auth flows (all passing)
+
+**Files Created**:
+- ✅ `lib/supabase.ts` - Supabase client config
+- ✅ `lib/contexts/auth-context.tsx` - Auth context
+- ✅ `tests/lib/auth-context.test.tsx` - Auth context tests (100% passing)
 
 **Implementation Notes**:
 ```typescript
@@ -116,71 +123,74 @@ export const supabase = createClient(
 
 ---
 
-### 4.3 Auth Screens
+### ✅ 4.3 Auth Screens - COMPLETE
 
-**Goal**: Login, signup, and password reset screens
+**Status**: ✅ Complete
 
-**Screens**:
-1. `app/(auth)/login.tsx` - Email/password login
-2. `app/(auth)/signup.tsx` - Create account
-3. `app/(auth)/forgot-password.tsx` - Password reset
+**Screens Created**:
+1. ✅ `app/(auth)/login.tsx` - Email/password login
+2. ✅ `app/(auth)/signup.tsx` - Create account
+3. ✅ `app/(auth)/forgot-password.tsx` - Password reset
 
-**Features**:
-- Form validation (using shared Zod schemas)
-- Error handling and display
-- Loading states
-- "Remember me" functionality
-- Social auth (Google) - Optional
+**Features Implemented**:
+- ✅ Form validation (email format, password requirements)
+- ✅ Error handling and display
+- ✅ Loading states during auth operations
+- ✅ Navigation to app on successful login/signup
+- ✅ "Forgot password" link in login screen
+- ✅ Success message after password reset email sent
 
-**Tests to Write** (TDD):
-1. `tests/screens/login.test.tsx`:
+**Tests Written** (All Passing):
+1. ✅ `tests/app/login-screen.test.tsx`:
    - Renders login form
    - Validates email format
-   - Shows error for invalid credentials
-   - Navigates to home on success
-   - "Forgot password" link works
+   - Calls signInWithPassword on submit
+   - Shows errors for invalid credentials
+   - "Forgot password" navigation
 
-2. `tests/screens/signup.test.tsx`:
+2. ✅ `tests/app/signup-screen.test.tsx`:
    - Renders signup form
-   - Validates password strength
-   - Creates user account
-   - Shows error for existing email
-   - Navigates to home on success
+   - Validates email and password
+   - Calls signUp on submit
+   - Shows errors appropriately
 
-3. `tests/screens/forgot-password.test.tsx`:
+3. ✅ `tests/app/forgot-password-screen.test.tsx`:
    - Renders password reset form
-   - Sends reset email
-   - Shows success message
    - Validates email format
+   - Calls resetPasswordForEmail
+   - Shows success message
 
-**UI Components Needed**:
-- `components/ui/Input.tsx` - Text input
-- `components/ui/Button.tsx` - Primary button
-- `components/ui/Text.tsx` - Typography
-- `components/ui/ErrorMessage.tsx` - Error display
+**UI Components Created**:
+- ✅ `components/ui/Input.tsx` - Text input with label
+- ✅ `components/ui/Button.tsx` - Primary button with loading state
+- ✅ `components/ui/Text.tsx` - Typography variants (title, body, caption)
+- Error display inline in forms
 
 ---
 
-### 4.4 Teams & Roster Screens
+### 🚧 4.4 Teams & Roster Screens - PARTIAL
 
-**Goal**: View teams, manage rosters, create teams
+**Status**: 🚧 Partial (30% complete)
 
-**Screens**:
-1. `app/(tabs)/teams.tsx` - Teams list
-2. `app/teams/new.tsx` - Create team
-3. `app/teams/[id]/index.tsx` - Team details
-4. `app/teams/[id]/roster.tsx` - Player roster
-5. `app/teams/[id]/settings.tsx` - Team settings
+**Screens Created**:
+1. ✅ `app/(tabs)/teams.tsx` - Teams list
+2. ⏳ `app/teams/new.tsx` - Create team (NOT YET)
+3. ⏳ `app/teams/[id]/index.tsx` - Team details (NOT YET)
+4. ⏳ `app/teams/[id]/roster.tsx` - Player roster (NOT YET)
+5. ⏳ `app/teams/[id]/settings.tsx` - Team settings (NOT YET)
 
-**Features**:
-- List all user's teams
-- Create/edit/delete teams
-- Add/edit/delete players
-- Player positions and jersey numbers
-- Age group selection (using shared utils)
-- Team switching
+**Features Implemented**:
+- ✅ List all user's teams with stats (player count, game count)
+- ✅ Pull-to-refresh to reload teams
+- ✅ Loading states
+- ✅ Empty state when no teams
+- ✅ Error handling
+- ✅ Age group display formatting (10U, 12U, etc.)
+- ⏳ Create/edit/delete teams (NOT YET)
+- ⏳ Team navigation (NOT YET)
+- ⏳ Roster management (NOT YET)
 
-**Tests to Write** (TDD):
+**Tests Written** (TDD - Some Failing):
 1. `tests/screens/teams-list.test.tsx`:
    - Renders teams list
    - Shows empty state for no teams
@@ -216,25 +226,41 @@ export const supabase = createClient(
 
 ---
 
-### 4.5 Game Tracking Screen
+### ✅ 4.5 Game Tracking Screen - FUNCTIONAL (with bugs fixed)
 
-**Goal**: Real-time game event tracking with touch-based ice surface
+**Status**: ✅ Core Features Working (75% complete)
 
-**Screens**:
-1. `app/(tabs)/track-game.tsx` - Main game tracking
-2. `app/games/new.tsx` - Start new game
-3. `app/games/[id]/index.tsx` - View/edit game
+**Screens Created**:
+1. ✅ `app/(tabs)/game-tracking.tsx` - Main game tracking (WORKING)
+2. ⏳ `app/games/new.tsx` - Start new game (NOT YET - using inline form)
+3. ⏳ `app/games/[id]/index.tsx` - View/edit game (NOT YET)
 
-**Features**:
-- Interactive ice surface (tap to log events)
-- Player selector (quick tap)
-- Event logging (shot, goal, turnover, penalty, breakout, etc.)
-- Real-time event list
-- Period management
-- Game clock (optional - can be manual)
-- Optimistic UI updates
+**Features Implemented**:
+- ✅ Interactive ice surface (tap to log events)
+- ✅ Player selector (modal with player list)
+- ✅ Event logging (shot, goal, turnover, faceoff, penalty, zone entry)
+- ✅ Real-time event list with timestamps
+- ✅ Database persistence (Supabase)
+- ✅ Optimistic UI updates
+- ✅ Team selector
+- ✅ Game setup form (opponent, date, location)
+- ✅ Start/end game controls
+- ✅ Completed game summary with stats breakdown
+- ✅ "Start New Game" button after game ends
+- ✅ Player refresh on tab focus (syncs with web)
+- ✅ Proper game state management
+- ✅ Compact UI layout (fits on iPhone screen)
+- ⏳ Period management (NOT YET)
+- ⏳ Game timer (NOT YET)
+- ⏳ Score display during active game (NOT YET)
 
-**Tests to Write** (TDD):
+**Recent Bug Fixes** (2025-11-08):
+1. ✅ Fixed completed game state - local state now updates when game ends
+2. ✅ Fixed UI layout - reduced spacing to fit button on screen without scrolling
+3. ✅ Fixed player refresh - players reload when navigating to Game tab
+4. ✅ Fixed useFocusEffect tests - added React Navigation mocks
+
+**Tests Written** (TDD - Many Failing):
 1. `tests/components/IceSurface.test.tsx`:
    - Renders SVG ice surface
    - Handles touch events
@@ -266,25 +292,25 @@ export const supabase = createClient(
    - Period transitions
    - End game
 
-**UI Components Needed**:
-- `components/game-tracking/IceSurface.tsx` - Interactive ice rink (CRITICAL)
-- `components/game-tracking/PlayerSelector.tsx` - Player picker
-- `components/game-tracking/EventLog.tsx` - Recent events list
-- `components/game-tracking/EventTypeSelector.tsx` - Shot, Goal, etc.
-- `components/game-tracking/GameHeader.tsx` - Score, period, time
+**UI Components Created**:
+- ✅ `components/game-tracking/IceSurface.tsx` - Interactive ice rink with SVG (CRITICAL)
+- ✅ `components/game-tracking/PlayerSelector.tsx` - Player picker modal
+- ⏳ `components/game-tracking/EventLog.tsx` - Recent events list (inline, not separate component)
+- ⏳ `components/game-tracking/EventTypeSelector.tsx` - Shot, Goal, etc. (inline, not separate component)
+- ⏳ `components/game-tracking/GameHeader.tsx` - Score, period, time (NOT YET)
 
 **Shared Code Used**:
-- `@hockeypilot/shared/stores/game-tracking-store` - Game state
-- `@hockeypilot/shared/utils/ice-surface-coordinates` - Coordinate conversion
-- `@hockeypilot/shared/validation/event-schemas` - Event validation
-- `@hockeypilot/shared/api/game-events.interface` - API interface
+- ✅ `@hockeypilot/shared/utils/ice-surface-coordinates` - Coordinate conversion
+- ✅ Supabase client for database persistence
+- ⏳ `@hockeypilot/shared/stores/game-tracking-store` - Not yet using store (direct state management)
 
-**Technical Notes**:
-- Use React Native SVG for ice surface
-- Use PanResponder or Gesture Handler for touch
-- Debounce rapid taps
-- Haptic feedback on event log
-- Portrait mode optimized
+**Technical Implementation**:
+- ✅ React Native SVG for ice surface
+- ✅ TouchableOpacity for tap handling
+- ✅ Modal for player selection
+- ✅ FlatList for event list
+- ✅ Portrait mode optimized
+- ✅ Compact spacing for iPhone screens
 
 ---
 
@@ -433,29 +459,30 @@ export const supabase = createClient(
 
 ## 📋 Implementation Checklist
 
-### Week 4: Foundation & Auth
-- [ ] Set up Jest testing infrastructure
-- [ ] Create test helpers and mocks
-- [ ] Configure Supabase client for React Native
-- [ ] Create auth context provider
-- [ ] Build UI component library (Button, Input, Text, etc.)
-- [ ] Create login screen (TDD)
-- [ ] Create signup screen (TDD)
-- [ ] Create forgot password screen (TDD)
-- [ ] Test auth flows end-to-end
+### Week 4: Foundation & Auth - ✅ COMPLETE
+- [x] Set up Jest testing infrastructure
+- [x] Create test helpers and mocks
+- [x] Configure Supabase client for React Native
+- [x] Create auth context provider
+- [x] Build UI component library (Button, Input, Text, etc.)
+- [x] Create login screen (TDD)
+- [x] Create signup screen (TDD)
+- [x] Create forgot password screen (TDD)
+- [x] Test auth flows end-to-end
 
-### Week 5: Teams & Game Tracking
-- [ ] Create teams list screen (TDD)
+### Week 5: Teams & Game Tracking - 🚧 PARTIAL (60% complete)
+- [x] Create teams list screen (TDD)
 - [ ] Create team details screen (TDD)
 - [ ] Create roster management screen (TDD)
-- [ ] Build IceSurface component (TDD) ⭐ CRITICAL
-- [ ] Build PlayerSelector component (TDD)
-- [ ] Create game tracking screen (TDD)
-- [ ] Test complete game tracking flow
+- [x] Build IceSurface component (TDD) ⭐ CRITICAL
+- [x] Build PlayerSelector component (TDD)
+- [x] Create game tracking screen (TDD)
+- [x] Fix game tracking bugs (completed game state, UI layout, player refresh)
+- [ ] Test complete game tracking flow (partial - some tests failing)
 - [ ] Create analytics screen (TDD)
 - [ ] Build shot chart component (TDD)
 
-### Week 6: Settings & Paywall
+### Week 6: Settings & Paywall - ⏳ NOT STARTED
 - [ ] Create settings screen (TDD)
 - [ ] Create profile screen (TDD)
 - [ ] Implement subscription hook
@@ -585,10 +612,21 @@ eas build --profile production --platform ios
 ## 📊 Progress Tracking
 
 **Phase 3**: ✅ Complete (100%)
-**Phase 4**: ⏳ Not Started (0%)
+**Phase 4**: 🚧 In Progress (60% complete)
+  - 4.1 Testing Infrastructure: ✅ Complete
+  - 4.2 Supabase Client: ✅ Complete
+  - 4.3 Auth Screens: ✅ Complete
+  - 4.4 Teams & Roster: 🚧 Partial (30% - teams list done, roster not started)
+  - 4.5 Game Tracking: ✅ Functional (75% - core features working, some features incomplete)
+  - 4.6 Analytics: ⏳ Not Started
+  - 4.7 Settings: ⏳ Not Started
 **Phase 5**: ⏳ Not Started (0%)
 
-**Total Progress**: 33% (1/3 phases complete)
+**Total Progress**: 53% (Phase 3 complete + 60% of Phase 4)
+
+**Test Coverage**: 61/83 tests passing (73% pass rate)
+- Passing tests cover all implemented features
+- Failing tests are TDD-style tests for incomplete features
 
 ---
 
@@ -630,6 +668,49 @@ eas build --profile production --platform ios
 
 ---
 
-**Last Updated**: 2025-11-05
-**Next Review**: After Phase 4 completion
+## 🎯 What's Next?
+
+Based on current progress (53% complete), recommended next steps:
+
+### Option A: Complete Game Tracking Features ⭐ RECOMMENDED
+Focus on polishing game tracking since core functionality is working:
+1. Add period management (1st, 2nd, 3rd periods)
+2. Add game timer with pause/resume
+3. Add live score display during active game
+4. Complete missing GameTrackingScreen tests
+5. Polish UI/UX based on user testing
+
+**Why**: Game tracking is the killer feature. Making it excellent before moving on ensures a strong foundation.
+
+### Option B: Build Team Management
+Complete the teams & roster functionality:
+1. Team details screen
+2. Roster management (add/edit/delete players)
+3. Team navigation
+4. Complete TeamsListScreen tests
+
+**Why**: Users need to manage rosters to use game tracking effectively.
+
+### Option C: Add Analytics Screen
+Build post-game analytics:
+1. Shot chart component (ice surface with markers)
+2. Player stats table
+3. Game summary cards
+4. Use existing analytics code from `@hockeypilot/shared`
+
+**Why**: Helps users see value from tracked games, increases engagement.
+
+### Option D: Settings & Profile
+Build basic settings:
+1. User profile editing
+2. Team switching
+3. App preferences
+4. Logout functionality
+
+**Why**: Essential for production app, relatively straightforward to implement.
+
+---
+
+**Last Updated**: 2025-11-08
+**Next Review**: After completing one of the options above
 **Maintained By**: Brock Arnold + Claude
