@@ -78,7 +78,7 @@ describe('SignupScreen', () => {
       email: 'coach@example.com',
       password: 'password123',
     })
-    expect(routerMock.replace).toHaveBeenCalledWith('/(tabs)')
+    expect(routerMock.replace).toHaveBeenCalledWith('/(tabs)/teams')
   })
 
   it('shows email confirmation message when required', async () => {

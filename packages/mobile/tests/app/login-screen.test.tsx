@@ -72,7 +72,7 @@ describe('LoginScreen', () => {
       email: 'coach@example.com',
       password: 'password123',
     })
-    expect(routerMock.replace).toHaveBeenCalledWith('/(tabs)')
+    expect(routerMock.replace).toHaveBeenCalledWith('/(tabs)/teams')
   })
 
   it('surfaces authentication errors', async () => {

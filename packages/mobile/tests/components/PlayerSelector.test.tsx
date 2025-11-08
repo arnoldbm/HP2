@@ -60,13 +60,13 @@ describe('PlayerSelector', () => {
       expect(jerseyNumbers).toHaveLength(4)
 
       // First card should be #3
-      expect(jerseyNumbers[0]).toHaveTextContent('3')
+      expect(jerseyNumbers[0]).toHaveTextContent(/^3/)
       // Second card should be #7
-      expect(jerseyNumbers[1]).toHaveTextContent('7')
+      expect(jerseyNumbers[1]).toHaveTextContent(/^7/)
       // Third card should be #12
-      expect(jerseyNumbers[2]).toHaveTextContent('12')
+      expect(jerseyNumbers[2]).toHaveTextContent(/^12/)
       // Fourth card should be #30
-      expect(jerseyNumbers[3]).toHaveTextContent('30')
+      expect(jerseyNumbers[3]).toHaveTextContent(/^30/)
     })
 
     it('renders player names with first initial', () => {
