@@ -506,12 +506,15 @@ export function GameTrackingScreen(props: GameTrackingScreenProps = {}) {
     )
 
     return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.setupContainer}>
-        <AppText variant="title" weight="bold" style={styles.title}>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.completedGameContainer}
+      >
+        <AppText variant="title" weight="bold" style={styles.completedTitle}>
           Game Complete
         </AppText>
 
-        <AppText variant="body" style={styles.teamName}>
+        <AppText variant="body" style={styles.completedSubtitle}>
           {team.name} vs {game.opponent_name}
         </AppText>
 
@@ -519,22 +522,26 @@ export function GameTrackingScreen(props: GameTrackingScreenProps = {}) {
           <AppText variant="body" weight="bold" style={styles.summaryLabel}>
             Final Score
           </AppText>
-          <AppText variant="title" weight="bold" style={styles.scoreText}>
-            {goalEvents.length}
-          </AppText>
+          <View style={styles.scoreContainer}>
+            <AppText style={styles.scoreText}>
+              {goalEvents.length}
+            </AppText>
+          </View>
 
-          <AppText variant="body" weight="semibold" style={[styles.summaryLabel, { marginTop: 16 }]}>
-            Total Events Logged
-          </AppText>
-          <AppText variant="body" style={styles.summaryValue}>
-            {events.length} events
-          </AppText>
+          <View style={styles.statsSection}>
+            <AppText variant="body" weight="semibold" style={styles.statsSectionTitle}>
+              Total Events Logged
+            </AppText>
+            <AppText variant="body" style={styles.summaryValue}>
+              {events.length} events
+            </AppText>
 
-          <AppText variant="caption" style={[styles.summaryLabel, { marginTop: 8 }]}>
-            Shots: {events.filter((e) => e.event_type === 'shot').length} |
-            Turnovers: {events.filter((e) => e.event_type === 'turnover').length} |
-            Zone Entries: {events.filter((e) => e.event_type === 'zone_entry').length}
-          </AppText>
+            <AppText variant="caption" style={styles.statsBreakdown}>
+              Shots: {events.filter((e) => e.event_type === 'shot').length} |{' '}
+              Turnovers: {events.filter((e) => e.event_type === 'turnover').length} |{' '}
+              Zone Entries: {events.filter((e) => e.event_type === 'zone_entry').length}
+            </AppText>
+          </View>
         </View>
 
         <Button onPress={() => {
@@ -841,8 +848,21 @@ const styles = StyleSheet.create({
   setupContainer: {
     padding: 16,
   },
+  completedGameContainer: {
+    padding: 24,
+    paddingBottom: 40,
+  },
   title: {
     marginBottom: 8,
+  },
+  completedTitle: {
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  completedSubtitle: {
+    marginBottom: 32,
+    color: '#6B7280',
+    textAlign: 'center',
   },
   teamName: {
     marginBottom: 24,
@@ -876,20 +896,44 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 24,
-    marginVertical: 24,
+    marginBottom: 32,
     borderWidth: 1,
     borderColor: '#E5E7EB',
   },
   summaryLabel: {
     color: '#6B7280',
-    marginBottom: 4,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  scoreContainer: {
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  scoreText: {
+    fontSize: 72,
+    fontWeight: 'bold',
+    color: '#3B82F6',
+  },
+  statsSection: {
+    marginTop: 24,
+    paddingTop: 24,
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+  },
+  statsSectionTitle: {
+    color: '#6B7280',
+    marginBottom: 8,
+    textAlign: 'center',
   },
   summaryValue: {
     color: '#111827',
+    textAlign: 'center',
+    marginBottom: 12,
   },
-  scoreText: {
-    fontSize: 48,
-    color: '#3B82F6',
+  statsBreakdown: {
+    color: '#6B7280',
+    textAlign: 'center',
+    marginTop: 8,
   },
   header: {
     backgroundColor: '#FFFFFF',
