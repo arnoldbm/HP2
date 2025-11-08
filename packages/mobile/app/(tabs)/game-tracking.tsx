@@ -10,6 +10,7 @@ import {
   Alert,
   useWindowDimensions,
 } from 'react-native'
+import { useFocusEffect } from '@react-navigation/native'
 import { IceSurface } from '@/components/game-tracking/IceSurface'
 import { PlayerSelector, type Player } from '@/components/game-tracking/PlayerSelector'
 import { EventContextMenu } from '@/components/game-tracking/EventContextMenu'
@@ -101,6 +102,15 @@ export function GameTrackingScreen(props: GameTrackingScreenProps = {}) {
       loadEvents()
     }
   }, [game])
+
+  // Reload players when screen comes into focus (e.g., after adding players on web)
+  useFocusEffect(
+    useCallback(() => {
+      if (team && !props.players) {
+        loadPlayers()
+      }
+    }, [team, props.players])
+  )
 
   // Timer effect
   useEffect(() => {
