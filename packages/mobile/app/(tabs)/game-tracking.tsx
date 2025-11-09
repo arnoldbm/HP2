@@ -613,6 +613,50 @@ export function GameTrackingScreen(props: GameTrackingScreenProps = {}) {
 
   return (
     <View style={styles.container}>
+      {/* Game Header */}
+      <View style={styles.gameHeader}>
+        <View style={styles.headerRow}>
+          <View style={styles.scoreSection}>
+            <AppText variant="caption" style={styles.headerLabel}>SCORE</AppText>
+            <AppText variant="title" weight="bold" style={styles.scoreValue}>{score}</AppText>
+          </View>
+
+          <View style={styles.periodSection}>
+            <AppText variant="caption" style={styles.headerLabel}>PERIOD</AppText>
+            <AppText variant="title" weight="bold" style={styles.periodValue}>
+              {getPeriodLabel(currentPeriod)}
+            </AppText>
+          </View>
+
+          <View style={styles.timerSection}>
+            <AppText variant="caption" style={styles.headerLabel}>TIME</AppText>
+            <AppText variant="title" weight="bold" style={styles.timerValue}>
+              {formatTime(elapsedTime)}
+            </AppText>
+          </View>
+        </View>
+
+        <View style={styles.headerControls}>
+          <TouchableOpacity
+            onPress={handlePauseResume}
+            style={styles.pauseButton}
+          >
+            <AppText variant="body" weight="semibold" style={styles.pauseButtonText}>
+              {isTimerRunning ? 'Pause' : 'Resume'}
+            </AppText>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleEndPeriod}
+            style={styles.endPeriodButton}
+          >
+            <AppText variant="body" weight="semibold" style={styles.endPeriodButtonText}>
+              End {getPeriodLabel(currentPeriod)}
+            </AppText>
+          </TouchableOpacity>
+        </View>
+      </View>
+
       {/* Ice Surface - Takes most of the space */}
       <View style={[styles.iceContainer, dynamicIceStyle]}>
         <IceSurface
@@ -847,6 +891,70 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F9FAFB',
+  },
+  // Game Header Styles
+  gameHeader: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 12,
+  },
+  scoreSection: {
+    alignItems: 'center',
+  },
+  periodSection: {
+    alignItems: 'center',
+  },
+  timerSection: {
+    alignItems: 'center',
+  },
+  headerLabel: {
+    color: '#6B7280',
+    marginBottom: 4,
+  },
+  scoreValue: {
+    color: '#3B82F6',
+    fontSize: 28,
+  },
+  periodValue: {
+    color: '#10B981',
+    fontSize: 28,
+  },
+  timerValue: {
+    color: '#6B7280',
+    fontSize: 28,
+  },
+  headerControls: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  pauseButton: {
+    flex: 1,
+    backgroundColor: '#3B82F6',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  pauseButtonText: {
+    color: '#FFFFFF',
+  },
+  endPeriodButton: {
+    flex: 1,
+    backgroundColor: '#EF4444',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  endPeriodButtonText: {
+    color: '#FFFFFF',
   },
   centerContainer: {
     flex: 1,
