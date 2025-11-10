@@ -9,6 +9,9 @@ import {
   Alert,
   Modal,
   TextInput,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native'
 import { useRouter, useLocalSearchParams } from 'expo-router'
 import { supabase } from '@/lib/supabase'
@@ -276,7 +279,10 @@ export default function RosterScreen() {
           resetForm()
         }}
       >
-        <View style={styles.modalContainer}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.modalContainer}
+        >
           <View style={styles.modalHeader}>
             <AppText variant="title" weight="bold">
               {editingPlayer ? 'Edit Player' : 'Add Player'}
@@ -291,102 +297,108 @@ export default function RosterScreen() {
             </TouchableOpacity>
           </View>
 
-          <View style={styles.form}>
-            {/* Jersey Number */}
-            <View style={styles.inputGroup}>
-              <AppText variant="body" weight="semibold" style={styles.label}>
-                Jersey Number *
-              </AppText>
-              <TextInput
-                style={[styles.input, formErrors.jerseyNumber && styles.inputError]}
-                placeholder="e.g., 7"
-                value={form.jerseyNumber}
-                onChangeText={(text) => setForm({ ...form, jerseyNumber: text })}
-                keyboardType="number-pad"
-                maxLength={3}
-              />
-              {formErrors.jerseyNumber && (
-                <AppText variant="caption" style={styles.errorText}>
-                  {formErrors.jerseyNumber}
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollViewContent}
+            keyboardShouldPersistTaps="handled"
+          >
+            <View style={styles.form}>
+              {/* Jersey Number */}
+              <View style={styles.inputGroup}>
+                <AppText variant="body" weight="semibold" style={styles.label}>
+                  Jersey Number *
                 </AppText>
-              )}
-            </View>
+                <TextInput
+                  style={[styles.input, formErrors.jerseyNumber && styles.inputError]}
+                  placeholder="e.g., 7"
+                  value={form.jerseyNumber}
+                  onChangeText={(text) => setForm({ ...form, jerseyNumber: text })}
+                  keyboardType="number-pad"
+                  maxLength={3}
+                />
+                {formErrors.jerseyNumber && (
+                  <AppText variant="caption" style={styles.errorText}>
+                    {formErrors.jerseyNumber}
+                  </AppText>
+                )}
+              </View>
 
-            {/* First Name */}
-            <View style={styles.inputGroup}>
-              <AppText variant="body" weight="semibold" style={styles.label}>
-                First Name *
-              </AppText>
-              <TextInput
-                style={[styles.input, formErrors.firstName && styles.inputError]}
-                placeholder="e.g., Connor"
-                value={form.firstName}
-                onChangeText={(text) => setForm({ ...form, firstName: text })}
-                autoCapitalize="words"
-              />
-              {formErrors.firstName && (
-                <AppText variant="caption" style={styles.errorText}>
-                  {formErrors.firstName}
+              {/* First Name */}
+              <View style={styles.inputGroup}>
+                <AppText variant="body" weight="semibold" style={styles.label}>
+                  First Name *
                 </AppText>
-              )}
-            </View>
+                <TextInput
+                  style={[styles.input, formErrors.firstName && styles.inputError]}
+                  placeholder="e.g., Connor"
+                  value={form.firstName}
+                  onChangeText={(text) => setForm({ ...form, firstName: text })}
+                  autoCapitalize="words"
+                />
+                {formErrors.firstName && (
+                  <AppText variant="caption" style={styles.errorText}>
+                    {formErrors.firstName}
+                  </AppText>
+                )}
+              </View>
 
-            {/* Last Name */}
-            <View style={styles.inputGroup}>
-              <AppText variant="body" weight="semibold" style={styles.label}>
-                Last Name *
-              </AppText>
-              <TextInput
-                style={[styles.input, formErrors.lastName && styles.inputError]}
-                placeholder="e.g., McDavid"
-                value={form.lastName}
-                onChangeText={(text) => setForm({ ...form, lastName: text })}
-                autoCapitalize="words"
-              />
-              {formErrors.lastName && (
-                <AppText variant="caption" style={styles.errorText}>
-                  {formErrors.lastName}
+              {/* Last Name */}
+              <View style={styles.inputGroup}>
+                <AppText variant="body" weight="semibold" style={styles.label}>
+                  Last Name *
                 </AppText>
-              )}
-            </View>
+                <TextInput
+                  style={[styles.input, formErrors.lastName && styles.inputError]}
+                  placeholder="e.g., McDavid"
+                  value={form.lastName}
+                  onChangeText={(text) => setForm({ ...form, lastName: text })}
+                  autoCapitalize="words"
+                />
+                {formErrors.lastName && (
+                  <AppText variant="caption" style={styles.errorText}>
+                    {formErrors.lastName}
+                  </AppText>
+                )}
+              </View>
 
-            {/* Position */}
-            <View style={styles.inputGroup}>
-              <AppText variant="body" weight="semibold" style={styles.label}>
-                Position *
-              </AppText>
-              <View style={styles.positionButtons}>
-                {(['forward', 'defense', 'goalie'] as const).map((position) => (
-                  <TouchableOpacity
-                    key={position}
-                    style={[
-                      styles.positionButton,
-                      form.position === position && styles.positionButtonActive,
-                    ]}
-                    onPress={() => setForm({ ...form, position })}
-                  >
-                    <AppText
-                      variant="body"
-                      weight="semibold"
+              {/* Position */}
+              <View style={styles.inputGroup}>
+                <AppText variant="body" weight="semibold" style={styles.label}>
+                  Position *
+                </AppText>
+                <View style={styles.positionButtons}>
+                  {(['forward', 'defense', 'goalie'] as const).map((position) => (
+                    <TouchableOpacity
+                      key={position}
                       style={[
-                        styles.positionButtonText,
-                        form.position === position && styles.positionButtonTextActive,
+                        styles.positionButton,
+                        form.position === position && styles.positionButtonActive,
                       ]}
+                      onPress={() => setForm({ ...form, position })}
                     >
-                      {position.charAt(0).toUpperCase() + position.slice(1)}
-                    </AppText>
-                  </TouchableOpacity>
-                ))}
+                      <AppText
+                        variant="body"
+                        weight="semibold"
+                        style={[
+                          styles.positionButtonText,
+                          form.position === position && styles.positionButtonTextActive,
+                        ]}
+                      >
+                        {position.charAt(0).toUpperCase() + position.slice(1)}
+                      </AppText>
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
             </View>
-          </View>
+          </ScrollView>
 
           <View style={styles.modalActions}>
             <Button onPress={handleSavePlayer}>
               {editingPlayer ? 'Update Player' : 'Add Player'}
             </Button>
           </View>
-        </View>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   )
@@ -508,6 +520,12 @@ const styles = StyleSheet.create({
   cancelText: {
     color: '#6B7280',
     fontSize: 32,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    flexGrow: 1,
   },
   form: {
     padding: 16,
