@@ -457,10 +457,10 @@ export function GameTrackingScreen(props: GameTrackingScreenProps = {}) {
   const calculateIceContainerStyle = () => {
     // Fixed UI elements heights
     const TAB_BAR_HEIGHT = 50
-    const EVENT_HISTORY_HEIGHT = 50
-    const PADDING = 4 // Minimal padding to maximize ice surface
+    const EVENT_HISTORY_HEIGHT = 60
+    const PADDING = 8
 
-    // Available space for ice surface
+    // Available space for ice surface (no game header now)
     const availableHeight = screenHeight - TAB_BAR_HEIGHT - EVENT_HISTORY_HEIGHT - PADDING * 2
     const availableWidth = screenWidth - PADDING * 2
 
@@ -613,51 +613,7 @@ export function GameTrackingScreen(props: GameTrackingScreenProps = {}) {
 
   return (
     <View style={styles.container}>
-      {/* Game Header */}
-      <View style={styles.gameHeader}>
-        <View style={styles.headerRow}>
-          <View style={styles.scoreSection}>
-            <AppText variant="caption" style={styles.headerLabel}>SCORE</AppText>
-            <AppText variant="title" weight="bold" style={styles.scoreValue}>{score}</AppText>
-          </View>
-
-          <View style={styles.periodSection}>
-            <AppText variant="caption" style={styles.headerLabel}>PERIOD</AppText>
-            <AppText variant="title" weight="bold" style={styles.periodValue}>
-              {getPeriodLabel(currentPeriod)}
-            </AppText>
-          </View>
-
-          <View style={styles.timerSection}>
-            <AppText variant="caption" style={styles.headerLabel}>TIME</AppText>
-            <AppText variant="title" weight="bold" style={styles.timerValue}>
-              {formatTime(elapsedTime)}
-            </AppText>
-          </View>
-        </View>
-
-        <View style={styles.headerControls}>
-          <TouchableOpacity
-            onPress={handlePauseResume}
-            style={styles.pauseButton}
-          >
-            <AppText variant="body" weight="semibold" style={styles.pauseButtonText}>
-              {isTimerRunning ? 'Pause' : 'Resume'}
-            </AppText>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={handleEndPeriod}
-            style={styles.endPeriodButton}
-          >
-            <AppText variant="body" weight="semibold" style={styles.endPeriodButtonText}>
-              End {getPeriodLabel(currentPeriod)}
-            </AppText>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Ice Surface - Takes most of the space */}
+      {/* Ice Surface - Fills most of the screen */}
       <View style={[styles.iceContainer, dynamicIceStyle]}>
         <IceSurface
           onTap={handleIceTap}
