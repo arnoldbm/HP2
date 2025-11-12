@@ -1,7 +1,0 @@
-{
-  "/demo/game-tracking/page": "app/demo/game-tracking/page.js",
-  "/demo/teams/[teamId]/page": "app/demo/teams/[teamId]/page.js",
-  "/demo/teams/[teamId]/roster/page": "app/demo/teams/[teamId]/roster/page.js",
-  "/demo/teams/page": "app/demo/teams/page.js",
-  "/page": "app/page.js"
-}
