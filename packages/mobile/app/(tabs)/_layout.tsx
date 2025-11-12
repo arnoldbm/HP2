@@ -36,8 +36,24 @@ export default function TabLayout() {
       <Tabs.Screen
         name="game-tracking"
         options={{
-          title: 'Game',
-          tabBarIcon: ({ color }) => <TabBarIcon name="futbol" color={color} />,
+          title: 'Track',
+          tabBarIcon: ({ color }) => <TabBarIcon name="circle" color={color} />,
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="analytics"
+        options={{
+          title: 'Analytics',
+          tabBarIcon: ({ color }) => <TabBarIcon name="bar-chart" color={color} />,
+          headerShown: false,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Settings',
+          tabBarIcon: ({ color }) => <TabBarIcon name="cog" color={color} />,
           headerShown: false,
         }}
       />
