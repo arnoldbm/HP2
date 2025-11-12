@@ -458,7 +458,7 @@ export function GameTrackingScreen(props: GameTrackingScreenProps = {}) {
     // Fixed UI elements heights
     const TAB_BAR_HEIGHT = 50
     const EVENT_HISTORY_HEIGHT = 60
-    const PADDING = 8
+    const PADDING = 2
 
     // Available space for ice surface (no game header now)
     const availableHeight = screenHeight - TAB_BAR_HEIGHT - EVENT_HISTORY_HEIGHT - PADDING * 2
